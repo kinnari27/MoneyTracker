@@ -15,6 +15,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moneytracker.domain.model.Category
@@ -379,5 +380,28 @@ private fun FormCard(content: @Composable ColumnScope.() -> Unit) {
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp), content = content)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AddTransactionScreenPreview() {
+    moneytrackerTheme {
+        AddTransactionScreen(
+            uiState = AddTransactionUiState(
+                amount = "1500",
+                title = "Dinner at Taj",
+                selectedCategory = Category.FOOD,
+                type = TransactionType.EXPENSE
+            ),
+            onTitleChange = {},
+            onAmountChange = {},
+            onCategorySelect = {},
+            onTypeChange = {},
+            onNoteChange = {},
+            onRecurringToggle = {},
+            onSave = {},
+            onSaveSuccess = {}
+        )
     }
 }

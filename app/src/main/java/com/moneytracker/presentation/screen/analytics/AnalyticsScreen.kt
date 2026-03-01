@@ -2,7 +2,6 @@ package com.moneytracker.presentation.screen.analytics
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,14 +15,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.moneytracker.domain.model.Category
 import com.moneytracker.presentation.components.categoryColor
 import com.moneytracker.ui.theme.*
-// Import your R file to access drawables
 import com.moneytracker.R
 
-// 1. Updated: icon is now an Int for R.drawable references
 data class StatItem(
     val iconRes: Int,
     val label: String,
@@ -33,6 +31,19 @@ data class StatItem(
 
 @Composable
 fun AnalyticsScreen(
+    uiState: AnalyticsUiState,
+    onPeriodChange: (AnalyticsPeriod) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AnalyticsScreenContent(
+        uiState = uiState,
+        onPeriodChange = onPeriodChange,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun AnalyticsScreenContent(
     uiState: AnalyticsUiState,
     onPeriodChange: (AnalyticsPeriod) -> Unit,
     modifier: Modifier = Modifier
@@ -102,7 +113,6 @@ fun AnalyticsScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     listOf(
-                        // Updated: Using R.drawable instead of Emojis
                         StatItem(R.drawable.ic_graph1, "Total Spent", "₹${uiState.totalSpent.toInt()}", Error),
                         StatItem(R.drawable.ic_graph2, "Total Saved", "₹${uiState.totalSaved.toInt()}", Success),
                     ).forEach { item ->
@@ -218,7 +228,7 @@ private fun CategoryProgressRow(category: String, amount: Int, percentage: Int) 
                 painter = painterResource(id = Category.iconResFor(category)),
                 contentDescription = category,
                 modifier = Modifier.size(22.dp),
-                tint = Color.Unspecified // Keep original drawable colors
+                tint = Color.Unspecified
             )
         }
 
@@ -263,7 +273,7 @@ private fun CategoryProgressRow(category: String, amount: Int, percentage: Int) 
 
 @Composable
 private fun StatCard(
-    iconRes: Int, // Updated: Takes Int resource ID
+    iconRes: Int,
     label: String,
     value: String,
     color: Color,
@@ -276,7 +286,6 @@ private fun StatCard(
         elevation = CardDefaults.cardElevation(1.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // Updated: Box around the icon for better visual style
             Box(
                 modifier = Modifier
                     .size(32.dp)
@@ -288,7 +297,7 @@ private fun StatCard(
                     painter = painterResource(id = iconRes),
                     contentDescription = label,
                     modifier = Modifier.size(18.dp),
-                    tint = color // Tints the drawable to the card's theme color (Error, Success, etc.)
+                    tint = color
                 )
             }
             Spacer(Modifier.height(12.dp))
@@ -305,5 +314,27 @@ private fun StatCard(
                 fontWeight = FontWeight.SemiBold
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AnalyticsScreenPreview() {
+    moneytrackerTheme {
+        AnalyticsScreenContent(
+            uiState = AnalyticsUiState(
+                isLoading = false,
+                totalSpent = 24500.0,
+                totalSaved = 15000.0,
+                dailyAverage = 800.0,
+                categoryTotals = mapOf(
+                    Category.FOOD to 5000.0,
+                    Category.SHOPPING to 8000.0,
+                    Category.TRANSPORT to 2000.0,
+                    Category.BILLS to 6000.0
+                )
+            ),
+            onPeriodChange = {}
+        )
     }
 }

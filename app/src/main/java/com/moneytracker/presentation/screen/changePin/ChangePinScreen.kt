@@ -20,10 +20,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.moneytracker.presentation.screen.changePin.ChangePinUiState
 import com.moneytracker.presentation.screen.changePin.ChangePinViewModel
 import com.moneytracker.presentation.screen.changePin.PinStep
 import com.moneytracker.ui.theme.*
@@ -40,6 +42,23 @@ fun ChangePinScreen(
         if (uiState.isComplete) onBack()
     }
 
+    ChangePinScreenContent(
+        uiState = uiState,
+        onBack = onBack,
+        onDigit = viewModel::onDigit,
+        onDelete = viewModel::onDelete,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun ChangePinScreenContent(
+    uiState: ChangePinUiState,
+    onBack: () -> Unit,
+    onDigit: (String) -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(modifier = modifier.fillMaxSize()) {
 
         // ── Header ────────────────────────────────────────────────────────────
@@ -174,7 +193,7 @@ fun ChangePinScreen(
                                     modifier = Modifier
                                         .size(72.dp)
                                         .clip(CircleShape)
-                                        .clickable { viewModel.onDelete() },
+                                        .clickable { onDelete() },
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(Icons.Default.Backspace, null, tint = OnSurfaceVariant, modifier = Modifier.size(26.dp))
@@ -184,7 +203,7 @@ fun ChangePinScreen(
                                         .size(72.dp)
                                         .clip(CircleShape)
                                         .background(SurfaceVariant)
-                                        .clickable { viewModel.onDigit(key) },
+                                        .clickable { onDigit(key) },
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
@@ -217,5 +236,21 @@ fun ChangePinScreen(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ChangePinScreenPreview() {
+    moneytrackerTheme {
+        ChangePinScreenContent(
+            uiState = ChangePinUiState(
+                step = PinStep.NEW,
+                newPin = "12"
+            ),
+            onBack = {},
+            onDigit = {},
+            onDelete = {}
+        )
     }
 }

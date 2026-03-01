@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -34,6 +35,19 @@ fun ProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    ProfileScreenContent(
+        uiState = uiState,
+        onNavigate = onNavigate,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun ProfileScreenContent(
+    uiState: ProfileUiState,
+    onNavigate: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     // Map each menu item to its route
     val menuSections = remember {
         listOf(
@@ -287,5 +301,24 @@ fun ProfileScreen(
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ProfileScreenPreview() {
+    moneytrackerTheme {
+        ProfileScreenContent(
+            uiState = ProfileUiState(
+                userName = "Rahul Sharma",
+                userEmail = "rahul.sharma@gmail.com",
+                isPremium = true,
+                totalTransactions = 124,
+                totalCategories = 8,
+                activeMonths = 6,
+                isLoading = false
+            ),
+            onNavigate = {}
+        )
     }
 }

@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,6 +36,31 @@ fun EditProfileScreen(
         if (uiState.isSaved) onBack()
     }
 
+    EditProfileScreenContent(
+        uiState = uiState,
+        onBack = onBack,
+        onNameChange = viewModel::onNameChange,
+        onEmailChange = viewModel::onEmailChange,
+        onPhoneChange = viewModel::onPhoneChange,
+        onOccupationChange = viewModel::onOccupationChange,
+        onIncomeGoalChange = viewModel::onIncomeGoalChange,
+        onSave = viewModel::save,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun EditProfileScreenContent(
+    uiState: EditProfileUiState,
+    onBack: () -> Unit,
+    onNameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPhoneChange: (String) -> Unit,
+    onOccupationChange: (String) -> Unit,
+    onIncomeGoalChange: (String) -> Unit,
+    onSave: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -107,21 +133,21 @@ fun EditProfileScreen(
                 ProfileField(
                     label         = "Full Name",
                     value         = uiState.name,
-                    onValueChange = viewModel::onNameChange,
+                    onValueChange = onNameChange,
                     placeholder   = "Enter your name"
                 )
                 Spacer(Modifier.height(12.dp))
                 ProfileField(
                     label         = "Email",
                     value         = uiState.email,
-                    onValueChange = viewModel::onEmailChange,
+                    onValueChange = onEmailChange,
                     placeholder   = "Enter your email"
                 )
                 Spacer(Modifier.height(12.dp))
                 ProfileField(
                     label         = "Phone",
                     value         = uiState.phone,
-                    onValueChange = viewModel::onPhoneChange,
+                    onValueChange = onPhoneChange,
                     placeholder   = "+91 XXXXX XXXXX"
                 )
             }
@@ -130,14 +156,14 @@ fun EditProfileScreen(
                 ProfileField(
                     label         = "Occupation",
                     value         = uiState.occupation,
-                    onValueChange = viewModel::onOccupationChange,
+                    onValueChange = onOccupationChange,
                     placeholder   = "e.g. Software Engineer"
                 )
                 Spacer(Modifier.height(12.dp))
                 ProfileField(
                     label         = "Monthly Income Goal",
                     value         = uiState.incomeGoal,
-                    onValueChange = viewModel::onIncomeGoalChange,
+                    onValueChange = onIncomeGoalChange,
                     placeholder   = "₹ 0"
                 )
             }
@@ -154,7 +180,7 @@ fun EditProfileScreen(
 
             // Save
             Button(
-                onClick  = viewModel::save,
+                onClick  = onSave,
                 enabled  = !uiState.isLoading,
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape    = RoundedCornerShape(18.dp),
@@ -218,6 +244,23 @@ private fun ProfileField(
                 focusedBorderColor   = Primary,
                 focusedLabelColor    = Primary
             )
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun EditProfileScreenPreview() {
+    moneytrackerTheme {
+        EditProfileScreenContent(
+            uiState = EditProfileUiState(),
+            onBack = {},
+            onNameChange = {},
+            onEmailChange = {},
+            onPhoneChange = {},
+            onOccupationChange = {},
+            onIncomeGoalChange = {},
+            onSave = {}
         )
     }
 }

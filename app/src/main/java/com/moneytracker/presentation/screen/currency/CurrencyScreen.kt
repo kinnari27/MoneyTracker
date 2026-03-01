@@ -19,10 +19,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.moneytracker.presentation.screen.currency.CurrencyItem
+import com.moneytracker.presentation.screen.currency.CurrencyUiState
 import com.moneytracker.presentation.screen.currency.CurrencyViewModel
 import com.moneytracker.ui.theme.*
 
@@ -34,6 +37,23 @@ fun CurrencyScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    CurrencyScreenContent(
+        uiState = uiState,
+        onBack = onBack,
+        onSearchChange = viewModel::onSearchChange,
+        onCurrencySelect = viewModel::onCurrencySelect,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun CurrencyScreenContent(
+    uiState: CurrencyUiState,
+    onBack: () -> Unit,
+    onSearchChange: (String) -> Unit,
+    onCurrencySelect: (CurrencyItem) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(modifier = modifier.fillMaxSize()) {
 
         // ── Header ────────────────────────────────────────────────────────────
@@ -56,7 +76,7 @@ fun CurrencyScreen(
                 // Search
                 OutlinedTextField(
                     value         = uiState.searchQuery,
-                    onValueChange = viewModel::onSearchChange,
+                    onValueChange = onSearchChange,
                     placeholder   = { Text("Search currency…", color = Color.White.copy(0.5f)) },
                     leadingIcon   = { Icon(Icons.Default.Search, null, tint = Color.White.copy(0.7f)) },
                     singleLine    = true,
@@ -118,7 +138,7 @@ fun CurrencyScreen(
                     shape     = RoundedCornerShape(16.dp),
                     colors    = CardDefaults.cardColors(containerColor = if (isSelected) Primary.copy(0.06f) else Surface),
                     elevation = CardDefaults.cardElevation(if (isSelected) 0.dp else 1.dp),
-                    onClick   = { viewModel.onCurrencySelect(currency) }
+                    onClick   = { onCurrencySelect(currency) }
                 ) {
                     Row(
                         modifier              = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
@@ -139,5 +159,18 @@ fun CurrencyScreen(
             }
             item { Spacer(Modifier.height(24.dp)) }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CurrencyScreenPreview() {
+    moneytrackerTheme {
+        CurrencyScreenContent(
+            uiState = CurrencyUiState(),
+            onBack = {},
+            onSearchChange = {},
+            onCurrencySelect = {}
+        )
     }
 }

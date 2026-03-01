@@ -15,11 +15,15 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.moneytracker.domain.model.Category
+import com.moneytracker.domain.model.Transaction
+import com.moneytracker.domain.model.TransactionType
 import com.moneytracker.presentation.components.*
 import com.moneytracker.ui.theme.*
+import java.util.Date
 
 @Composable
 fun HomeScreen(
@@ -42,7 +46,10 @@ fun HomeScreen(
                             colors = listOf(PrimaryDark, Primary, PrimaryLight)
                         )
                     )
-                    .padding(top = 52.dp, start = 20.dp, end = 20.dp, bottom = 80.dp)
+                    // Added statusBarsPadding to let background flow behind status bar
+                    // and content start below it.
+                    .statusBarsPadding()
+                    .padding(top = 24.dp, start = 20.dp, end = 20.dp, bottom = 80.dp)
             ) {
                 Column {
                     // Greeting
@@ -208,7 +215,7 @@ private fun BalanceTile(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        prefix +"99999",
+                        prefix,
                         color = Color.White,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
@@ -228,5 +235,48 @@ private fun BalanceTile(
                 color = Color.White
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenPreview() {
+    moneytrackerTheme {
+        HomeScreen(
+            uiState = HomeUiState(
+                isLoading = false,
+                totalBalance = 24500.0,
+                totalIncome = 45000.0,
+                totalExpense = 20500.0,
+                recentTransactions = listOf(
+                    Transaction(
+                        id = 1,
+                        title = "Groceries",
+                        amount = 1200.0,
+                        category = Category.FOOD,
+                        type = TransactionType.EXPENSE,
+                        date = Date()
+                    ),
+                    Transaction(
+                        id = 2,
+                        title = "Salary",
+                        amount = 45000.0,
+                        category = Category.OTHER,
+                        type = TransactionType.INCOME,
+                        date = Date()
+                    ),
+                    Transaction(
+                        id = 3,
+                        title = "Netflix Subscription",
+                        amount = 499.0,
+                        category = Category.ENTERTAINMENT,
+                        type = TransactionType.EXPENSE,
+                        date = Date()
+                    )
+                )
+            ),
+            onAddClick = {},
+            onSeeAllClick = {}
+        )
     }
 }

@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,6 +36,25 @@ fun BiometricLockScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    BiometricLockScreenContent(
+        uiState = uiState,
+        onBack = onBack,
+        onBiometricToggle = viewModel::onBiometricToggle,
+        onFaceIdToggle = viewModel::onFaceIdToggle,
+        onAutoLockSelect = viewModel::onAutoLockSelect,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun BiometricLockScreenContent(
+    uiState: BiometricLockUiState,
+    onBack: () -> Unit,
+    onBiometricToggle: () -> Unit,
+    onFaceIdToggle: () -> Unit,
+    onAutoLockSelect: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
     // Pulse animation for fingerprint icon
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulseScale by infiniteTransition.animateFloat(
@@ -145,7 +165,7 @@ fun BiometricLockScreen(
                     }
                     Switch(
                         checked         = uiState.biometricEnabled,
-                        onCheckedChange = { viewModel.onBiometricToggle() },
+                        onCheckedChange = { onBiometricToggle() },
                         colors          = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = Primary)
                     )
                 }
@@ -183,7 +203,7 @@ fun BiometricLockScreen(
                     }
                     Switch(
                         checked         = uiState.faceIdEnabled,
-                        onCheckedChange = { viewModel.onFaceIdToggle() },
+                        onCheckedChange = { onFaceIdToggle() },
                         colors          = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = Secondary)
                     )
                 }
@@ -210,7 +230,7 @@ fun BiometricLockScreen(
                             Row(
                                 modifier              = Modifier
                                     .fillMaxWidth()
-                                    .clickable(onClick = { viewModel.onAutoLockSelect(idx) })
+                                    .clickable(onClick = { onAutoLockSelect(idx) })
                                     .padding(horizontal = 20.dp, vertical = 14.dp),
                                 verticalAlignment     = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
@@ -254,5 +274,23 @@ fun BiometricLockScreen(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BiometricLockScreenPreview() {
+    moneytrackerTheme {
+        BiometricLockScreenContent(
+            uiState = BiometricLockUiState(
+                biometricEnabled = true,
+                faceIdEnabled = false,
+                autoLockOption = 1
+            ),
+            onBack = {},
+            onBiometricToggle = {},
+            onFaceIdToggle = {},
+            onAutoLockSelect = {}
+        )
     }
 }

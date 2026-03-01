@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -30,6 +31,21 @@ fun NotificationsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    NotificationsScreenContent(
+        uiState = uiState,
+        onBack = onBack,
+        onToggle = {},
+        modifier = modifier
+    )
+}
+
+@Composable
+fun NotificationsScreenContent(
+    uiState: NotificationsUiState,
+    onBack: () -> Unit,
+    onToggle: (String, Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 40.dp)
@@ -113,7 +129,7 @@ fun NotificationsScreen(
                     }
                     Switch(
                         checked = uiState.allNotifications,
-                        onCheckedChange = viewModel::onAllNotificationsToggle,
+                        onCheckedChange = { onToggle("all", it) },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = Color.White,
                             checkedTrackColor = Primary
@@ -130,41 +146,41 @@ fun NotificationsScreen(
                     "Budget Limit Alert",
                     "Warn when you near budget limit",
                     uiState.budgetAlert
-                ) to viewModel::onBudgetAlertToggle,
+                ) to "budget",
                 Triple(
                     "Large Transaction",
                     "Alert for transactions over ₹1000",
                     uiState.largeTransaction
-                ) to viewModel::onLargeTransactionToggle,
+                ) to "large",
                 Triple(
                     "Daily Spending Summary",
                     "Get a summary every evening",
                     uiState.dailySummary
-                ) to viewModel::onDailySummaryToggle,
+                ) to "daily",
             ),
             "Reminders" to listOf(
                 Triple(
                     "Bill Payment Reminder",
                     "Remind before due date",
                     uiState.billReminder
-                ) to viewModel::onBillReminderToggle,
+                ) to "bill",
                 Triple(
                     "Monthly Report",
                     "Summary on 1st of every month",
                     uiState.monthlyReport
-                ) to viewModel::onMonthlyReportToggle,
+                ) to "monthly",
             ),
             "App" to listOf(
                 Triple(
                     "Tips & Insights",
                     "Smart money-saving tips",
                     uiState.tips
-                ) to viewModel::onTipsToggle,
+                ) to "tips",
                 Triple(
                     "App Updates",
                     "New features and improvements",
                     uiState.appUpdates
-                ) to viewModel::onAppUpdatesToggle,
+                ) to "updates",
             )
         )
 
@@ -184,7 +200,7 @@ fun NotificationsScreen(
                         colors = CardDefaults.cardColors(containerColor = Surface),
                         elevation = CardDefaults.cardElevation(1.dp)
                     ) {
-                        items.forEachIndexed { idx, (triple, toggle) ->
+                        items.forEachIndexed { idx, (triple, key) ->
                             val (title, subtitle, isOn) = triple
                             val enabled = uiState.allNotifications
                             Row(
@@ -209,7 +225,7 @@ fun NotificationsScreen(
                                 }
                                 Switch(
                                     checked = isOn && enabled,
-                                    onCheckedChange = { if (enabled) toggle(it) },
+                                    onCheckedChange = { if (enabled) onToggle(key, it) },
                                     enabled = enabled,
                                     colors = SwitchDefaults.colors(
                                         checkedThumbColor = Color.White,
@@ -229,5 +245,22 @@ fun NotificationsScreen(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun NotificationsScreenPreview() {
+    moneytrackerTheme {
+        NotificationsScreenContent(
+            uiState = NotificationsUiState(
+                allNotifications = true,
+                budgetAlert = true,
+                largeTransaction = false,
+                dailySummary = true
+            ),
+            onBack = {},
+            onToggle = { _, _ -> }
+        )
     }
 }

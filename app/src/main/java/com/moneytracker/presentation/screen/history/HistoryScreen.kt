@@ -1,4 +1,5 @@
 package com.moneytracker.presentation.screen.history
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,12 +17,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.moneytracker.domain.model.Category
 import com.moneytracker.domain.model.Transaction
+import com.moneytracker.domain.model.TransactionType
 import com.moneytracker.presentation.components.TransactionCard
 import com.moneytracker.ui.theme.*
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 @Composable
@@ -147,7 +152,7 @@ fun HistoryScreen(
                     ) {
                         Text(date, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = OnSurfaceVariant)
                         Surface(shape = RoundedCornerShape(99.dp), color = SurfaceVariant) {
-                            val dayNet = transactions.sumOf { if (it.type.name == "INCOME") it.amount else -it.amount }
+                            val dayNet = transactions.sumOf { if (it.type == TransactionType.INCOME) it.amount else -it.amount }
                             Text(
                                 text     = "${if (dayNet >= 0) "+" else ""}₹${Math.abs(dayNet).toInt()}",
                                 style    = MaterialTheme.typography.labelSmall,
@@ -165,5 +170,27 @@ fun HistoryScreen(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HistoryScreenPreview() {
+    moneytrackerTheme {
+        HistoryScreen(
+            uiState = HistoryUiState(
+                isLoading = false,
+                totalIncome = 5000.0,
+                totalExpense = 2000.0,
+                filteredTransactions = listOf(
+                    Transaction(id = 1, title = "Lunch", amount = 500.0, category = Category.FOOD, type = TransactionType.EXPENSE, date = Date()),
+                    Transaction(id = 2, title = "Freelance", amount = 5000.0, category = Category.OTHER, type = TransactionType.INCOME, date = Date()),
+                    Transaction(id = 3, title = "Uber", amount = 300.0, category = Category.TRANSPORT, type = TransactionType.EXPENSE, date = Date())
+                )
+            ),
+            onFilterChange = {},
+            onSearchChange = {},
+            onDeleteTransaction = {}
+        )
     }
 }
