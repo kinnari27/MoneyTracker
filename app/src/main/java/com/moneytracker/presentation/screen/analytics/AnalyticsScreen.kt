@@ -1,11 +1,27 @@
 package com.moneytracker.presentation.screen.analytics
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,16 +33,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.moneytracker.R
 import com.moneytracker.domain.model.Category
 import com.moneytracker.presentation.components.categoryColor
-import com.moneytracker.ui.theme.*
-import com.moneytracker.R
+import com.moneytracker.ui.theme.OnSurface
+import com.moneytracker.ui.theme.OnSurfaceVariant
+import com.moneytracker.ui.theme.Primary
+import com.moneytracker.ui.theme.PrimaryDark
+import com.moneytracker.ui.theme.Surface
+import com.moneytracker.ui.theme.SurfaceVariant
+import com.moneytracker.ui.theme.moneytrackerTheme
 
 data class StatItem(
     val iconRes: Int,
     val label: String,
-    val value: String,
-    val color: Color
+    val value: String
 )
 
 @Composable
@@ -113,14 +134,21 @@ fun AnalyticsScreenContent(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     listOf(
-                        StatItem(R.drawable.ic_graph1, "Total Spent", "₹${uiState.totalSpent.toInt()}", Error),
-                        StatItem(R.drawable.ic_graph2, "Total Saved", "₹${uiState.totalSaved.toInt()}", Success),
+                        StatItem(
+                            R.drawable.ic_graph1,
+                            "Total Spent",
+                            "₹${uiState.totalSpent.toInt()}"
+                        ),
+                        StatItem(
+                            R.drawable.ic_graph2,
+                            "Total Saved",
+                            "₹${uiState.totalSaved.toInt()}"
+                        ),
                     ).forEach { item ->
                         StatCard(
                             iconRes = item.iconRes,
                             label = item.label,
                             value = item.value,
-                            color = item.color,
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -132,19 +160,21 @@ fun AnalyticsScreenContent(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     listOf(
-                        StatItem(R.drawable.ic_graph3, "Daily Average", "₹${uiState.dailyAverage.toInt()}", Primary),
+                        StatItem(
+                            R.drawable.ic_graph3,
+                            "Daily Average",
+                            "₹${uiState.dailyAverage.toInt()}"
+                        ),
                         StatItem(
                             R.drawable.ic_shopping,
                             "Largest",
-                            "₹${uiState.largestExpense?.amount?.toInt() ?: 0}",
-                            Warning
+                            "₹${uiState.largestExpense?.amount?.toInt() ?: 0}"
                         ),
                     ).forEach { item ->
                         StatCard(
                             iconRes = item.iconRes,
                             label = item.label,
                             value = item.value,
-                            color = item.color,
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -224,11 +254,10 @@ private fun CategoryProgressRow(category: String, amount: Int, percentage: Int) 
                 .background(categoryColor(category).copy(0.1f)),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
+            Image(
                 painter = painterResource(id = Category.iconResFor(category)),
                 contentDescription = category,
                 modifier = Modifier.size(22.dp),
-                tint = Color.Unspecified
             )
         }
 
@@ -276,7 +305,6 @@ private fun StatCard(
     iconRes: Int,
     label: String,
     value: String,
-    color: Color,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -290,14 +318,13 @@ private fun StatCard(
                 modifier = Modifier
                     .size(32.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(color.copy(alpha = 0.1f)),
+                    .background(SurfaceVariant.copy(alpha = 0.5f)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
+                Image(
                     painter = painterResource(id = iconRes),
                     contentDescription = label,
-                    modifier = Modifier.size(18.dp),
-                    tint = color
+                    modifier = Modifier.size(18.dp)
                 )
             }
             Spacer(Modifier.height(12.dp))
@@ -305,7 +332,7 @@ private fun StatCard(
                 text = value,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.ExtraBold,
-                color = color
+                color = OnSurface
             )
             Text(
                 text = label,

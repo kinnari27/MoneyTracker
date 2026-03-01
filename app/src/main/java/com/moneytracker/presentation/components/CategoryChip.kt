@@ -1,5 +1,6 @@
 package com.moneytracker.presentation.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.moneytracker.domain.model.Category
 import com.moneytracker.ui.theme.*
 
@@ -50,11 +50,10 @@ fun CategoryChip(
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             if (showIcon) {
-                Icon(
+                Image(
                     painter = painterResource(id = Category.iconResFor(category)),
                     contentDescription = category,
                     modifier = Modifier.size(18.dp),
-                    tint = if (isSelected) categoryColor(category) else OnSurfaceVariant
                 )
             }
             if (showLabel) {
@@ -114,11 +113,10 @@ fun CategoryChipGrid(
                                     .background(color.copy(alpha = 0.15f)),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Icon(
+                                Image(
                                     painter = painterResource(id = Category.iconResFor(category)),
                                     contentDescription = category,
                                     modifier = Modifier.size(22.dp),
-                                    tint = color
                                 )
                             }
                             Text(
