@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.moneytracker.data.local.AppDatabase
 import com.moneytracker.data.local.dao.BudgetDao
 import com.moneytracker.data.local.dao.TransactionDao
+import com.moneytracker.data.local.dao.UserDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,4 +35,8 @@ object DatabaseModule {
     @Provides
     fun provideBudgetDao(db: AppDatabase): BudgetDao =
         db.budgetDao()
+
+    @Provides
+    fun provideUserDao(db: AppDatabase): UserDao =
+        db.userDao()
 }

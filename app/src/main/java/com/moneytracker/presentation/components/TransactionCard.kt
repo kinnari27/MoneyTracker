@@ -2,34 +2,49 @@ package com.moneytracker.presentation.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.moneytracker.domain.model.Category
 import com.moneytracker.domain.model.Transaction
 import com.moneytracker.domain.model.TransactionType
-import com.moneytracker.domain.model.Category
-import com.moneytracker.ui.theme.*
+import com.moneytracker.ui.theme.Error
+import com.moneytracker.ui.theme.OnSurface
+import com.moneytracker.ui.theme.OnSurfaceVariant
+import com.moneytracker.ui.theme.Success
+import com.moneytracker.ui.theme.Surface
 
 @Composable
 fun TransactionCard(
     transaction: Transaction,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
     val categoryColor = categoryColor(transaction.category)
 
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        // Use Surface from your Theme for better M3 support
         colors = CardDefaults.cardColors(containerColor = Surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.5.dp)
     ) {
@@ -43,7 +58,7 @@ fun TransactionCard(
             // Icon Container
             Box(
                 modifier = Modifier
-                    .size(44.dp) // Increased slightly for better visual balance
+                    .size(44.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .background(categoryColor.copy(alpha = 0.12f)),
                 contentAlignment = Alignment.Center
@@ -59,11 +74,11 @@ fun TransactionCard(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = transaction.title,
-                    style = MaterialTheme.typography.titleMedium, // Better hierarchy than bodyMedium
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = OnSurface,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis // Prevents text overlap on small screens
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = transaction.category,
@@ -87,7 +102,6 @@ fun TransactionCard(
 // ── Helpers ───────────────────────────────────────────────────────────────────
 fun formatAmount(transaction: Transaction): String {
     val prefix = if (transaction.type == TransactionType.INCOME) "+" else "-"
-    // Cleanly formats the decimal if present (e.g., 50.0 -> 50)
     val amountText = if (transaction.amount % 1.0 == 0.0) {
         transaction.amount.toInt().toString()
     } else {

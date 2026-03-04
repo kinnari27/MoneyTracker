@@ -1,7 +1,9 @@
 package com.moneytracker.domain.repository
 
-class UserRepository {
-    val observeCurrentUser: Any
+import com.moneytracker.domain.model.User
+import kotlinx.coroutines.flow.Flow
 
-    fun updateBiometric(userId: Int, enabled: Boolean) {}
+interface UserRepository {
+    val observeCurrentUser: Flow<User?>
+    suspend fun updateBiometric(userId: Int, enabled: Boolean)
 }

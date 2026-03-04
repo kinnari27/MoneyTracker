@@ -55,6 +55,7 @@ fun HistoryScreen(
     onFilterChange: (TransactionFilter) -> Unit,
     onSearchChange: (String) -> Unit,
     onDeleteTransaction: (Transaction) -> Unit,
+    onEditTransaction: (Transaction) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val grouped = uiState.filteredTransactions.groupBy { transaction ->
@@ -195,6 +196,7 @@ fun HistoryScreen(
                 items(transactions) { transaction ->
                     TransactionCard(
                         transaction = transaction,
+                        onClick = { onEditTransaction(transaction) },
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
                             .padding(bottom = 8.dp)
@@ -222,7 +224,8 @@ fun HistoryScreenPreview() {
             ),
             onFilterChange = {},
             onSearchChange = {},
-            onDeleteTransaction = {}
+            onDeleteTransaction = {},
+            onEditTransaction = {}
         )
     }
 }

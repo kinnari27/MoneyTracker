@@ -17,13 +17,14 @@ import com.moneytracker.presentation.screen.analytics.AnalyticsScreen
 import com.moneytracker.presentation.screen.analytics.AnalyticsViewModel
 import com.moneytracker.presentation.screen.auth.LoginScreen
 import com.moneytracker.presentation.screen.auth.RegisterScreen
+import com.moneytracker.presentation.screen.biometricLock.BiometricLockScreen
 import com.moneytracker.presentation.screen.edit.EditTransactionScreen
 import com.moneytracker.presentation.screen.history.HistoryScreen
 import com.moneytracker.presentation.screen.history.HistoryViewModel
 import com.moneytracker.presentation.screen.home.HomeScreen
 import com.moneytracker.presentation.screen.home.HomeViewModel
+import com.moneytracker.presentation.screen.notifications.NotificationsScreen
 import com.moneytracker.presentation.screen.profile.ProfileScreen
-import com.moneytracker.presentation.screen.security.BiometricLockScreen
 import com.moneytracker.presentation.screen.security.ChangePinScreen
 import com.moneytracker.presentation.screen.splash.SplashScreen
 

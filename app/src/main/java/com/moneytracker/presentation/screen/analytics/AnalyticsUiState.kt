@@ -14,11 +14,11 @@ data class AnalyticsUiState(
     // Income
     val totalIncome: Double = 0.0,
     val netSavings: Double = 0.0,
-    // Investment  ← NEW
+    // Investment
     val totalInvested: Double = 0.0,
     val investmentBreakdown: Map<String, Double> = emptyMap(),
     // Meta
     val period: AnalyticsPeriod = AnalyticsPeriod.MONTHLY,
     val error: String? = null,
-    val totalSaved: Double
+    val totalSaved: Double = 0.0
 )

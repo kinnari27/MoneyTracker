@@ -30,6 +30,7 @@ fun HomeScreen(
     uiState: HomeUiState,
     onAddClick: () -> Unit,
     onSeeAllClick: () -> Unit,
+    onTransactionClick: (Transaction) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -46,8 +47,6 @@ fun HomeScreen(
                             colors = listOf(PrimaryDark, Primary, PrimaryLight)
                         )
                     )
-                    // Added statusBarsPadding to let background flow behind status bar
-                    // and content start below it.
                     .statusBarsPadding()
                     .padding(top = 24.dp, start = 20.dp, end = 20.dp, bottom = 80.dp)
             ) {
@@ -178,6 +177,7 @@ fun HomeScreen(
             items(uiState.recentTransactions) { transaction ->
                 TransactionCard(
                     transaction = transaction,
+                    onClick = { onTransactionClick(transaction) },
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .padding(bottom = 8.dp)
@@ -276,7 +276,8 @@ fun HomeScreenPreview() {
                 )
             ),
             onAddClick = {},
-            onSeeAllClick = {}
+            onSeeAllClick = {},
+            onTransactionClick = {}
         )
     }
 }

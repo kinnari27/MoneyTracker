@@ -29,9 +29,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             moneytrackerTheme {
-                val navController    = rememberNavController()
-                val currentEntry     by navController.currentBackStackEntryAsState()
-                val currentRoute     = currentEntry?.destination?.route
+                val navController = rememberNavController()
+                val currentEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = currentEntry?.destination?.route
 
                  val hideBottomBarRoutes = setOf<String>(
                     Routes.SPLASH,

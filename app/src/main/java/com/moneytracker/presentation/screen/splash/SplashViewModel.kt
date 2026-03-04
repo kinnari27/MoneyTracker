@@ -18,14 +18,11 @@ class SplashViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(SplashUiState())
     val uiState: StateFlow<SplashUiState> = _uiState.asStateFlow()
-
-    // Kept for backward compatibility with SplashScreen LaunchedEffect
     private val _destination = MutableStateFlow<SplashDestination>(SplashDestination.Loading)
     val destination: StateFlow<SplashDestination> = _destination.asStateFlow()
-
     init {
         viewModelScope.launch {
-            delay(2000L)  // show splash for 2 s
+            delay(2000L)
             val dest = if (hasAccount()) SplashDestination.Login else SplashDestination.Register
             _destination.value = dest
             _uiState.value = SplashUiState(destination = dest, isReady = true)

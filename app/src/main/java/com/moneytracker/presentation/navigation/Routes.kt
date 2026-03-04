@@ -5,12 +5,8 @@ object Routes {
     const val SPLASH   = "splash"
     const val LOGIN    = "login"
     const val REGISTER = "register"
-
-    // Transaction edit — parametrised
     const val EDIT_TRANSACTION = "edit_transaction/{transactionId}"
     fun editTransaction(id: Int) = "edit_transaction/$id"
-
-    // Settings
     const val EDIT_PROFILE   = "edit_profile"
     const val NOTIFICATIONS  = "notifications"
     const val CURRENCY       = "currency"

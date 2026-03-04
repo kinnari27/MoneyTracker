@@ -1,4 +1,10 @@
 package com.moneytracker.domain.usecase.auth
 
-class LoginUserUseCase {
+import javax.inject.Inject
+
+class LoginUserUseCase @Inject constructor() {
+    suspend operator fun invoke(email: String, password: String): Result<Unit> {
+
+        return Result.success(Unit)
+    }
 }
