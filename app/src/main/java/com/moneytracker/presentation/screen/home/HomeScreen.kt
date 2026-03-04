@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,6 +24,7 @@ import com.moneytracker.domain.model.Transaction
 import com.moneytracker.domain.model.TransactionType
 import com.moneytracker.presentation.components.*
 import com.moneytracker.ui.theme.*
+import java.util.Calendar
 import java.util.Date
 
 @Composable
@@ -33,6 +35,9 @@ fun HomeScreen(
     onTransactionClick: (Transaction) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val greeting = remember { getGreeting() }
+    val userName = uiState.user?.name ?: "User"
+
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 16.dp)
@@ -59,12 +64,12 @@ fun HomeScreen(
                     ) {
                         Column {
                             Text(
-                                "Good Morning 👋",
+                                "$greeting 👋",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = Color.White.copy(alpha = 0.7f)
                             )
                             Text(
-                                "Rahul Sharma",
+                                userName,
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = Color.White
@@ -78,7 +83,7 @@ fun HomeScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                "R",
+                                userName.take(1).uppercase(),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
@@ -184,6 +189,15 @@ fun HomeScreen(
                 )
             }
         }
+    }
+}
+
+private fun getGreeting(): String {
+    return when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
+        in 0..11 -> "Good Morning"
+        in 12..15 -> "Good Afternoon"
+        in 16..20 -> "Good Evening"
+        else -> "Good Night"
     }
 }
 

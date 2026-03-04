@@ -23,19 +23,9 @@ class SplashViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             delay(2000L)
-            val dest = if (hasAccount()) SplashDestination.Login else SplashDestination.Register
+            val dest = if (hasAccount()) SplashDestination.Home else SplashDestination.Register
             _destination.value = dest
             _uiState.value = SplashUiState(destination = dest, isReady = true)
         }
     }
 }
-
-
-
-
-
-
-
-
-
-

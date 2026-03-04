@@ -1,14 +1,29 @@
 package com.moneytracker.domain.usecase.auth
 
+import com.moneytracker.domain.model.User
+import com.moneytracker.domain.repository.UserRepository
 import javax.inject.Inject
 
-class RegisterUserUseCase @Inject constructor() {
+class RegisterUserUseCase @Inject constructor(
+    private val userRepository: UserRepository
+) {
     suspend operator fun invoke(
         name: String,
         email: String,
         password: String,
         phone: String
     ): Result<Unit> {
-        return Result.success(Unit)
+        return try {
+            val user = User(
+                name = name,
+                email = email,
+                phone = phone,
+                biometricEnabled = false
+            )
+            userRepository.insertUser(user)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }
