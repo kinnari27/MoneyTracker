@@ -11,13 +11,17 @@ class RegisterUserUseCase @Inject constructor(
         name: String,
         email: String,
         password: String,
-        phone: String
+        phone: String,
+        occupation: String,
+        incomeGoal: String
     ): Result<Unit> {
         return try {
             val user = User(
                 name = name,
                 email = email,
                 phone = phone,
+                occupation = occupation,
+                incomeGoal = incomeGoal,
                 biometricEnabled = false
             )
             userRepository.insertUser(user)

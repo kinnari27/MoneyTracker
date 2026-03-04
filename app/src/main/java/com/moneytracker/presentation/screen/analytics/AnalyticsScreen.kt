@@ -2,13 +2,36 @@ package com.moneytracker.presentation.screen.analytics
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,7 +45,12 @@ import com.moneytracker.R
 import com.moneytracker.domain.model.Category
 import com.moneytracker.domain.model.InvestmentCategory
 import com.moneytracker.presentation.components.categoryColor
-import com.moneytracker.ui.theme.*
+import com.moneytracker.ui.theme.AppTheme
+import com.moneytracker.ui.theme.Error
+import com.moneytracker.ui.theme.MoneyTrackerTheme
+import com.moneytracker.ui.theme.PrimaryDark
+import com.moneytracker.ui.theme.Success
+import com.moneytracker.ui.theme.Warning
 
 // Investment category colour — amber/gold tone
 private fun investmentColor(category: String): Color = Warning
@@ -34,7 +62,7 @@ fun AnalyticsScreen(
     modifier: Modifier = Modifier
 ) {
     val cs = MaterialTheme.colorScheme
-    val colors = AppTheme.colors
+    AppTheme.colors
 
     LazyColumn(
         modifier = modifier
@@ -301,7 +329,7 @@ private fun MoneyFlowCard(uiState: AnalyticsUiState) {
 
 @Composable
 private fun RowScope.FlowLegendItem(label: String, pct: String, color: Color) {
-    val cs = MaterialTheme.colorScheme
+    MaterialTheme.colorScheme
     val colors = AppTheme.colors
     Row(
         modifier = Modifier.weight(1f),
@@ -414,11 +442,10 @@ private fun CategoryBreakdownCard(
                             .background(barColor(cat).copy(alpha = 0.12f)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
+                        Image(
                             painter = painterResource(iconRes(cat)),
                             contentDescription = cat,
                             modifier = Modifier.size(22.dp),
-                            tint = barColor(cat)
                         )
                     }
                     Column(modifier = Modifier.weight(1f)) {
@@ -561,11 +588,10 @@ private fun StatCard(
                     .background(color.copy(alpha = 0.12f)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
+                Image(
                     painter = painterResource(iconRes),
                     contentDescription = label,
                     modifier = Modifier.size(24.dp),
-                    tint = color
                 )
             }
             Text(

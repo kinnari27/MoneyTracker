@@ -66,34 +66,33 @@ fun EditProfileScreen(
     }
 
     EditProfileScreenContent(
-        uiState            = uiState,
-        onBack             = onBack,
-        onNameChange       = viewModel::onNameChange,
-        onEmailChange      = viewModel::onEmailChange,
-        onPhoneChange      = viewModel::onPhoneChange,
+        uiState = uiState,
+        onBack = onBack,
+        onNameChange = viewModel::onNameChange,
+        onEmailChange = viewModel::onEmailChange,
+        onPhoneChange = viewModel::onPhoneChange,
         onOccupationChange = viewModel::onOccupationChange,
         onIncomeGoalChange = viewModel::onIncomeGoalChange,
-        onSave             = viewModel::save,
-        modifier           = modifier
+        onSave = viewModel::save,
+        modifier = modifier
     )
 }
 
 @Composable
 fun EditProfileScreenContent(
-    uiState            : EditProfileUiState,
-    onBack             : () -> Unit,
-    onNameChange       : (String) -> Unit,
-    onEmailChange      : (String) -> Unit,
-    onPhoneChange      : (String) -> Unit,
+    uiState: EditProfileUiState,
+    onBack: () -> Unit,
+    onNameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPhoneChange: (String) -> Unit,
     onOccupationChange : (String) -> Unit,
     onIncomeGoalChange : (String) -> Unit,
-    onSave             : () -> Unit,
-    modifier           : Modifier = Modifier
+    onSave: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     // ── Theme-aware color tokens ──────────────────────────────────────────────
-    // Always read from MaterialTheme / AppTheme — never hardcode light values.
-    val cs     = MaterialTheme.colorScheme          // M3 scheme (flips light ↔ dark)
-    val colors = AppTheme.colors                    // our extended semantic tokens
+    val cs = MaterialTheme.colorScheme
+    val colors = AppTheme.colors
 
     Column(
         modifier = modifier
@@ -115,14 +114,14 @@ fun EditProfileScreenContent(
                 modifier = Modifier.padding(start = 8.dp, top = 4.dp)
             ) {
                 Icon(
-                    imageVector        = Icons.Default.ArrowBackIosNew,
+                    imageVector = Icons.Default.ArrowBackIosNew,
                     contentDescription = "Back",
-                    tint               = Color.White
+                    tint = Color.White
                 )
             }
 
             Column(
-                modifier            = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(Modifier.height(8.dp))
@@ -138,10 +137,10 @@ fun EditProfileScreenContent(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text       = uiState.name.take(1).ifEmpty { "?" },
-                            fontSize   = 40.sp,
+                            text = uiState.name.take(1).ifEmpty { "?" },
+                            fontSize = 40.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color      = Color.White
+                            color = Color.White
                         )
                     }
                     Box(
@@ -155,8 +154,8 @@ fun EditProfileScreenContent(
                         Icon(
                             imageVector = Icons.Default.CameraAlt,
                             contentDescription = null,
-                            tint        = Color.White,
-                            modifier    = Modifier.size(16.dp)
+                            tint = Color.White,
+                            modifier = Modifier.size(16.dp)
                         )
                     }
                 }
@@ -164,9 +163,9 @@ fun EditProfileScreenContent(
                 Spacer(Modifier.height(12.dp))
                 Text(
                     "Edit Profile",
-                    style      = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.ExtraBold,
-                    color      = Color.White
+                    color = Color.White
                 )
                 Text(
                     "Update your personal info",
@@ -178,22 +177,47 @@ fun EditProfileScreenContent(
 
         // ── Form body ─────────────────────────────────────────────────────────
         Column(
-            modifier            = Modifier.padding(20.dp),
+            modifier = Modifier.padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
             ProfileFormCard(title = "Personal Info") {
-                ProfileField("Full Name",  uiState.name,       onNameChange,       "Rahul Sharma")
+                ProfileField(
+                    "Full Name",
+                    uiState.name,
+                    onNameChange,
+                    "Rahul Sharma"
+                )
                 Spacer(Modifier.height(12.dp))
-                ProfileField("Email",      uiState.email,      onEmailChange,      "rahul@gmail.com")
+                ProfileField(
+                    "Email",
+                    uiState.email,
+                    onEmailChange,
+                    "rahul@gmail.com"
+                )
                 Spacer(Modifier.height(12.dp))
-                ProfileField("Phone",      uiState.phone,      onPhoneChange,      "+91 XXXXX XXXXX")
+                ProfileField(
+                    "Phone",
+                    uiState.phone,
+                    onPhoneChange,
+                    "+91 XXXXX XXXXX"
+                )
             }
 
             ProfileFormCard(title = "About") {
-                ProfileField("Occupation",          uiState.occupation, onOccupationChange, "e.g. Software Engineer")
+                ProfileField(
+                    "Occupation",
+                    uiState.occupation,
+                    onOccupationChange,
+                    "e.g. Software Engineer"
+                )
                 Spacer(Modifier.height(12.dp))
-                ProfileField("Monthly Income Goal", uiState.incomeGoal, onIncomeGoalChange, "₹ 0")
+                ProfileField(
+                    "Monthly Income Goal",
+                    uiState.incomeGoal,
+                    onIncomeGoalChange,
+                    "₹ 0"
+                )
             }
 
             // Error banner
@@ -223,8 +247,8 @@ fun EditProfileScreenContent(
                     .height(56.dp),
                 shape  = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = cs.primary,          // #1565C0 light / #60A5FA dark
-                    contentColor   = cs.onPrimary         // always white
+                    containerColor = cs.primary,
+                    contentColor = cs.onPrimary
                 )
             ) {
                 if (uiState.isLoading) {
@@ -234,11 +258,15 @@ fun EditProfileScreenContent(
                         strokeWidth = 2.dp
                     )
                 } else {
-                    Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                    Icon(
+                        Icons.Default.Check,
+                        null,
+                        modifier = Modifier.size(18.dp)
+                    )
                     Spacer(Modifier.width(8.dp))
                     Text(
                         "Save Changes",
-                        style      = MaterialTheme.typography.titleSmall,
+                        style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.ExtraBold
                     )
                 }
@@ -250,7 +278,6 @@ fun EditProfileScreenContent(
 }
 
 // ── Reusable sub-composables ──────────────────────────────────────────────────
-
 @Composable
 private fun ProfileFormCard(
     title   : String,
@@ -260,21 +287,20 @@ private fun ProfileFormCard(
     val colors = AppTheme.colors
 
     Column {
-        // Section label — e.g. "PERSONAL INFO"
         Text(
-            text          = title.uppercase(),
-            style         = MaterialTheme.typography.labelSmall,
-            color         = colors.textSecondary,          // #4A6080 light / #94A3B8 dark
-            fontWeight    = FontWeight.Bold,
+            text = title.uppercase(),
+            style = MaterialTheme.typography.labelSmall,
+            color = colors.textSecondary,
+            fontWeight = FontWeight.Bold,
             letterSpacing = 1.sp,
-            modifier      = Modifier.padding(start = 4.dp, bottom = 8.dp)
+            modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
         )
         Card(
             modifier  = Modifier.fillMaxWidth(),
-            shape     = RoundedCornerShape(20.dp),
-            colors    = CardDefaults.cardColors(
-                containerColor = cs.surface,               // #FFF light / #1E293B dark
-                contentColor   = cs.onSurface              // text inside card
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = cs.surface,
+                contentColor = cs.onSurface
             ),
             elevation = CardDefaults.cardElevation(
                 defaultElevation = if (colors.isDark) 0.dp else 2.dp
@@ -290,53 +316,44 @@ private fun ProfileFormCard(
 
 @Composable
 private fun ProfileField(
-    label         : String,
-    value         : String,
+    label: String,
+    value: String,
     onValueChange : (String) -> Unit,
-    placeholder   : String
+    placeholder: String
 ) {
     val cs     = MaterialTheme.colorScheme
     val colors = AppTheme.colors
 
     Column {
         Text(
-            text       = label,
-            style      = MaterialTheme.typography.labelMedium,
-            color      = colors.textSecondary,             // #4A6080 light / #94A3B8 dark
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = colors.textSecondary,
             fontWeight = FontWeight.SemiBold
         )
         Spacer(Modifier.height(6.dp))
         OutlinedTextField(
-            value         = value,
+            value = value,
             onValueChange = onValueChange,
-            placeholder   = {
+            placeholder = {
                 Text(
                     text  = placeholder,
                     color = colors.textSecondary.copy(alpha = 0.5f)
                 )
             },
             singleLine = true,
-            shape      = RoundedCornerShape(14.dp),
-            modifier   = Modifier.fillMaxWidth(),
-            colors     = colors(
-                // Container (fill inside the field)
-                unfocusedContainerColor  = colors.surfaceVariant,    // #E8EFF7 light / #334155 dark
-                focusedContainerColor    = colors.surfaceVariant,
-
-                // Border
-                unfocusedBorderColor     = colors.outline,            // #C5D8EE light / #475569 dark
-                focusedBorderColor       = cs.primary,
-
-                // Text the user types
-                unfocusedTextColor       = cs.onSurface,              // #1A2332 light / #F1F5F9 dark
-                focusedTextColor         = cs.onSurface,
-
-                // Cursor
-                cursorColor              = cs.primary,
-
-                // Label
-                focusedLabelColor        = cs.primary,
-                unfocusedLabelColor      = colors.textSecondary,
+            shape = RoundedCornerShape(14.dp),
+            modifier = Modifier.fillMaxWidth(),
+            colors = colors(
+                unfocusedContainerColor = colors.surfaceVariant,
+                focusedContainerColor = colors.surfaceVariant,
+                unfocusedBorderColor = colors.outline,
+                focusedBorderColor = cs.primary,
+                unfocusedTextColor = cs.onSurface,
+                focusedTextColor = cs.onSurface,
+                cursorColor = cs.primary,
+                focusedLabelColor = cs.primary,
+                unfocusedLabelColor = colors.textSecondary,
             )
         )
     }

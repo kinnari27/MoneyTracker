@@ -8,6 +8,8 @@ fun UserEntity.toDomain() = User(
     name = name,
     email = email,
     phone = phone,
+    occupation = occupation,
+    incomeGoal = incomeGoal,
     biometricEnabled = biometricEnabled
 )
 
@@ -16,5 +18,7 @@ fun User.toEntity() = UserEntity(
     name = name,
     email = email,
     phone = phone,
+    occupation = occupation,
+    incomeGoal = incomeGoal,
     biometricEnabled = biometricEnabled
 )

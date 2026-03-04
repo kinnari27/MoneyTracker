@@ -23,10 +23,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Phone
+import androidx.compose.material.icons.outlined.WorkOutline
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -79,6 +81,8 @@ fun RegisterScreen(
         onNameChange = viewModel::onNameChange,
         onEmailChange = viewModel::onEmailChange,
         onPhoneChange = viewModel::onPhoneChange,
+        onOccupationChange = viewModel::onOccupationChange,
+        onIncomeGoalChange = viewModel::onIncomeGoalChange,
         onPasswordChange = viewModel::onPasswordChange,
         onConfirmChange = viewModel::onConfirmChange,
         onTogglePassword = viewModel::togglePasswordVisible,
@@ -95,6 +99,8 @@ fun RegisterScreenContent(
     onNameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onPhoneChange: (String) -> Unit,
+    onOccupationChange: (String) -> Unit,
+    onIncomeGoalChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onConfirmChange: (String) -> Unit,
     onTogglePassword: () -> Unit,
@@ -218,14 +224,37 @@ fun RegisterScreenContent(
                         onImeAction = { focus.moveFocus(FocusDirection.Down) }
                     )
 
-                    // Phone (optional)
+                    // Phone
                     AuthField(
                         value = uiState.phone,
-                        onValueChange = onPhoneChange,
-                        label = "Phone (optional)",
-                        placeholder = "+91 XXXXX XXXXX",
+                        onValueChange = { if (it.length <= 10) onPhoneChange(it) },
+                        label = "Phone Number",
+                        placeholder = "10-digit number",
                         leadingIcon = Icons.Outlined.Phone,
                         keyboardType = KeyboardType.Phone,
+                        imeAction = ImeAction.Next,
+                        onImeAction = { focus.moveFocus(FocusDirection.Down) }
+                    )
+
+                    // Occupation
+                    AuthField(
+                        value = uiState.occupation,
+                        onValueChange = onOccupationChange,
+                        label = "Occupation",
+                        placeholder = "e.g. Engineer, Student",
+                        leadingIcon = Icons.Outlined.WorkOutline,
+                        imeAction = ImeAction.Next,
+                        onImeAction = { focus.moveFocus(FocusDirection.Down) }
+                    )
+
+                    // Income Goal
+                    AuthField(
+                        value = uiState.incomeGoal,
+                        onValueChange = onIncomeGoalChange,
+                        label = "Monthly Income Goal",
+                        placeholder = "e.g. 50000",
+                        leadingIcon = Icons.Outlined.AccountBalanceWallet,
+                        keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Next,
                         onImeAction = { focus.moveFocus(FocusDirection.Down) }
                     )
@@ -408,6 +437,7 @@ private fun RegisterPreviewLight() {
         RegisterScreenContent(
             uiState = AuthUiState(password = "Hello@123"),
             onNameChange = {}, onEmailChange = {}, onPhoneChange = {},
+            onOccupationChange = {}, onIncomeGoalChange = {},
             onPasswordChange = {}, onConfirmChange = {},
             onTogglePassword = {}, onToggleConfirm = {},
             onRegister = {}, onNavigateToLogin = {}
@@ -422,6 +452,7 @@ private fun RegisterPreviewDark() {
         RegisterScreenContent(
             uiState = AuthUiState(error = "Passwords don't match"),
             onNameChange = {}, onEmailChange = {}, onPhoneChange = {},
+            onOccupationChange = {}, onIncomeGoalChange = {},
             onPasswordChange = {}, onConfirmChange = {},
             onTogglePassword = {}, onToggleConfirm = {},
             onRegister = {}, onNavigateToLogin = {}

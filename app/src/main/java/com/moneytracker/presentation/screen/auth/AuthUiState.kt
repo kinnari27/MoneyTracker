@@ -6,6 +6,8 @@ data class AuthUiState(
     val password: String = "",
     val confirmPassword: String = "",
     val phone: String = "",
+    val occupation: String = "",
+    val incomeGoal: String = "",
     val isLoading: Boolean = false,
     val error: String? = null,
     val isSuccess: Boolean = false,

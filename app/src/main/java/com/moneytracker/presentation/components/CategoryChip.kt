@@ -1,13 +1,23 @@
 package com.moneytracker.presentation.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,7 +27,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.moneytracker.domain.model.Category
-import com.moneytracker.ui.theme.*
+import com.moneytracker.ui.theme.AppTheme
 
 // ── Single Category Chip ──────────────────────────────────────────────────────
 @Composable
@@ -51,11 +61,10 @@ fun CategoryChip(
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             if (showIcon) {
-                Icon(
-                    painter            = painterResource(Category.iconResFor(category)),
+                Image(
+                    painter = painterResource(Category.iconResFor(category)),
                     contentDescription = category,
-                    modifier           = Modifier.size(18.dp),
-                    tint               = if (isSelected) color else colors.textSecondary
+                    modifier = Modifier.size(18.dp),
                 )
             }
             if (showLabel) {
@@ -95,7 +104,11 @@ fun CategoryChipGrid(
                             .weight(1f)
                             .clip(RoundedCornerShape(16.dp))
                             .background(if (isSelected) color.copy(0.15f) else cs.surfaceVariant)
-                            .border(2.dp, if (isSelected) color else Color.Transparent, RoundedCornerShape(16.dp))
+                            .border(
+                                2.dp,
+                                if (isSelected) color else Color.Transparent,
+                                RoundedCornerShape(16.dp)
+                            )
                             .clickable { onCategorySelect(category) }
                             .padding(vertical = 12.dp),
                         contentAlignment = Alignment.Center
@@ -111,19 +124,18 @@ fun CategoryChipGrid(
                                     .background(color.copy(alpha = 0.15f)),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Icon(
-                                    painter            = painterResource(Category.iconResFor(category)),
+                                Image(
+                                    painter = painterResource(Category.iconResFor(category)),
                                     contentDescription = category,
-                                    modifier           = Modifier.size(22.dp),
-                                    tint               = color
+                                    modifier = Modifier.size(22.dp),
                                 )
                             }
                             Text(
-                                text       = category,
-                                style      = MaterialTheme.typography.labelSmall,
+                                text = category,
+                                style = MaterialTheme.typography.labelSmall,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                color      = if (isSelected) color else colors.textSecondary,
-                                maxLines   = 1
+                                color = if (isSelected) color else colors.textSecondary,
+                                maxLines = 1
                             )
                         }
                     }
@@ -154,7 +166,11 @@ fun CategoryFilterRow(
                 modifier = Modifier
                     .clip(RoundedCornerShape(99.dp))
                     .background(if (selectedCategory == null) cs.primary.copy(0.15f) else cs.surfaceVariant)
-                    .border(2.dp, if (selectedCategory == null) cs.primary else Color.Transparent, RoundedCornerShape(99.dp))
+                    .border(
+                        2.dp,
+                        if (selectedCategory == null) cs.primary else Color.Transparent,
+                        RoundedCornerShape(99.dp)
+                    )
                     .clickable { onCategorySelect(null) }
                     .padding(horizontal = 16.dp, vertical = 9.dp),
                 contentAlignment = Alignment.Center

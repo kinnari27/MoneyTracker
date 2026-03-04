@@ -56,10 +56,10 @@ object IncomeCategory {
     val ALL = listOf(SALARY, FREELANCE, BUSINESS, RENTAL, DIVIDEND, REFUND, GIFT, OTHER)
 
     fun iconResFor(category: String): Int = when (category) {
-        SALARY -> R.drawable.ic_bill       // reuse closest icon
-        FREELANCE -> R.drawable.ic_book
+        SALARY -> R.drawable.ic_salary
+        FREELANCE -> R.drawable.ic_freelancer
         BUSINESS -> R.drawable.ic_shopping
-        RENTAL -> R.drawable.ic_other
+        RENTAL -> R.drawable.ic_rental
         DIVIDEND -> R.drawable.ic_stat_largest
         REFUND -> R.drawable.ic_pills
         GIFT -> R.drawable.ic_star
@@ -87,7 +87,7 @@ object InvestmentCategory {
         MUTUAL_FUND -> R.drawable.ic_stat_largest
         STOCKS -> R.drawable.ic_export
         PPF -> R.drawable.ic_cloud
-        GOLD -> R.drawable.ic_star
+        GOLD -> R.drawable.ic_gold
         else -> R.drawable.ic_other
     }
 

@@ -5,7 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.moneytracker.domain.usecase.auth.LoginUserUseCase
 import com.moneytracker.domain.usecase.auth.RegisterUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,7 +26,9 @@ class AuthViewModel @Inject constructor(
     fun onEmailChange(v: String) = _uiState.update { it.copy(email = v, error = null) }
     fun onPasswordChange(v: String) = _uiState.update { it.copy(password = v, error = null) }
     fun onConfirmChange(v: String) = _uiState.update { it.copy(confirmPassword = v, error = null) }
-    fun onPhoneChange(v: String) = _uiState.update { it.copy(phone = v) }
+    fun onPhoneChange(v: String) = _uiState.update { it.copy(phone = v, error = null) }
+    fun onOccupationChange(v: String) = _uiState.update { it.copy(occupation = v) }
+    fun onIncomeGoalChange(v: String) = _uiState.update { it.copy(incomeGoal = v) }
     fun togglePasswordVisible() = _uiState.update { it.copy(passwordVisible = !it.passwordVisible) }
     fun toggleConfirmVisible() = _uiState.update { it.copy(confirmVisible = !it.confirmVisible) }
     fun clearError() = _uiState.update { it.copy(error = null) }
@@ -63,6 +68,9 @@ class AuthViewModel @Inject constructor(
         if (s.email.isBlank() || !s.email.contains("@")) {
             _uiState.update { it.copy(error = "Enter a valid email address") }; return
         }
+        if (s.phone.length != 10) {
+            _uiState.update { it.copy(error = "Phone number must be exactly 10 digits") }; return
+        }
         if (s.password.length < 6) {
             _uiState.update { it.copy(error = "Password must be at least 6 characters") }; return
         }
@@ -71,7 +79,14 @@ class AuthViewModel @Inject constructor(
         }
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            registerUser(s.name.trim(), s.email.trim(), s.password, s.phone.trim()).fold(
+            registerUser(
+                s.name.trim(),
+                s.email.trim(),
+                s.password,
+                s.phone.trim(),
+                s.occupation.trim(),
+                s.incomeGoal.trim()
+            ).fold(
                 onSuccess = { _uiState.update { it.copy(isLoading = false, isSuccess = true) } },
                 onFailure = { e ->
                     _uiState.update {

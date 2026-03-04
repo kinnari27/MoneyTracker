@@ -2,20 +2,53 @@ package com.moneytracker.presentation.screen.account
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moneytracker.domain.model.User
+import com.moneytracker.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class EditProfileViewModel @Inject constructor() : ViewModel() {
+class EditProfileViewModel @Inject constructor(
+    private val userRepository: UserRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(EditProfileUiState())
     val uiState: StateFlow<EditProfileUiState> = _uiState.asStateFlow()
+
+    private var currentUserId: Int = 0
+    private var currentBiometric: Boolean = false
+
+    init {
+        loadUser()
+    }
+
+    private fun loadUser() {
+        viewModelScope.launch {
+            userRepository.observeCurrentUser
+                .filterNotNull()
+                .take(1)
+                .collect { user ->
+                    currentUserId = user.id
+                    currentBiometric = user.biometricEnabled
+                    _uiState.update {
+                        it.copy(
+                            name = user.name,
+                            email = user.email,
+                            phone = user.phone,
+                            occupation = user.occupation,
+                            incomeGoal = user.incomeGoal
+                        )
+                    }
+                }
+        }
+    }
 
     fun onNameChange(v: String) = _uiState.update { it.copy(name = v, error = null) }
     fun onEmailChange(v: String) = _uiState.update { it.copy(email = v, error = null) }
@@ -33,7 +66,16 @@ class EditProfileViewModel @Inject constructor() : ViewModel() {
         }
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            delay(800) // TODO: replace with DataStore / API call
+            val updatedUser = User(
+                id = currentUserId,
+                name = s.name,
+                email = s.email,
+                phone = s.phone,
+                occupation = s.occupation,
+                incomeGoal = s.incomeGoal,
+                biometricEnabled = currentBiometric
+            )
+            userRepository.insertUser(updatedUser)
             _uiState.update { it.copy(isLoading = false, isSaved = true) }
         }
     }
