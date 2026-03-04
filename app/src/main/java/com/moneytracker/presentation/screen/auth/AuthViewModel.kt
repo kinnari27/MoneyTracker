@@ -5,10 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.moneytracker.domain.usecase.auth.LoginUserUseCase
 import com.moneytracker.domain.usecase.auth.RegisterUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,6 +26,9 @@ class AuthViewModel @Inject constructor(
     fun onPhoneChange(v: String) = _uiState.update { it.copy(phone = v, error = null) }
     fun onOccupationChange(v: String) = _uiState.update { it.copy(occupation = v) }
     fun onIncomeGoalChange(v: String) = _uiState.update { it.copy(incomeGoal = v) }
+    fun onBudgetLimitChange(v: String) = _uiState.update { it.copy(budgetLimit = v) }
+    fun onCurrencyChange(v: String) = _uiState.update { it.copy(currency = v) }
+
     fun togglePasswordVisible() = _uiState.update { it.copy(passwordVisible = !it.passwordVisible) }
     fun toggleConfirmVisible() = _uiState.update { it.copy(confirmVisible = !it.confirmVisible) }
     fun clearError() = _uiState.update { it.copy(error = null) }
@@ -85,7 +85,9 @@ class AuthViewModel @Inject constructor(
                 s.password,
                 s.phone.trim(),
                 s.occupation.trim(),
-                s.incomeGoal.trim()
+                s.incomeGoal.trim(),
+                s.budgetLimit.trim(),
+                s.currency.trim()
             ).fold(
                 onSuccess = { _uiState.update { it.copy(isLoading = false, isSuccess = true) } },
                 onFailure = { e ->

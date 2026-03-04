@@ -12,5 +12,7 @@ data class UserEntity(
     val phone: String,
     val occupation: String,
     val incomeGoal: String,
+    val budgetLimit: String,
+    val currency: String,
     val biometricEnabled: Boolean
 )

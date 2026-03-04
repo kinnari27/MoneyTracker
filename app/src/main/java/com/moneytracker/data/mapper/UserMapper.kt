@@ -10,6 +10,8 @@ fun UserEntity.toDomain() = User(
     phone = phone,
     occupation = occupation,
     incomeGoal = incomeGoal,
+    budgetLimit = budgetLimit,
+    currency = currency,
     biometricEnabled = biometricEnabled
 )
 
@@ -20,5 +22,7 @@ fun User.toEntity() = UserEntity(
     phone = phone,
     occupation = occupation,
     incomeGoal = incomeGoal,
+    budgetLimit = budgetLimit,
+    currency = currency,
     biometricEnabled = biometricEnabled
 )

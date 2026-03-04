@@ -66,6 +66,7 @@ fun ProfileScreen(
     ProfileScreenContent(
         uiState = uiState,
         onNavigate = onNavigate,
+        onSignOut = viewModel::signOut,
         modifier = modifier
     )
 }
@@ -74,6 +75,7 @@ fun ProfileScreen(
 fun ProfileScreenContent(
     uiState: ProfileUiState,
     onNavigate: (String) -> Unit,
+    onSignOut: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val userName = uiState.user?.name ?: "User"
@@ -300,7 +302,7 @@ fun ProfileScreenContent(
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(18.dp),
                 colors = CardDefaults.cardColors(containerColor = Error.copy(0.08f)),
-                onClick = { }
+                onClick = { onSignOut() }
             ) {
                 Box(
                     modifier = Modifier
@@ -348,7 +350,8 @@ fun ProfileScreenPreview() {
                 activeMonths = 6,
                 isLoading = false
             ),
-            onNavigate = {}
+            onNavigate = {},
+            onSignOut = {}
         )
     }
 }

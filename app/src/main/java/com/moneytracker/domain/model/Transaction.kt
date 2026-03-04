@@ -48,21 +48,16 @@ object IncomeCategory {
     const val FREELANCE = "Freelance"
     const val BUSINESS = "Business"
     const val RENTAL = "Rental"
-    const val DIVIDEND = "Dividend"
     const val REFUND = "Refund"
-    const val GIFT = "Gift"
-    const val OTHER = "Other Income"
 
-    val ALL = listOf(SALARY, FREELANCE, BUSINESS, RENTAL, DIVIDEND, REFUND, GIFT, OTHER)
+    val ALL = listOf(SALARY, FREELANCE, BUSINESS, RENTAL, REFUND)
 
     fun iconResFor(category: String): Int = when (category) {
         SALARY -> R.drawable.ic_salary
         FREELANCE -> R.drawable.ic_freelancer
         BUSINESS -> R.drawable.ic_shopping
         RENTAL -> R.drawable.ic_rental
-        DIVIDEND -> R.drawable.ic_stat_largest
-        REFUND -> R.drawable.ic_pills
-        GIFT -> R.drawable.ic_star
+        REFUND -> R.drawable.ic_refund
         else -> R.drawable.ic_other
     }
 }
@@ -76,17 +71,16 @@ object InvestmentCategory {
     const val STOCKS = "Stocks / SIP"
     const val PPF = "PPF / NPS"
     const val GOLD = "Gold"
-    const val OTHER = "Other Investment"
 
-    val ALL = listOf(FD, RD, LIC, MUTUAL_FUND, STOCKS, PPF, GOLD, OTHER)
+    val ALL = listOf(FD, RD, LIC, MUTUAL_FUND, STOCKS, PPF, GOLD)
 
     fun iconResFor(category: String): Int = when (category) {
-        FD -> R.drawable.ic_stat_saved
-        RD -> R.drawable.ic_stat_average
-        LIC -> R.drawable.ic_locked
-        MUTUAL_FUND -> R.drawable.ic_stat_largest
-        STOCKS -> R.drawable.ic_export
-        PPF -> R.drawable.ic_cloud
+        FD -> R.drawable.ic_fd
+        RD -> R.drawable.ic_rd
+        LIC -> R.drawable.ic_lic
+        MUTUAL_FUND -> R.drawable.ic_mutual_fund
+        STOCKS -> R.drawable.ic_stock
+        PPF -> R.drawable.ic_ppf
         GOLD -> R.drawable.ic_gold
         else -> R.drawable.ic_other
     }

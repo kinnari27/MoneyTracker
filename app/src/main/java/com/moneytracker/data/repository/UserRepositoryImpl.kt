@@ -21,4 +21,8 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun insertUser(user: User) {
         userDao.insertUser(user.toEntity())
     }
+
+    override suspend fun signOut() {
+        userDao.deleteUser()
+    }
 }

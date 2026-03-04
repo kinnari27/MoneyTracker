@@ -41,6 +41,8 @@ class HomeViewModel @Inject constructor(
                     .filter { it.type == TransactionType.EXPENSE }
                     .sumOf { it.amount }
 
+                val budgetLimit = user?.incomeGoal?.toDoubleOrNull() ?: 40000.0
+
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -48,6 +50,7 @@ class HomeViewModel @Inject constructor(
                         totalBalance = income - expense,
                         totalIncome = income,
                         totalExpense = expense,
+                        budgetLimit = budgetLimit,
                         recentTransactions = transactions.take(5),
                         error = null
                     )

@@ -8,6 +8,8 @@ data class AuthUiState(
     val phone: String = "",
     val occupation: String = "",
     val incomeGoal: String = "",
+    val budgetLimit: String = "",
+    val currency: String = "INR",
     val isLoading: Boolean = false,
     val error: String? = null,
     val isSuccess: Boolean = false,

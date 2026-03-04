@@ -43,7 +43,9 @@ class EditProfileViewModel @Inject constructor(
                             email = user.email,
                             phone = user.phone,
                             occupation = user.occupation,
-                            incomeGoal = user.incomeGoal
+                            incomeGoal = user.incomeGoal,
+                            budgetLimit = user.budgetLimit,
+                            currency = user.currency
                         )
                     }
                 }
@@ -55,6 +57,8 @@ class EditProfileViewModel @Inject constructor(
     fun onPhoneChange(v: String) = _uiState.update { it.copy(phone = v, error = null) }
     fun onOccupationChange(v: String) = _uiState.update { it.copy(occupation = v) }
     fun onIncomeGoalChange(v: String) = _uiState.update { it.copy(incomeGoal = v) }
+    fun onBudgetLimitChange(v: String) = _uiState.update { it.copy(budgetLimit = v) }
+    fun onCurrencyChange(v: String) = _uiState.update { it.copy(currency = v) }
 
     fun save() {
         val s = _uiState.value
@@ -73,10 +77,18 @@ class EditProfileViewModel @Inject constructor(
                 phone = s.phone,
                 occupation = s.occupation,
                 incomeGoal = s.incomeGoal,
+                budgetLimit = s.budgetLimit,
+                currency = s.currency,
                 biometricEnabled = currentBiometric
             )
             userRepository.insertUser(updatedUser)
             _uiState.update { it.copy(isLoading = false, isSaved = true) }
+        }
+    }
+
+    fun signOut() {
+        viewModelScope.launch {
+            userRepository.signOut()
         }
     }
 }

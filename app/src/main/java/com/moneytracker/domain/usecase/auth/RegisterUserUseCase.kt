@@ -13,7 +13,9 @@ class RegisterUserUseCase @Inject constructor(
         password: String,
         phone: String,
         occupation: String,
-        incomeGoal: String
+        incomeGoal: String,
+        budgetLimit: String,
+        currency: String
     ): Result<Unit> {
         return try {
             val user = User(
@@ -22,6 +24,8 @@ class RegisterUserUseCase @Inject constructor(
                 phone = phone,
                 occupation = occupation,
                 incomeGoal = incomeGoal,
+                budgetLimit = budgetLimit,
+                currency = currency,
                 biometricEnabled = false
             )
             userRepository.insertUser(user)
