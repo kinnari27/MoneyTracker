@@ -1,17 +1,11 @@
 package com.moneytracker.presentation.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -24,15 +18,16 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.moneytracker.presentation.navigation.BottomNavItem
-import com.moneytracker.ui.theme.Accent
-import com.moneytracker.ui.theme.OnSurfaceVariant
-import com.moneytracker.ui.theme.Primary
-import com.moneytracker.ui.theme.PrimaryContainer
+import com.moneytracker.presentation.navigation.Routes
+import com.moneytracker.ui.theme.*
 
 @Composable
 fun BottomNavBar(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    val hideRoutes = setOf(Routes.SPLASH, Routes.LOGIN, Routes.REGISTER)
+    if (currentRoute in hideRoutes) return
+    if (currentRoute?.startsWith("edit_transaction/") == true) return
 
     val items = listOf(
         BottomNavItem.Home,
@@ -68,9 +63,7 @@ fun BottomNavBar(navController: NavController) {
                                 .size(52.dp)
                                 .shadow(8.dp, CircleShape)
                                 .background(
-                                    brush = Brush.linearGradient(
-                                        colors = listOf(Primary, Accent)
-                                    ),
+                                    brush = Brush.linearGradient(listOf(Primary, Accent)),
                                     shape = CircleShape
                                 ),
                             contentAlignment = Alignment.Center
@@ -91,11 +84,11 @@ fun BottomNavBar(navController: NavController) {
                 },
                 label = { Text(item.label, style = MaterialTheme.typography.labelSmall) },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Primary,
-                    selectedTextColor = Primary,
-                    unselectedIconColor = OnSurfaceVariant,
-                    unselectedTextColor = OnSurfaceVariant,
-                    indicatorColor = PrimaryContainer
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = AppTheme.colors.textSecondary,
+                    unselectedTextColor = AppTheme.colors.textSecondary,
+                    indicatorColor = MaterialTheme.colorScheme.primaryContainer
                 )
             )
         }

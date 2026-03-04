@@ -14,6 +14,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.moneytracker.presentation.components.BottomNavBar
 import com.moneytracker.presentation.navigation.NavGraph
+import com.moneytracker.presentation.navigation.Routes
 import com.moneytracker.ui.theme.moneytrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
@@ -28,10 +29,24 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             moneytrackerTheme {
-                val navController = rememberNavController()
+                val navController    = rememberNavController()
+                val currentEntry     by navController.currentBackStackEntryAsState()
+                val currentRoute     = currentEntry?.destination?.route
+
+                 val hideBottomBarRoutes = setOf<String>(
+                    Routes.SPLASH,
+                    Routes.LOGIN,
+                    Routes.REGISTER
+                )
+                val showBottomBar = currentRoute != null
+                        && currentRoute !in hideBottomBarRoutes
+                        && !currentRoute.startsWith("edit_transaction/")
+
                 Scaffold(
                     bottomBar = {
-                        BottomNavBar(navController = navController)
+                        if (showBottomBar) {
+                            BottomNavBar(navController = navController)
+                        }
                     }
                 ) { innerPadding ->
                     Box(modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())) {

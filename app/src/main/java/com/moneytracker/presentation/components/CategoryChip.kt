@@ -1,6 +1,5 @@
 package com.moneytracker.presentation.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,19 +22,21 @@ import com.moneytracker.ui.theme.*
 // ── Single Category Chip ──────────────────────────────────────────────────────
 @Composable
 fun CategoryChip(
-    category: String,
+    category  : String,
     isSelected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    showIcon: Boolean = true,
-    showLabel: Boolean = true
+    onClick   : () -> Unit,
+    modifier  : Modifier = Modifier,
+    showIcon  : Boolean  = true,
+    showLabel : Boolean  = true
 ) {
-    val color = categoryColor(category)
+    val cs     = MaterialTheme.colorScheme
+    val colors = AppTheme.colors
+    val color  = categoryColor(category)
 
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(99.dp))
-            .background(if (isSelected) color.copy(alpha = 0.15f) else SurfaceVariant)
+            .background(if (isSelected) color.copy(alpha = 0.15f) else cs.surfaceVariant)
             .border(
                 width = if (isSelected) 2.dp else 0.dp,
                 color = if (isSelected) color else Color.Transparent,
@@ -46,58 +47,55 @@ fun CategoryChip(
         contentAlignment = Alignment.Center
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment     = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             if (showIcon) {
-                Image(
-                    painter = painterResource(id = Category.iconResFor(category)),
+                Icon(
+                    painter            = painterResource(Category.iconResFor(category)),
                     contentDescription = category,
-                    modifier = Modifier.size(18.dp),
+                    modifier           = Modifier.size(18.dp),
+                    tint               = if (isSelected) color else colors.textSecondary
                 )
             }
             if (showLabel) {
                 Text(
-                    text = category,
-                    style = MaterialTheme.typography.labelMedium,
+                    text       = category,
+                    style      = MaterialTheme.typography.labelMedium,
                     fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Normal,
-                    color = if (isSelected) color else OnSurfaceVariant
+                    color      = if (isSelected) color else colors.textSecondary
                 )
             }
         }
     }
 }
 
-// ── Grid Category Chip (for Add Transaction screen) ───────────────────────────
+// ── Grid Category Chip ────────────────────────────────────────────────────────
 @Composable
 fun CategoryChipGrid(
-    selectedCategory: String,
-    onCategorySelect: (String) -> Unit,
-    modifier: Modifier = Modifier
+    selectedCategory : String,
+    onCategorySelect : (String) -> Unit,
+    modifier         : Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
+    val cs     = MaterialTheme.colorScheme
+    val colors = AppTheme.colors
+
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Category.ALL.chunked(4).forEach { row ->
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier              = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 row.forEach { category ->
                     val isSelected = selectedCategory == category
-                    val color = categoryColor(category)
+                    val color      = categoryColor(category)
 
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .clip(RoundedCornerShape(16.dp))
-                            .background(if (isSelected) color.copy(0.15f) else SurfaceVariant)
-                            .border(
-                                2.dp,
-                                if (isSelected) color else Color.Transparent,
-                                RoundedCornerShape(16.dp)
-                            )
+                            .background(if (isSelected) color.copy(0.15f) else cs.surfaceVariant)
+                            .border(2.dp, if (isSelected) color else Color.Transparent, RoundedCornerShape(16.dp))
                             .clickable { onCategorySelect(category) }
                             .padding(vertical = 12.dp),
                         contentAlignment = Alignment.Center
@@ -107,80 +105,74 @@ fun CategoryChipGrid(
                             verticalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
                             Box(
-                                modifier = Modifier
+                                modifier         = Modifier
                                     .size(38.dp)
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(color.copy(alpha = 0.15f)),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Image(
-                                    painter = painterResource(id = Category.iconResFor(category)),
+                                Icon(
+                                    painter            = painterResource(Category.iconResFor(category)),
                                     contentDescription = category,
-                                    modifier = Modifier.size(22.dp),
+                                    modifier           = Modifier.size(22.dp),
+                                    tint               = color
                                 )
                             }
                             Text(
-                                text = category,
-                                style = MaterialTheme.typography.labelSmall,
+                                text       = category,
+                                style      = MaterialTheme.typography.labelSmall,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                color = if (isSelected) color else OnSurfaceVariant,
-                                maxLines = 1
+                                color      = if (isSelected) color else colors.textSecondary,
+                                maxLines   = 1
                             )
                         }
                     }
                 }
-                // Fill empty slots in last row
-                repeat(4 - row.size) {
-                    Spacer(modifier = Modifier.weight(1f))
-                }
+                repeat(4 - row.size) { Spacer(modifier = Modifier.weight(1f)) }
             }
         }
     }
 }
 
-// ── Horizontal Scrollable Category Filter Row (for History screen) ────────────
+// ── Horizontal Scrollable Category Filter Row ─────────────────────────────────
 @Composable
 fun CategoryFilterRow(
-    selectedCategory: String?,
-    onCategorySelect: (String?) -> Unit,
-    modifier: Modifier = Modifier
+    selectedCategory : String?,
+    onCategorySelect : (String?) -> Unit,
+    modifier         : Modifier = Modifier
 ) {
+    val cs     = MaterialTheme.colorScheme
+    val colors = AppTheme.colors
+
     LazyRow(
-        modifier = modifier,
+        modifier              = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp)
+        contentPadding        = PaddingValues(horizontal = 16.dp)
     ) {
-        // "All" chip
         item {
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(99.dp))
-                    .background(if (selectedCategory == null) Primary.copy(0.15f) else SurfaceVariant)
-                    .border(
-                        2.dp,
-                        if (selectedCategory == null) Primary else Color.Transparent,
-                        RoundedCornerShape(99.dp)
-                    )
+                    .background(if (selectedCategory == null) cs.primary.copy(0.15f) else cs.surfaceVariant)
+                    .border(2.dp, if (selectedCategory == null) cs.primary else Color.Transparent, RoundedCornerShape(99.dp))
                     .clickable { onCategorySelect(null) }
                     .padding(horizontal = 16.dp, vertical = 9.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "All",
-                    style = MaterialTheme.typography.labelMedium,
+                    text       = "All",
+                    style      = MaterialTheme.typography.labelMedium,
                     fontWeight = if (selectedCategory == null) FontWeight.ExtraBold else FontWeight.Normal,
-                    color = if (selectedCategory == null) Primary else OnSurfaceVariant
+                    color      = if (selectedCategory == null) cs.primary else colors.textSecondary
                 )
             }
         }
-
         items(Category.ALL) { category ->
             CategoryChip(
-                category = category,
+                category   = category,
                 isSelected = selectedCategory == category,
-                onClick = { onCategorySelect(category) }
+                onClick    = { onCategorySelect(category) }
             )
         }
     }
 }
-

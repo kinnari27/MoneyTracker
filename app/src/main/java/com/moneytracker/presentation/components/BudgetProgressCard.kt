@@ -15,58 +15,64 @@ import com.moneytracker.ui.theme.*
 
 @Composable
 fun BudgetProgressCard(
-    spent: Double,
-    total: Double,
-    modifier: Modifier = Modifier
+    spent    : Double,
+    total    : Double,
+    modifier : Modifier = Modifier
 ) {
-    val progress = if (total > 0) (spent / total).coerceIn(0.0, 1.0) else 0.0
-    val remaining = total - spent
-    val isNearLimit = progress >= 0.8
+    val cs           = MaterialTheme.colorScheme
+    val colors       = AppTheme.colors
+    val progress     = if (total > 0) (spent / total).coerceIn(0.0, 1.0) else 0.0
+    val remaining    = total - spent
+    val isNearLimit  = progress >= 0.8
     val isOverBudget = progress >= 1.0
 
-    // Animate progress bar on first load
-    var animationPlayed by remember { mutableStateOf(false) }
-    val animatedProgress by animateFloatAsState(
-        targetValue = if (animationPlayed) progress.toFloat() else 0f,
-        animationSpec = tween(durationMillis = 1000),
-        label = "budget_progress"
+    var animPlayed by remember { mutableStateOf(false) }
+    val animProgress by animateFloatAsState(
+        targetValue   = if (animPlayed) progress.toFloat() else 0f,
+        animationSpec = tween(1000),
+        label         = "budget_progress"
     )
-    LaunchedEffect(Unit) { animationPlayed = true }
+    LaunchedEffect(Unit) { animPlayed = true }
 
     val barColor = when {
-        isOverBudget -> Error
-        isNearLimit -> Warning
-        else -> Primary
+        isOverBudget -> colors.error
+        isNearLimit  -> Warning
+        else         -> cs.primary
     }
 
     Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        modifier  = modifier.fillMaxWidth(),
+        shape     = RoundedCornerShape(20.dp),
+        colors    = CardDefaults.cardColors(
+            containerColor = cs.surface,
+            contentColor   = cs.onSurface
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (colors.isDark) 0.dp else 2.dp
+        )
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
 
-            // ── Header Row ────────────────────────────────────────────────────
+            // Header
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier              = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+                verticalAlignment     = Alignment.Top
             ) {
                 Column {
                     Text(
-                        text = "Monthly Budget",
-                        style = MaterialTheme.typography.titleMedium,
+                        "Monthly Budget",
+                        style      = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.ExtraBold,
-                        color = OnSurface
+                        color      = cs.onSurface
                     )
                     Text(
-                        text = "February 2026",
+                        java.text.SimpleDateFormat("MMMM yyyy", java.util.Locale.getDefault())
+                            .format(java.util.Date()),
                         style = MaterialTheme.typography.bodySmall,
-                        color = OnSurfaceVariant
+                        color = colors.textSecondary
                     )
                 }
-                // Status Badge
                 Surface(
                     shape = RoundedCornerShape(99.dp),
                     color = barColor.copy(alpha = 0.12f)
@@ -74,106 +80,80 @@ fun BudgetProgressCard(
                     Text(
                         text = when {
                             isOverBudget -> "⚠ Over Budget"
-                            isNearLimit -> "⚡ Near Limit"
-                            else -> "✓ On Track"
+                            isNearLimit  -> "⚡ Near Limit"
+                            else         -> "✓ On Track"
                         },
-                        style = MaterialTheme.typography.labelSmall,
-                        color = barColor,
+                        style      = MaterialTheme.typography.labelSmall,
+                        color      = barColor,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                        modifier   = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
-            // ── Amount Row ────────────────────────────────────────────────────
+            // Amounts row
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier              = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
+                verticalAlignment     = Alignment.Bottom
             ) {
                 Column {
-                    Text(
-                        "Spent",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = OnSurfaceVariant
-                    )
-                    Text(
-                        text = "₹${spent.toInt()}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = barColor
-                    )
+                    Text("Spent", style = MaterialTheme.typography.labelSmall, color = colors.textSecondary)
+                    Text("₹${spent.toInt()}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.ExtraBold, color = barColor)
                 }
                 Text(
-                    text = "${(progress * 100).toInt()}%",
-                    style = MaterialTheme.typography.titleSmall,
+                    "${(progress * 100).toInt()}%",
+                    style      = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.ExtraBold,
-                    color = barColor
+                    color      = barColor
                 )
                 Column(horizontalAlignment = Alignment.End) {
+                    Text("Remaining", style = MaterialTheme.typography.labelSmall, color = colors.textSecondary)
                     Text(
-                        "Remaining",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = OnSurfaceVariant
-                    )
-                    Text(
-                        text = "₹${remaining.toInt()}",
-                        style = MaterialTheme.typography.titleMedium,
+                        "₹${remaining.toInt()}",
+                        style      = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.ExtraBold,
-                        color = if (isOverBudget) Error else Success
+                        color      = if (isOverBudget) colors.error else colors.success
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(Modifier.height(12.dp))
 
-            // ── Progress Bar ──────────────────────────────────────────────────
+            // Animated progress bar
             LinearProgressIndicator(
-                progress = { animatedProgress },
-                modifier = Modifier
+                progress   = { animProgress },
+                modifier   = Modifier
                     .fillMaxWidth()
                     .height(12.dp)
                     .clip(RoundedCornerShape(99.dp)),
-                color = barColor,
-                trackColor = SurfaceVariant,
+                color      = barColor,
+                trackColor = cs.surfaceVariant
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(Modifier.height(8.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("₹0", style = MaterialTheme.typography.labelSmall, color = OnSurfaceVariant)
-                Text(
-                    text = "Total: ₹${total.toInt()}",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = OnSurfaceVariant,
-                    fontWeight = FontWeight.SemiBold
-                )
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text("₹0",                  style = MaterialTheme.typography.labelSmall, color = colors.textSecondary)
+                Text("Goal: ₹${total.toInt()}", style = MaterialTheme.typography.labelSmall, color = colors.textSecondary, fontWeight = FontWeight.SemiBold)
             }
 
-            // ── Over Budget Warning ───────────────────────────────────────────
+            // Over-budget warning
             if (isOverBudget) {
-                Spacer(modifier = Modifier.height(12.dp))
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = Error.copy(alpha = 0.08f)
-                ) {
+                Spacer(Modifier.height(12.dp))
+                Surface(shape = RoundedCornerShape(12.dp), color = colors.errorContainer) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
+                        modifier              = Modifier.fillMaxWidth().padding(12.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment     = Alignment.CenterVertically
                     ) {
                         Text("⚠️", style = MaterialTheme.typography.bodySmall)
                         Text(
-                            text = "Exceeded budget by ₹${(spent - total).toInt()}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Error,
+                            "Exceeded budget by ₹${(spent - total).toInt()}",
+                            style      = MaterialTheme.typography.bodySmall,
+                            color      = colors.error,
                             fontWeight = FontWeight.SemiBold
                         )
                     }
