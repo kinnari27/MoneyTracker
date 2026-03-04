@@ -14,9 +14,10 @@ data class Transaction(
     val isRecurring: Boolean = false
 )
 
-enum class TransactionType { INCOME, EXPENSE }
+// ── Transaction types ─────────────────────────────────────────────────────────
+enum class TransactionType { INCOME, EXPENSE, INVESTMENT }
 
-// Category constants used across the app
+// ── Expense categories ────────────────────────────────────────────────────────
 object Category {
     const val FOOD = "Food"
     const val TRANSPORT = "Transport"
@@ -38,5 +39,67 @@ object Category {
         BILLS -> R.drawable.ic_bill
         EDUCATION -> R.drawable.ic_book
         else -> R.drawable.ic_other
+    }
+}
+
+// ── Income categories ─────────────────────────────────────────────────────────
+object IncomeCategory {
+    const val SALARY = "Salary"
+    const val FREELANCE = "Freelance"
+    const val BUSINESS = "Business"
+    const val RENTAL = "Rental"
+    const val DIVIDEND = "Dividend"
+    const val REFUND = "Refund"
+    const val GIFT = "Gift"
+    const val OTHER = "Other Income"
+
+    val ALL = listOf(SALARY, FREELANCE, BUSINESS, RENTAL, DIVIDEND, REFUND, GIFT, OTHER)
+
+    fun iconResFor(category: String): Int = when (category) {
+        SALARY -> R.drawable.ic_bill       // reuse closest icon
+        FREELANCE -> R.drawable.ic_book
+        BUSINESS -> R.drawable.ic_shopping
+        RENTAL -> R.drawable.ic_other
+        DIVIDEND -> R.drawable.ic_stat_largest
+        REFUND -> R.drawable.ic_pills
+        GIFT -> R.drawable.ic_star
+        else -> R.drawable.ic_other
+    }
+}
+
+// ── Investment categories ─────────────────────────────────────────────────────
+object InvestmentCategory {
+    const val FD = "Fixed Deposit"
+    const val RD = "Recurring Deposit"
+    const val LIC = "LIC / Insurance"
+    const val MUTUAL_FUND = "Mutual Fund"
+    const val STOCKS = "Stocks / SIP"
+    const val PPF = "PPF / NPS"
+    const val GOLD = "Gold"
+    const val OTHER = "Other Investment"
+
+    val ALL = listOf(FD, RD, LIC, MUTUAL_FUND, STOCKS, PPF, GOLD, OTHER)
+
+    fun iconResFor(category: String): Int = when (category) {
+        FD -> R.drawable.ic_stat_saved
+        RD -> R.drawable.ic_stat_average
+        LIC -> R.drawable.ic_locked
+        MUTUAL_FUND -> R.drawable.ic_stat_largest
+        STOCKS -> R.drawable.ic_export
+        PPF -> R.drawable.ic_cloud
+        GOLD -> R.drawable.ic_star
+        else -> R.drawable.ic_other
+    }
+
+    // Short display labels for the grid chips
+    fun shortLabel(category: String): String = when (category) {
+        FD -> "FD"
+        RD -> "RD"
+        LIC -> "LIC"
+        MUTUAL_FUND -> "Mutual Fund"
+        STOCKS -> "Stocks"
+        PPF -> "PPF/NPS"
+        GOLD -> "Gold"
+        else -> "Other"
     }
 }
