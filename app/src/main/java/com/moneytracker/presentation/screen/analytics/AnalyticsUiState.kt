@@ -19,5 +19,6 @@ data class AnalyticsUiState(
     val investmentBreakdown: Map<String, Double> = emptyMap(),
     // Meta
     val period: AnalyticsPeriod = AnalyticsPeriod.MONTHLY,
-    val error: String? = null
+    val error: String? = null,
+    val totalSaved: Double
 )

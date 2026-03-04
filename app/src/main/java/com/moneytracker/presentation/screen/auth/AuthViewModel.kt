@@ -2,6 +2,8 @@ package com.moneytracker.presentation.screen.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moneytracker.domain.usecase.auth.LoginUserUseCase
+import com.moneytracker.domain.usecase.auth.RegisterUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

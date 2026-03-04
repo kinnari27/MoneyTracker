@@ -599,10 +599,7 @@ private fun AnalyticsPreviewLight() {
         AnalyticsScreen(
             uiState = AnalyticsUiState(
                 isLoading = false,
-                totalIncome = 80000.0,
                 totalSpent = 32000.0,
-                totalInvested = 20000.0,
-                netSavings = 28000.0,
                 dailyAverage = 1066.0,
                 categoryTotals = mapOf(
                     "Food" to 12000.0,
@@ -610,8 +607,10 @@ private fun AnalyticsPreviewLight() {
                     "Shopping" to 7000.0,
                     "Bills" to 5000.0
                 ),
+                totalIncome = 80000.0,
+                netSavings = 28000.0,
+                totalInvested = 20000.0,
                 investmentBreakdown = mapOf("Fixed Deposit" to 12000.0, "Mutual Fund" to 8000.0),
-                period = AnalyticsPeriod.MONTHLY
             ),
             onPeriodChange = {}
         )
@@ -625,21 +624,20 @@ private fun AnalyticsPreviewDark() {
         AnalyticsScreen(
             uiState = AnalyticsUiState(
                 isLoading = false,
-                totalIncome = 80000.0,
                 totalSpent = 32000.0,
-                totalInvested = 20000.0,
-                netSavings = 28000.0,
                 dailyAverage = 1066.0,
                 categoryTotals = mapOf(
                     "Food" to 12000.0,
                     "Transport" to 8000.0,
                     "Shopping" to 7000.0
                 ),
+                totalIncome = 80000.0,
+                netSavings = 28000.0,
+                totalInvested = 20000.0,
                 investmentBreakdown = mapOf(
                     "Fixed Deposit" to 12000.0,
                     "LIC / Insurance" to 8000.0
                 ),
-                period = AnalyticsPeriod.MONTHLY
             ),
             onPeriodChange = {}
         )

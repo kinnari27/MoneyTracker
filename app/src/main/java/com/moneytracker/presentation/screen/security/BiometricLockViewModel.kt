@@ -2,6 +2,7 @@ package com.moneytracker.presentation.screen.security
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moneytracker.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -22,7 +23,7 @@ class BiometricLockViewModel @Inject constructor(
     // ── Load current biometric setting from Room ───────────────────────────────
     private fun loadFromDb() {
         viewModelScope.launch {
-            userRepository.observeCurrentUser()
+            userRepository.observeCurrentUser
                 .filterNotNull()
                 .take(1)
                 .collect { user ->
