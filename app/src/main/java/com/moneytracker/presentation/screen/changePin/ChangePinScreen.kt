@@ -1,18 +1,36 @@
 package com.moneytracker.presentation.screen.security
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Backspace
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,7 +46,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moneytracker.presentation.screen.changePin.ChangePinUiState
 import com.moneytracker.presentation.screen.changePin.ChangePinViewModel
 import com.moneytracker.presentation.screen.changePin.PinStep
-import com.moneytracker.ui.theme.*
+import com.moneytracker.ui.theme.Error
+import com.moneytracker.ui.theme.OnSurface
+import com.moneytracker.ui.theme.OnSurfaceVariant
+import com.moneytracker.ui.theme.Outline
+import com.moneytracker.ui.theme.Primary
+import com.moneytracker.ui.theme.PrimaryDark
+import com.moneytracker.ui.theme.Success
+import com.moneytracker.ui.theme.SurfaceVariant
+import com.moneytracker.ui.theme.moneytrackerTheme
 
 @Composable
 fun ChangePinScreen(
@@ -89,7 +115,9 @@ fun ChangePinScreenContent(
 
         // Step indicator
         Row(
-            modifier              = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 16.dp),
+            modifier              = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             listOf(PinStep.CURRENT, PinStep.NEW, PinStep.CONFIRM).forEach { step ->
@@ -102,9 +130,9 @@ fun ChangePinScreenContent(
                         .clip(RoundedCornerShape(99.dp))
                         .background(
                             when {
-                                isPast    -> Primary
+                                isPast -> Primary
                                 isCurrent -> Primary.copy(0.5f)
-                                else      -> SurfaceVariant
+                                else -> SurfaceVariant
                             }
                         )
                 )
@@ -151,12 +179,16 @@ fun ChangePinScreenContent(
                             .background(
                                 when {
                                     isError -> Error
-                                    filled  -> Primary
-                                    else    -> SurfaceVariant
+                                    filled -> Primary
+                                    else -> SurfaceVariant
                                 }
                             )
                             .then(
-                                if (!filled) Modifier.border(2.dp, Outline, CircleShape) else Modifier
+                                if (!filled) Modifier.border(
+                                    2.dp,
+                                    Outline,
+                                    CircleShape
+                                ) else Modifier
                             )
                     )
                 }

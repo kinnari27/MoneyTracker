@@ -152,13 +152,21 @@ fun HistoryScreen(
 
         if (uiState.isLoading) {
             item {
-                Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(32.dp), contentAlignment = Alignment.Center
+                ) {
                     CircularProgressIndicator(color = Primary)
                 }
             }
         } else if (grouped.isEmpty()) {
             item {
-                Box(Modifier.fillMaxWidth().padding(40.dp), contentAlignment = Alignment.Center) {
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(40.dp), contentAlignment = Alignment.Center
+                ) {
                     Text("No transactions found", color = OnSurfaceVariant)
                 }
             }
@@ -166,7 +174,9 @@ fun HistoryScreen(
             grouped.forEach { (date, transactions) ->
                 item {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -185,7 +195,9 @@ fun HistoryScreen(
                 items(transactions) { transaction ->
                     TransactionCard(
                         transaction = transaction,
-                        modifier    = Modifier.padding(horizontal = 16.dp).padding(bottom = 8.dp)
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .padding(bottom = 8.dp)
                     )
                 }
             }
