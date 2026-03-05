@@ -20,6 +20,7 @@ class SplashViewModel @Inject constructor(
     val uiState: StateFlow<SplashUiState> = _uiState.asStateFlow()
     private val _destination = MutableStateFlow<SplashDestination>(SplashDestination.Loading)
     val destination: StateFlow<SplashDestination> = _destination.asStateFlow()
+
     init {
         viewModelScope.launch {
             delay(2000L)

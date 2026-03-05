@@ -11,7 +11,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import com.moneytracker.ui.theme.*
+import com.moneytracker.ui.theme.CategoryBills
+import com.moneytracker.ui.theme.CategoryEducation
+import com.moneytracker.ui.theme.CategoryEntertainment
+import com.moneytracker.ui.theme.CategoryFood
+import com.moneytracker.ui.theme.CategoryHealth
+import com.moneytracker.ui.theme.CategoryOther
+import com.moneytracker.ui.theme.CategoryShopping
+import com.moneytracker.ui.theme.CategoryTransport
+import com.moneytracker.ui.theme.OnSurface
+import com.moneytracker.ui.theme.Primary
 
 @Composable
 fun SectionHeader(

@@ -79,35 +79,35 @@ private val DarkAppColors = AppColors(
 val LocalAppColors = staticCompositionLocalOf { LightAppColors }
 
 private val M3Light = lightColorScheme(
-    primary                = Primary,
-    onPrimary              = OnPrimary,
-    primaryContainer       = PrimaryContainer,
-    onPrimaryContainer     = PrimaryDark,
-    secondary              = Secondary,
-    onSecondary            = OnPrimary,
-    secondaryContainer     = Color(0xFFCCE5FF),
-    onSecondaryContainer   = Color(0xFF00497A),
-    tertiary               = Accent,
-    onTertiary             = OnPrimary,
-    tertiaryContainer      = Color(0xFFCCF0FF),
-    onTertiaryContainer    = Color(0xFF004D66),
-    background             = Background,
-    onBackground           = OnSurface,
-    surface                = Surface,
-    onSurface              = OnSurface,
-    surfaceVariant         = SurfaceVariant,
-    onSurfaceVariant       = OnSurfaceVariant,
-    outline                = Outline,
-    outlineVariant         = Color(0xFFDEEAF7),
-    error                  = Error,
-    onError                = OnPrimary,
-    errorContainer         = Color(0xFFFFDAD6),
-    onErrorContainer       = Color(0xFF93000A),
-    inverseSurface         = OnSurface,
-    inverseOnSurface       = Surface,
-    inversePrimary         = PrimaryLight,
-    scrim                  = Color(0xFF000000),
-    surfaceTint            = Primary,
+    primary = Primary,
+    onPrimary = OnPrimary,
+    primaryContainer = PrimaryContainer,
+    onPrimaryContainer = PrimaryDark,
+    secondary = Secondary,
+    onSecondary = OnPrimary,
+    secondaryContainer = Color(0xFFCCE5FF),
+    onSecondaryContainer = Color(0xFF00497A),
+    tertiary = Accent,
+    onTertiary = OnPrimary,
+    tertiaryContainer = Color(0xFFCCF0FF),
+    onTertiaryContainer = Color(0xFF004D66),
+    background = Background,
+    onBackground = OnSurface,
+    surface = Surface,
+    onSurface = OnSurface,
+    surfaceVariant = SurfaceVariant,
+    onSurfaceVariant = OnSurfaceVariant,
+    outline = Outline,
+    outlineVariant = Color(0xFFDEEAF7),
+    error = Error,
+    onError = OnPrimary,
+    errorContainer = Color(0xFFFFDAD6),
+    onErrorContainer = Color(0xFF93000A),
+    inverseSurface = OnSurface,
+    inverseOnSurface = Surface,
+    inversePrimary = PrimaryLight,
+    scrim = Color(0xFF000000),
+    surfaceTint = Primary,
 )
 
 private val M3Dark = darkColorScheme(
@@ -147,7 +147,7 @@ fun MoneyTrackerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val m3Scheme  = if (darkTheme) M3Dark        else M3Light
+    val m3Scheme = if (darkTheme) M3Dark else M3Light
     val appColors = if (darkTheme) DarkAppColors else LightAppColors
 
     CompositionLocalProvider(LocalAppColors provides appColors) {
@@ -168,5 +168,5 @@ object AppTheme {
 @Composable
 fun moneytrackerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    content  : @Composable () -> Unit
+    content: @Composable () -> Unit
 ) = MoneyTrackerTheme(darkTheme = darkTheme, content = content)

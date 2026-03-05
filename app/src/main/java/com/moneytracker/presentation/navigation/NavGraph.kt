@@ -9,24 +9,24 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.moneytracker.presentation.screen.account.CurrencyScreen
-import com.moneytracker.presentation.screen.account.EditProfileScreen
-import com.moneytracker.presentation.screen.add.AddTransactionScreen
-import com.moneytracker.presentation.screen.add.AddTransactionViewModel
-import com.moneytracker.presentation.screen.analytics.AnalyticsScreen
-import com.moneytracker.presentation.screen.analytics.AnalyticsViewModel
 import com.moneytracker.presentation.screen.auth.LoginScreen
 import com.moneytracker.presentation.screen.auth.RegisterScreen
-import com.moneytracker.presentation.screen.biometricLock.BiometricLockScreen
-import com.moneytracker.presentation.screen.edit.EditTransactionScreen
-import com.moneytracker.presentation.screen.history.HistoryScreen
-import com.moneytracker.presentation.screen.history.HistoryViewModel
-import com.moneytracker.presentation.screen.home.HomeScreen
-import com.moneytracker.presentation.screen.home.HomeViewModel
-import com.moneytracker.presentation.screen.notifications.NotificationsScreen
-import com.moneytracker.presentation.screen.profile.ProfileScreen
-import com.moneytracker.presentation.screen.security.ChangePinScreen
+import com.moneytracker.presentation.screen.dashboard.analytics.AnalyticsScreen
+import com.moneytracker.presentation.screen.dashboard.analytics.AnalyticsViewModel
+import com.moneytracker.presentation.screen.dashboard.history.HistoryScreen
+import com.moneytracker.presentation.screen.dashboard.history.HistoryViewModel
+import com.moneytracker.presentation.screen.dashboard.home.HomeScreen
+import com.moneytracker.presentation.screen.dashboard.home.HomeViewModel
+import com.moneytracker.presentation.screen.settings.account.CurrencyScreen
+import com.moneytracker.presentation.screen.settings.account.EditProfileScreen
+import com.moneytracker.presentation.screen.settings.notifications.NotificationsScreen
+import com.moneytracker.presentation.screen.settings.profile.ProfileScreen
+import com.moneytracker.presentation.screen.settings.security.BiometricLockScreen
+import com.moneytracker.presentation.screen.settings.security.ChangePinScreen
 import com.moneytracker.presentation.screen.splash.SplashScreen
+import com.moneytracker.presentation.screen.transaction.add.AddTransactionScreen
+import com.moneytracker.presentation.screen.transaction.add.AddTransactionViewModel
+import com.moneytracker.presentation.screen.transaction.edit.EditTransactionScreen
 
 @Composable
 fun NavGraph(navController: NavHostController) {

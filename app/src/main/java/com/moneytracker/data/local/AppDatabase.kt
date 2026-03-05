@@ -10,8 +10,8 @@ import com.moneytracker.data.local.entity.TransactionEntity
 import com.moneytracker.data.local.entity.UserEntity
 
 @Database(
-    entities  = [TransactionEntity::class, BudgetEntity::class, UserEntity::class],
-    version   = 4,
+    entities = [TransactionEntity::class, BudgetEntity::class, UserEntity::class],
+    version = 4,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

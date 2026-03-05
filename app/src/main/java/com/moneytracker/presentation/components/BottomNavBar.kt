@@ -1,11 +1,17 @@
 package com.moneytracker.presentation.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -19,7 +25,9 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.moneytracker.presentation.navigation.BottomNavItem
 import com.moneytracker.presentation.navigation.Routes
-import com.moneytracker.ui.theme.*
+import com.moneytracker.ui.theme.Accent
+import com.moneytracker.ui.theme.AppTheme
+import com.moneytracker.ui.theme.Primary
 
 @Composable
 fun BottomNavBar(navController: NavController) {

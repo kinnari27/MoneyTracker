@@ -32,16 +32,16 @@ import com.moneytracker.ui.theme.AppTheme
 // ── Single Category Chip ──────────────────────────────────────────────────────
 @Composable
 fun CategoryChip(
-    category  : String,
+    category: String,
     isSelected: Boolean,
-    onClick   : () -> Unit,
-    modifier  : Modifier = Modifier,
-    showIcon  : Boolean  = true,
-    showLabel : Boolean  = true
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    showIcon: Boolean = true,
+    showLabel: Boolean = true
 ) {
-    val cs     = MaterialTheme.colorScheme
+    val cs = MaterialTheme.colorScheme
     val colors = AppTheme.colors
-    val color  = categoryColor(category)
+    val color = categoryColor(category)
 
     Box(
         modifier = modifier
@@ -57,7 +57,7 @@ fun CategoryChip(
         contentAlignment = Alignment.Center
     ) {
         Row(
-            verticalAlignment     = Alignment.CenterVertically,
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             if (showIcon) {
@@ -69,10 +69,10 @@ fun CategoryChip(
             }
             if (showLabel) {
                 Text(
-                    text       = category,
-                    style      = MaterialTheme.typography.labelMedium,
+                    text = category,
+                    style = MaterialTheme.typography.labelMedium,
                     fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Normal,
-                    color      = if (isSelected) color else colors.textSecondary
+                    color = if (isSelected) color else colors.textSecondary
                 )
             }
         }
@@ -82,22 +82,22 @@ fun CategoryChip(
 // ── Grid Category Chip ────────────────────────────────────────────────────────
 @Composable
 fun CategoryChipGrid(
-    selectedCategory : String,
-    onCategorySelect : (String) -> Unit,
-    modifier         : Modifier = Modifier
+    selectedCategory: String,
+    onCategorySelect: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val cs     = MaterialTheme.colorScheme
+    val cs = MaterialTheme.colorScheme
     val colors = AppTheme.colors
 
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Category.ALL.chunked(4).forEach { row ->
             Row(
-                modifier              = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 row.forEach { category ->
                     val isSelected = selectedCategory == category
-                    val color      = categoryColor(category)
+                    val color = categoryColor(category)
 
                     Box(
                         modifier = Modifier
@@ -118,7 +118,7 @@ fun CategoryChipGrid(
                             verticalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
                             Box(
-                                modifier         = Modifier
+                                modifier = Modifier
                                     .size(38.dp)
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(color.copy(alpha = 0.15f)),
@@ -149,17 +149,17 @@ fun CategoryChipGrid(
 // ── Horizontal Scrollable Category Filter Row ─────────────────────────────────
 @Composable
 fun CategoryFilterRow(
-    selectedCategory : String?,
-    onCategorySelect : (String?) -> Unit,
-    modifier         : Modifier = Modifier
+    selectedCategory: String?,
+    onCategorySelect: (String?) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val cs     = MaterialTheme.colorScheme
+    val cs = MaterialTheme.colorScheme
     val colors = AppTheme.colors
 
     LazyRow(
-        modifier              = modifier,
+        modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding        = PaddingValues(horizontal = 16.dp)
+        contentPadding = PaddingValues(horizontal = 16.dp)
     ) {
         item {
             Box(
@@ -176,18 +176,18 @@ fun CategoryFilterRow(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text       = "All",
-                    style      = MaterialTheme.typography.labelMedium,
+                    text = "All",
+                    style = MaterialTheme.typography.labelMedium,
                     fontWeight = if (selectedCategory == null) FontWeight.ExtraBold else FontWeight.Normal,
-                    color      = if (selectedCategory == null) cs.primary else colors.textSecondary
+                    color = if (selectedCategory == null) cs.primary else colors.textSecondary
                 )
             }
         }
         items(Category.ALL) { category ->
             CategoryChip(
-                category   = category,
+                category = category,
                 isSelected = selectedCategory == category,
-                onClick    = { onCategorySelect(category) }
+                onClick = { onCategorySelect(category) }
             )
         }
     }

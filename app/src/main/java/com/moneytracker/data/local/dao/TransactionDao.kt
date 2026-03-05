@@ -1,6 +1,11 @@
 package com.moneytracker.data.local.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 import com.moneytracker.data.local.entity.TransactionEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -27,18 +32,22 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE id = :id")
     suspend fun getTransactionById(id: Int): TransactionEntity?
 
-    @Query("""
+    @Query(
+        """
         SELECT SUM(amount) FROM transactions 
         WHERE type = 'income' 
         AND date BETWEEN :startDate AND :endDate
-    """)
+    """
+    )
     fun getTotalIncome(startDate: Long, endDate: Long): Flow<Double?>
 
-    @Query("""
+    @Query(
+        """
         SELECT SUM(amount) FROM transactions 
         WHERE type = 'expense' 
         AND date BETWEEN :startDate AND :endDate
-    """)
+    """
+    )
     fun getTotalExpense(startDate: Long, endDate: Long): Flow<Double?>
 
     // ── Write ────────────────────────────────────────────────────────────────
