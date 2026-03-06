@@ -10,9 +10,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,39 +25,60 @@ class HomeViewModel @Inject constructor(
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
-        loadData()
+        loadUser()
+        loadTransactions()
     }
 
-    private fun loadData() {
+    // ── Load user name from Room DB ───────────────────────────────────────────
+    private fun loadUser() {
         viewModelScope.launch {
-            combine(
-                getAllTransactionsUseCase(),
-                userRepository.observeCurrentUser
-            ) { transactions, user ->
-                val income = transactions
-                    .filter { it.type == TransactionType.INCOME }
-                    .sumOf { it.amount }
-                val expense = transactions
-                    .filter { it.type == TransactionType.EXPENSE }
-                    .sumOf { it.amount }
-
-                val budgetLimit = user?.incomeGoal?.toDoubleOrNull() ?: 40000.0
-
+            userRepository.observeCurrentUser.collect { user ->
                 _uiState.update {
                     it.copy(
-                        isLoading = false,
-                        user = user,
-                        totalBalance = income - expense,
-                        totalIncome = income,
-                        totalExpense = expense,
-                        budgetLimit = budgetLimit,
-                        recentTransactions = transactions.take(5),
-                        error = null
+                        userName = user?.name ?: "",
+                        userInitial = user?.name?.take(1)?.uppercase() ?: "?",
+                        budgetLimit = user?.incomeGoal?.toDouble() ?: 0.0,
+                        greeting = timeGreeting()
                     )
                 }
-            }.catch { e ->
-                _uiState.update { it.copy(isLoading = false, error = e.message) }
-            }.collect {}
+            }
+        }
+    }
+
+    // ── Load all transactions from Room DB ────────────────────────────────────
+    private fun loadTransactions() {
+        viewModelScope.launch {
+            getAllTransactionsUseCase()
+                .catch { e -> _uiState.update { it.copy(isLoading = false, error = e.message) } }
+                .collect { transactions ->
+                    val income = transactions.filter { it.type == TransactionType.INCOME }
+                        .sumOf { it.amount }
+                    val expense = transactions.filter { it.type == TransactionType.EXPENSE }
+                        .sumOf { it.amount }
+                    val invested = transactions.filter { it.type == TransactionType.INVESTMENT }
+                        .sumOf { it.amount }
+
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            totalBalance = income - expense - invested,
+                            totalIncome = income,
+                            totalExpense = expense,
+                            totalInvested = invested,
+                            recentTransactions = transactions.take(5),
+                            error = null
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun timeGreeting(): String {
+        return when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
+            in 5..11 -> "Good Morning"
+            in 12..16 -> "Good Afternoon"
+            in 17..20 -> "Good Evening"
+            else -> "Good Night"
         }
     }
 }

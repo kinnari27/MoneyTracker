@@ -10,7 +10,16 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface UserDao {
     @Query("SELECT * FROM users LIMIT 1")
-    fun observeUser(): Flow<UserEntity?>
+    fun observeCurrentUser(): Flow<UserEntity?>
+
+    @Query("SELECT * FROM users LIMIT 1")
+    suspend fun getCurrentUser(): UserEntity?
+
+    @Query("SELECT COUNT(*) FROM users")
+    suspend fun getUserCount(): Int
+
+    @Query("SELECT * FROM users WHERE email = :email")
+    suspend fun getUserByEmail(email: String): UserEntity?
 
     @Query("UPDATE users SET biometricEnabled = :enabled WHERE id = :userId")
     suspend fun updateBiometric(userId: Int, enabled: Boolean)
@@ -19,5 +28,21 @@ interface UserDao {
     suspend fun insertUser(user: UserEntity)
 
     @Query("DELETE FROM users")
-    suspend fun deleteUser()
+    suspend fun deleteAllUsers()
+
+    @Query("UPDATE users SET name = :name, email = :email, phone = :phone, occupation = :occupation, incomeGoal = :incomeGoal WHERE id = :userId")
+    suspend fun updateProfile(
+        userId: Int,
+        name: String,
+        email: String,
+        phone: String,
+        occupation: String,
+        incomeGoal: Double
+    )
+
+    @Query("UPDATE users SET currency = :code WHERE id = :userId")
+    suspend fun updateCurrency(userId: Int, code: String)
+
+    @Query("UPDATE users SET pin = :newPin WHERE id = :userId")
+    suspend fun updatePin(userId: Int, newPin: String)
 }

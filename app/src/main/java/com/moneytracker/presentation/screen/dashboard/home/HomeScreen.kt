@@ -58,7 +58,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
     val greeting = remember { getGreeting() }
-    val userName = uiState.user?.name ?: "User"
+    val userName = uiState.userName.ifBlank { "User" }
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -105,7 +105,7 @@ fun HomeScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                userName.take(1).uppercase(),
+                                uiState.userInitial,
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
@@ -281,6 +281,8 @@ fun HomeScreenPreview() {
         HomeScreen(
             uiState = HomeUiState(
                 isLoading = false,
+                userName = "Rahul Sharma",
+                userInitial = "R",
                 totalBalance = 24500.0,
                 totalIncome = 45000.0,
                 totalExpense = 20500.0,

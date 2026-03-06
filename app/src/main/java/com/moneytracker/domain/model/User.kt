@@ -6,8 +6,8 @@ data class User(
     val email: String,
     val phone: String = "",
     val occupation: String = "",
-    val incomeGoal: String = "",
-    val budgetLimit: String = "",
-    val currency: String = "",
+    val incomeGoal: Double = 0.0,
+    val budgetLimit: Double = 0.0,
+    val currency: String = "INR",
     val biometricEnabled: Boolean = false
 )

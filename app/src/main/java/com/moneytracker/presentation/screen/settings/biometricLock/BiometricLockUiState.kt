@@ -3,5 +3,9 @@ package com.moneytracker.presentation.screen.settings.biometricLock
 data class BiometricLockUiState(
     val biometricEnabled: Boolean = false,
     val faceIdEnabled: Boolean = false,
-    val autoLockOption: Int = 0   // index into ["Immediately","1 min","5 min","15 min"]
+    // 0=Immediately, 1=1 min, 2=5 min, 3=15 min
+    val autoLockOption: Int = 0,
+    val isLoading: Boolean = true,
+    val isSaved: Boolean = false,
+    val userId: Int = 0
 )

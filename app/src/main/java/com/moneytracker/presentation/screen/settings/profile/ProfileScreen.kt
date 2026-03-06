@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moneytracker.R
-import com.moneytracker.domain.model.User
 import com.moneytracker.presentation.navigation.Routes
 import com.moneytracker.ui.theme.Error
 import com.moneytracker.ui.theme.OnSurface
@@ -78,8 +77,8 @@ fun ProfileScreenContent(
     onSignOut: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val userName = uiState.user?.name ?: "User"
-    val userEmail = uiState.user?.email ?: ""
+    val userName = uiState.userName.ifBlank { "User" }
+    val userEmail = uiState.userEmail
 
     // Map each menu item to its route
     val menuSections = remember {
@@ -343,7 +342,8 @@ fun ProfileScreenPreview() {
     moneytrackerTheme {
         ProfileScreenContent(
             uiState = ProfileUiState(
-                user = User(name = "Rahul Sharma", email = "rahul.sharma@gmail.com"),
+                userName = "Rahul Sharma",
+                userEmail = "rahul.sharma@gmail.com",
                 isPremium = true,
                 totalTransactions = 124,
                 totalCategories = 8,

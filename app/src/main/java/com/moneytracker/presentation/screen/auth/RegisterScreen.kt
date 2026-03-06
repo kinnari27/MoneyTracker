@@ -1,8 +1,10 @@
 package com.moneytracker.presentation.screen.auth
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,18 +18,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.Work
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -57,13 +63,16 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moneytracker.ui.theme.AppTheme
+import com.moneytracker.ui.theme.MoneyTrackerTheme
 import com.moneytracker.ui.theme.PrimaryDark
 
+// ── Entry point ───────────────────────────────────────────────────────────────
 @Composable
 fun RegisterScreen(
     onRegisterSuccess: () -> Unit,
@@ -86,6 +95,7 @@ fun RegisterScreen(
         onPhoneChange = viewModel::onPhoneChange,
         onOccupationChange = viewModel::onOccupationChange,
         onIncomeGoalChange = viewModel::onIncomeGoalChange,
+        onBudgetLimitChange = viewModel::onBudgetLimitChange,
         onCurrencyChange = viewModel::onCurrencyChange,
         onPasswordChange = viewModel::onPasswordChange,
         onConfirmChange = viewModel::onConfirmChange,
@@ -96,6 +106,7 @@ fun RegisterScreen(
     )
 }
 
+// ── Stateless content ─────────────────────────────────────────────────────────
 @Composable
 fun RegisterScreenContent(
     uiState: AuthUiState,
@@ -104,6 +115,7 @@ fun RegisterScreenContent(
     onPhoneChange: (String) -> Unit,
     onOccupationChange: (String) -> Unit,
     onIncomeGoalChange: (String) -> Unit,
+    onBudgetLimitChange: (String) -> Unit,
     onCurrencyChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onConfirmChange: (String) -> Unit,
@@ -118,12 +130,16 @@ fun RegisterScreenContent(
     var currentStep by remember { mutableIntStateOf(0) }
     val totalSteps = 3
 
+    // Step-level "Next" gate — only step 0 requires fields before proceeding
+    val canProceedStep0 = uiState.name.isNotBlank() && uiState.email.isNotBlank()
+            && uiState.email.contains("@")
+
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(cs.background)
     ) {
-        // Gradient Header
+        // ── Gradient header ───────────────────────────────────────────────────
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -137,39 +153,51 @@ fun RegisterScreenContent(
         ) {
             Spacer(Modifier.height(40.dp))
 
-            // Logo & Title
+            // ── Logo ──────────────────────────────────────────────────────────
             Box(
                 modifier = Modifier
                     .size(64.dp)
                     .clip(CircleShape)
-                    .background(Color.White.copy(0.2f)),
+                    .background(Color.White.copy(0.20f)),
                 contentAlignment = Alignment.Center
             ) {
                 Text("₹", fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
             }
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(10.dp))
             Text(
                 "MoneyTracker",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = Color.White
             )
+            Text(
+                "Create your account",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White.copy(0.70f)
+            )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(20.dp))
 
+            // ── Multi-step card ───────────────────────────────────────────────
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp),
                 shape = RoundedCornerShape(28.dp),
-                colors = CardDefaults.cardColors(containerColor = cs.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                colors = CardDefaults.cardColors(
+                    containerColor = cs.surface,
+                    contentColor = cs.onSurface
+                ),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = if (colors.isDark) 0.dp else 4.dp
+                )
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Step Header
+
+                    // ── Step header row ───────────────────────────────────────
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -177,13 +205,14 @@ fun RegisterScreenContent(
                     ) {
                         Column {
                             Text(
-                                when (currentStep) {
+                                text = when (currentStep) {
                                     0 -> "Basic Info"
                                     1 -> "Personalization"
                                     else -> "Security"
                                 },
                                 style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                color = cs.onSurface
                             )
                             Text(
                                 "Step ${currentStep + 1} of $totalSteps",
@@ -196,26 +225,59 @@ fun RegisterScreenContent(
                                 onClick = { currentStep-- },
                                 modifier = Modifier.size(32.dp)
                             ) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = cs.primary)
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "Back",
+                                    tint = cs.primary
+                                )
                             }
                         }
                     }
 
-                    LinearProgressIndicator(
-                        progress = { (currentStep + 1).toFloat() / totalSteps },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(4.dp)
-                            .clip(CircleShape),
-                        color = cs.primary,
-                        trackColor = colors.inputBackground
-                    )
+                    // ── Step dots + progress bar ──────────────────────────────
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            repeat(totalSteps) { idx ->
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(4.dp)
+                                        .clip(CircleShape)
+                                        .background(
+                                            when {
+                                                idx < currentStep -> cs.primary           // completed
+                                                idx == currentStep -> cs.primary            // active
+                                                else -> colors.inputBackground // upcoming
+                                            }
+                                        )
+                                )
+                            }
+                        }
+                        // Step subtitles
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            listOf("Required", "Optional", "Security").forEachIndexed { idx, lbl ->
+                                Text(
+                                    lbl,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = if (idx <= currentStep) cs.primary else colors.textSecondary,
+                                    fontWeight = if (idx == currentStep) FontWeight.Bold else FontWeight.Normal
+                                )
+                            }
+                        }
+                    }
 
-                    // Step Content with Animation (No Scroll)
+                    // ── Animated step content ─────────────────────────────────
+                    // Fixed height so card doesn't jump during transitions
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(210.dp)
+                            .height(if (currentStep == 1) 260.dp else 200.dp)
                     ) {
                         AnimatedContent(
                             targetState = currentStep,
@@ -223,48 +285,96 @@ fun RegisterScreenContent(
                             label = "StepTransition"
                         ) { step ->
                             when (step) {
-                                0 -> BasicInfoStep(uiState, onNameChange, onEmailChange)
-                                1 -> PersonalizationStep(
-                                    uiState,
-                                    onPhoneChange,
-                                    onOccupationChange,
-                                    onCurrencyChange
+                                0 -> Step1BasicInfo(
+                                    uiState = uiState,
+                                    onNameChange = onNameChange,
+                                    onEmailChange = onEmailChange
                                 )
 
-                                2 -> SecurityStep(
-                                    uiState,
-                                    onPasswordChange,
-                                    onConfirmChange,
-                                    onTogglePassword,
-                                    onToggleConfirm
+                                1 -> Step2Personalization(
+                                    uiState = uiState,
+                                    onPhoneChange = onPhoneChange,
+                                    onOccupationChange = onOccupationChange,
+                                    onIncomeGoalChange = onIncomeGoalChange,
+                                    onBudgetLimitChange = onBudgetLimitChange,
+                                    onCurrencyChange = onCurrencyChange
+                                )
+
+                                else -> Step3Security(
+                                    uiState = uiState,
+                                    onPasswordChange = onPasswordChange,
+                                    onConfirmChange = onConfirmChange,
+                                    onTogglePassword = onTogglePassword,
+                                    onToggleConfirm = onToggleConfirm
                                 )
                             }
                         }
                     }
 
-                    // Navigation Actions
-                    val isFirstStepValid = uiState.name.isNotBlank() && uiState.email.isNotBlank()
+                    // ── Error banner ──────────────────────────────────────────
+                    AnimatedVisibility(
+                        visible = uiState.error != null,
+                        enter = fadeIn() + slideInVertically(),
+                        exit = fadeOut()
+                    ) {
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = colors.errorContainer,
+                                contentColor = colors.error
+                            ),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(12.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    Icons.Default.ErrorOutline,
+                                    null,
+                                    modifier = Modifier.size(16.dp),
+                                    tint = colors.error
+                                )
+                                Text(
+                                    uiState.error ?: "",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = colors.error,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
+                    }
 
+                    // ── Next / Register button ────────────────────────────────
                     Button(
                         onClick = {
                             if (currentStep < totalSteps - 1) currentStep++
                             else onRegister()
                         },
-                        enabled = !uiState.isLoading && (currentStep != 0 || isFirstStepValid),
+                        enabled = !uiState.isLoading && (currentStep != 0 || canProceedStep0),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(50.dp),
-                        shape = RoundedCornerShape(14.dp)
+                            .height(52.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = cs.primary,
+                            contentColor = cs.onPrimary
+                        )
                     ) {
                         if (uiState.isLoading) {
                             CircularProgressIndicator(
                                 color = cs.onPrimary,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp
                             )
                         } else {
-                            Text(if (currentStep < totalSteps - 1) "Next" else "Register")
+                            Text(
+                                text = if (currentStep < totalSteps - 1) "Next" else "Create Account",
+                                fontWeight = FontWeight.ExtraBold,
+                                style = MaterialTheme.typography.titleSmall
+                            )
                             if (currentStep < totalSteps - 1) {
-                                Spacer(Modifier.size(8.dp))
+                                Spacer(Modifier.width(6.dp))
                                 Icon(
                                     Icons.AutoMirrored.Filled.ArrowForward,
                                     null,
@@ -277,27 +387,45 @@ fun RegisterScreenContent(
             }
 
             Spacer(Modifier.height(24.dp))
-            Row(modifier = Modifier.clickable { onNavigateToLogin() }) {
-                Text("Already have an account? ", color = colors.textSecondary)
-                Text("Login", fontWeight = FontWeight.Bold, color = cs.primary)
+
+            // ── Login link ────────────────────────────────────────────────────
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "Already have an account?",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = colors.textSecondary
+                )
+                Text(
+                    "Sign In",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = cs.primary,
+                    modifier = Modifier.clickable { onNavigateToLogin() }
+                )
             }
         }
     }
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+//  STEP 1 — Basic Info (Name + Email are REQUIRED)
+// ══════════════════════════════════════════════════════════════════════════════
 @Composable
-private fun BasicInfoStep(
+private fun Step1BasicInfo(
     uiState: AuthUiState,
     onNameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit
 ) {
     val focus = LocalFocusManager.current
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         AuthField(
             value = uiState.name,
             onValueChange = onNameChange,
             label = "Full Name",
-            placeholder = "Enter your name",
+            placeholder = "Enter your full name",
             leadingIcon = Icons.Outlined.Person,
             isRequired = true,
             imeAction = ImeAction.Next,
@@ -314,44 +442,157 @@ private fun BasicInfoStep(
             imeAction = ImeAction.Done,
             onImeAction = { focus.clearFocus() }
         )
+        // Hint label
+        Text(
+            "* Required fields",
+            style = MaterialTheme.typography.labelSmall,
+            color = AppTheme.colors.textSecondary
+        )
     }
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+//  STEP 2 — Personalization (all optional)
+// ══════════════════════════════════════════════════════════════════════════════
 @Composable
-private fun PersonalizationStep(
+private fun Step2Personalization(
     uiState: AuthUiState,
     onPhoneChange: (String) -> Unit,
     onOccupationChange: (String) -> Unit,
+    onIncomeGoalChange: (String) -> Unit,
+    onBudgetLimitChange: (String) -> Unit,
     onCurrencyChange: (String) -> Unit
 ) {
     val focus = LocalFocusManager.current
-    val currencies = listOf("INR (₹)", "USD ($)", "EUR (€)", "GBP (£)", "JPY (¥)")
-    var expanded by remember { mutableStateOf(false) }
-    val colors = AppTheme.colors
     val cs = MaterialTheme.colorScheme
+    val colors = AppTheme.colors
+    val currencies = listOf("INR", "USD", "EUR", "GBP", "JPY", "AED", "AUD", "CAD")
+    val currencySymbols = mapOf(
+        "INR" to "₹", "USD" to "$", "EUR" to "€", "GBP" to "£",
+        "JPY" to "¥", "AED" to "د.إ", "AUD" to "A$", "CAD" to "C$"
+    )
+    var expanded by remember { mutableStateOf(false) }
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+
+        // Phone
         AuthField(
             value = uiState.phone,
             onValueChange = { if (it.length <= 10) onPhoneChange(it) },
-            label = "Phone (Optional)",
-            placeholder = "10-digit number",
+            label = "Phone Number",
+            placeholder = "10-digit mobile number",
             leadingIcon = Icons.Outlined.Phone,
             keyboardType = KeyboardType.Phone,
             imeAction = ImeAction.Next,
             onImeAction = { focus.moveFocus(FocusDirection.Down) }
         )
 
+        // Occupation
+        AuthField(
+            value = uiState.occupation,
+            onValueChange = onOccupationChange,
+            label = "Occupation",
+            placeholder = "e.g. Software Engineer",
+            leadingIcon = Icons.Default.Work,
+            imeAction = ImeAction.Next,
+            onImeAction = { focus.moveFocus(FocusDirection.Down) }
+        )
+
+        // Income Goal + Budget Limit (side by side)
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Text(
+                    "Monthly Income Goal",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = colors.textSecondary,
+                    fontWeight = FontWeight.SemiBold
+                )
+                OutlinedTextField(
+                    value = uiState.incomeGoal,
+                    onValueChange = onIncomeGoalChange,
+                    placeholder = {
+                        Text(
+                            "e.g. 50000",
+                            color = colors.textSecondary.copy(0.5f),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    },
+                    singleLine = true,
+                    shape = RoundedCornerShape(14.dp),
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = androidx.compose.foundation.text.KeyboardActions(
+                        onNext = { focus.moveFocus(FocusDirection.Right) }
+                    ),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedContainerColor = colors.inputBackground,
+                        focusedContainerColor = colors.inputBackground,
+                        unfocusedBorderColor = colors.outline,
+                        focusedBorderColor = cs.primary,
+                        unfocusedTextColor = cs.onSurface,
+                        focusedTextColor = cs.onSurface,
+                        cursorColor = cs.primary
+                    )
+                )
+            }
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Text(
+                    "Monthly Budget Limit",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = colors.textSecondary,
+                    fontWeight = FontWeight.SemiBold
+                )
+                OutlinedTextField(
+                    value = uiState.budgetLimit,
+                    onValueChange = onBudgetLimitChange,
+                    placeholder = {
+                        Text(
+                            "e.g. 20000",
+                            color = colors.textSecondary.copy(0.5f),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    },
+                    singleLine = true,
+                    shape = RoundedCornerShape(14.dp),
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = androidx.compose.foundation.text.KeyboardActions(
+                        onDone = { focus.clearFocus() }
+                    ),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedContainerColor = colors.inputBackground,
+                        focusedContainerColor = colors.inputBackground,
+                        unfocusedBorderColor = colors.outline,
+                        focusedBorderColor = cs.primary,
+                        unfocusedTextColor = cs.onSurface,
+                        focusedTextColor = cs.onSurface,
+                        cursorColor = cs.primary
+                    )
+                )
+            }
+        }
+
+        // Currency picker
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text(
-                text = "Currency",
+                "Preferred Currency",
                 style = MaterialTheme.typography.labelMedium,
                 color = colors.textSecondary,
                 fontWeight = FontWeight.SemiBold
             )
             Box {
                 OutlinedTextField(
-                    value = uiState.currency,
+                    value = "${uiState.currency}  ${currencySymbols[uiState.currency] ?: ""}",
                     onValueChange = {},
                     readOnly = true,
                     modifier = Modifier
@@ -359,36 +600,38 @@ private fun PersonalizationStep(
                         .clickable { expanded = true },
                     shape = RoundedCornerShape(14.dp),
                     leadingIcon = {
-                        Icon(
-                            Icons.Outlined.AccountBalanceWallet,
-                            null,
-                            tint = colors.textSecondary
-                        )
+                        Icon(Icons.Outlined.AccountBalanceWallet, null, tint = colors.textSecondary)
                     },
                     trailingIcon = {
                         IconButton(onClick = { expanded = true }) {
-                            Icon(Icons.Default.ArrowDropDown, null)
+                            Icon(Icons.Default.ArrowDropDown, null, tint = colors.textSecondary)
                         }
                     },
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedContainerColor = colors.inputBackground,
                         focusedContainerColor = colors.inputBackground,
                         unfocusedBorderColor = colors.outline,
-                        focusedBorderColor = cs.primary
+                        focusedBorderColor = cs.primary,
+                        unfocusedTextColor = cs.onSurface,
+                        focusedTextColor = cs.onSurface
                     )
                 )
                 DropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
-                    modifier = Modifier
-                        .fillMaxWidth(0.8f)
-                        .background(cs.surface)
+                    modifier = Modifier.background(cs.surface)
                 ) {
-                    currencies.forEach { currency ->
+                    currencies.forEach { code ->
                         DropdownMenuItem(
-                            text = { Text(currency) },
+                            text = {
+                                Text(
+                                    "$code  ${currencySymbols[code] ?: ""}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = cs.onSurface
+                                )
+                            },
                             onClick = {
-                                onCurrencyChange(currency.split(" ")[0])
+                                onCurrencyChange(code)
                                 expanded = false
                             }
                         )
@@ -396,11 +639,20 @@ private fun PersonalizationStep(
                 }
             }
         }
+
+        Text(
+            "All fields on this step are optional — you can update them later in Settings.",
+            style = MaterialTheme.typography.labelSmall,
+            color = colors.textSecondary
+        )
     }
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+//  STEP 3 — Security (Password required)
+// ══════════════════════════════════════════════════════════════════════════════
 @Composable
-private fun SecurityStep(
+private fun Step3Security(
     uiState: AuthUiState,
     onPasswordChange: (String) -> Unit,
     onConfirmChange: (String) -> Unit,
@@ -408,7 +660,12 @@ private fun SecurityStep(
     onToggleConfirm: () -> Unit
 ) {
     val focus = LocalFocusManager.current
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    val colors = AppTheme.colors
+
+    // Live password strength
+    val strength = passwordStrength(uiState.password)
+
+    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         AuthField(
             value = uiState.password,
             onValueChange = onPasswordChange,
@@ -418,9 +675,16 @@ private fun SecurityStep(
             isPassword = true,
             passwordVisible = uiState.passwordVisible,
             onTogglePassword = onTogglePassword,
+            isRequired = true,
             imeAction = ImeAction.Next,
             onImeAction = { focus.moveFocus(FocusDirection.Down) }
         )
+
+        // Strength bar — only shown while typing
+        if (uiState.password.isNotEmpty()) {
+            PasswordStrengthBar(strength = strength)
+        }
+
         AuthField(
             value = uiState.confirmPassword,
             onValueChange = onConfirmChange,
@@ -430,8 +694,102 @@ private fun SecurityStep(
             isPassword = true,
             passwordVisible = uiState.confirmVisible,
             onTogglePassword = onToggleConfirm,
+            isRequired = true,
             imeAction = ImeAction.Done,
             onImeAction = { focus.clearFocus() }
+        )
+
+        // Match indicator
+        if (uiState.confirmPassword.isNotEmpty()) {
+            val matches = uiState.password == uiState.confirmPassword
+            Text(
+                text = if (matches) "✓ Passwords match" else "✗ Passwords don't match",
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
+                color = if (matches) colors.success else colors.error
+            )
+        }
+    }
+}
+
+// ── Password strength helpers ─────────────────────────────────────────────────
+enum class PasswordStrength(val label: String, val fraction: Float) {
+    WEAK("Weak", 0.33f),
+    MEDIUM("Medium", 0.66f),
+    STRONG("Strong", 1.00f)
+}
+
+fun passwordStrength(password: String): PasswordStrength {
+    var score = 0
+    if (password.length >= 8) score++
+    if (password.any { it.isDigit() }) score++
+    if (password.any { !it.isLetterOrDigit() }) score++
+    return when {
+        score >= 3 -> PasswordStrength.STRONG
+        score == 2 -> PasswordStrength.MEDIUM
+        else -> PasswordStrength.WEAK
+    }
+}
+
+@Composable
+private fun PasswordStrengthBar(strength: PasswordStrength) {
+    val cs = MaterialTheme.colorScheme
+    val colors = AppTheme.colors
+    val color = when (strength) {
+        PasswordStrength.WEAK -> colors.error
+        PasswordStrength.MEDIUM -> colors.warning
+        PasswordStrength.STRONG -> colors.success
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        LinearProgressIndicator(
+            progress = { strength.fraction },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(5.dp)
+                .clip(CircleShape),
+            color = color,
+            trackColor = cs.surfaceVariant
+        )
+        Text(
+            "Strength: ${strength.label}",
+            style = MaterialTheme.typography.labelSmall,
+            color = color,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
+}
+
+// ── Previews ──────────────────────────────────────────────────────────────────
+@Preview(name = "Register Step1 — Light", showBackground = true)
+@Composable
+private fun RegisterPreviewLight() {
+    MoneyTrackerTheme(darkTheme = false) {
+        RegisterScreenContent(
+            uiState = AuthUiState(name = "Rahul", email = "rahul@test.com"),
+            onNameChange = {}, onEmailChange = {},
+            onPhoneChange = {}, onOccupationChange = {},
+            onIncomeGoalChange = {}, onBudgetLimitChange = {},
+            onCurrencyChange = {}, onPasswordChange = {},
+            onConfirmChange = {}, onTogglePassword = {},
+            onToggleConfirm = {}, onRegister = {},
+            onNavigateToLogin = {}
+        )
+    }
+}
+
+@Preview(name = "Register Step1 — Dark", showBackground = true)
+@Composable
+private fun RegisterPreviewDark() {
+    MoneyTrackerTheme(darkTheme = true) {
+        RegisterScreenContent(
+            uiState = AuthUiState(error = "Name is required"),
+            onNameChange = {}, onEmailChange = {},
+            onPhoneChange = {}, onOccupationChange = {},
+            onIncomeGoalChange = {}, onBudgetLimitChange = {},
+            onCurrencyChange = {}, onPasswordChange = {},
+            onConfirmChange = {}, onTogglePassword = {},
+            onToggleConfirm = {}, onRegister = {},
+            onNavigateToLogin = {}
         )
     }
 }
