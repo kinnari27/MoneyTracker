@@ -17,12 +17,16 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.moneytracker.ui.theme.AppTheme
 
@@ -39,14 +43,22 @@ fun AuthField(
     onTogglePassword: () -> Unit = {},
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Next,
-    onImeAction: () -> Unit = {}
+    onImeAction: () -> Unit = {},
+    isRequired: Boolean = false
 ) {
     val cs = MaterialTheme.colorScheme
     val colors = AppTheme.colors
 
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(
-            text = label,
+            text = buildAnnotatedString {
+                append(label)
+                if (isRequired) {
+                    withStyle(style = SpanStyle(color = Color.Red)) {
+                        append(" *")
+                    }
+                }
+            },
             style = MaterialTheme.typography.labelMedium,
             color = colors.textSecondary,
             fontWeight = FontWeight.SemiBold

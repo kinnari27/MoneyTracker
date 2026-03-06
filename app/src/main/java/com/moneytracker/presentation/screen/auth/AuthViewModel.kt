@@ -71,8 +71,8 @@ class AuthViewModel @Inject constructor(
         if (s.email.isBlank() || !s.email.contains("@")) {
             _uiState.update { it.copy(error = "Enter a valid email address") }; return
         }
-        if (s.phone.length != 10) {
-            _uiState.update { it.copy(error = "Phone number must be exactly 10 digits") }; return
+        if (s.phone.isNotBlank() && s.phone.length != 10) {
+            _uiState.update { it.copy(error = "Phone number must be 10 digits") }; return
         }
         if (s.password.length < 6) {
             _uiState.update { it.copy(error = "Password must be at least 6 characters") }; return
