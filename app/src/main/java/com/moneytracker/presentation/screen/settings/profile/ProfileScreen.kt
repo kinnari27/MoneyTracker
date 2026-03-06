@@ -57,6 +57,7 @@ import com.moneytracker.ui.theme.moneytrackerTheme
 @Composable
 fun ProfileScreen(
     onNavigate: (String) -> Unit = {},
+    onSignOut: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
@@ -65,7 +66,10 @@ fun ProfileScreen(
     ProfileScreenContent(
         uiState = uiState,
         onNavigate = onNavigate,
-        onSignOut = viewModel::signOut,
+        onSignOut = {
+            viewModel.signOut()
+            onSignOut()
+        },
         modifier = modifier
     )
 }

@@ -19,8 +19,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -123,12 +125,14 @@ fun RegisterScreenContent(
     onToggleConfirm: () -> Unit,
     onRegister: () -> Unit,
     onNavigateToLogin: () -> Unit,
+    initialStep: Int = 0,
     modifier: Modifier = Modifier
 ) {
     val cs = MaterialTheme.colorScheme
     val colors = AppTheme.colors
-    var currentStep by remember { mutableIntStateOf(0) }
+    var currentStep by remember { mutableIntStateOf(initialStep) }
     val totalSteps = 3
+    val scrollState = rememberScrollState()
 
     // Step-level "Next" gate — only step 0 requires fields before proceeding
     val canProceedStep0 = uiState.name.isNotBlank() && uiState.email.isNotBlank()
@@ -148,7 +152,9 @@ fun RegisterScreenContent(
         )
 
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(Modifier.height(40.dp))
@@ -273,11 +279,9 @@ fun RegisterScreenContent(
                     }
 
                     // ── Animated step content ─────────────────────────────────
-                    // Fixed height so card doesn't jump during transitions
+                    // Removed fixed height to allow content to expand naturally
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(if (currentStep == 1) 260.dp else 200.dp)
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         AnimatedContent(
                             targetState = currentStep,
@@ -406,6 +410,9 @@ fun RegisterScreenContent(
                     modifier = Modifier.clickable { onNavigateToLogin() }
                 )
             }
+            
+            // Extra padding for scroll
+            Spacer(Modifier.height(40.dp))
         }
     }
 }
@@ -595,9 +602,7 @@ private fun Step2Personalization(
                     value = "${uiState.currency}  ${currencySymbols[uiState.currency] ?: ""}",
                     onValueChange = {},
                     readOnly = true,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { expanded = true },
+                    modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(14.dp),
                     leadingIcon = {
                         Icon(Icons.Outlined.AccountBalanceWallet, null, tint = colors.textSecondary)
@@ -615,6 +620,12 @@ private fun Step2Personalization(
                         unfocusedTextColor = cs.onSurface,
                         focusedTextColor = cs.onSurface
                     )
+                )
+                // Transparent overlay to detect clicks on the whole field
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clickable { expanded = true }
                 )
                 DropdownMenu(
                     expanded = expanded,
@@ -760,36 +771,65 @@ private fun PasswordStrengthBar(strength: PasswordStrength) {
 }
 
 // ── Previews ──────────────────────────────────────────────────────────────────
-@Preview(name = "Register Step1 — Light", showBackground = true)
+@Preview(name = "Step 1: Basic Info", showBackground = true)
 @Composable
-private fun RegisterPreviewLight() {
-    MoneyTrackerTheme(darkTheme = false) {
+private fun RegisterPreviewStep1() {
+    MoneyTrackerTheme {
         RegisterScreenContent(
-            uiState = AuthUiState(name = "Rahul", email = "rahul@test.com"),
+            uiState = AuthUiState(name = "Rahul Sharma", email = "rahul@example.com"),
             onNameChange = {}, onEmailChange = {},
             onPhoneChange = {}, onOccupationChange = {},
             onIncomeGoalChange = {}, onBudgetLimitChange = {},
             onCurrencyChange = {}, onPasswordChange = {},
             onConfirmChange = {}, onTogglePassword = {},
             onToggleConfirm = {}, onRegister = {},
-            onNavigateToLogin = {}
+            onNavigateToLogin = {},
+            initialStep = 0
         )
     }
 }
 
-@Preview(name = "Register Step1 — Dark", showBackground = true)
+@Preview(name = "Step 2: Personalization", showBackground = true)
 @Composable
-private fun RegisterPreviewDark() {
-    MoneyTrackerTheme(darkTheme = true) {
+private fun RegisterPreviewStep2() {
+    MoneyTrackerTheme {
         RegisterScreenContent(
-            uiState = AuthUiState(error = "Name is required"),
+            uiState = AuthUiState(
+                name = "Rahul Sharma", 
+                email = "rahul@example.com",
+                phone = "9876543210",
+                occupation = "Software Engineer"
+            ),
             onNameChange = {}, onEmailChange = {},
             onPhoneChange = {}, onOccupationChange = {},
             onIncomeGoalChange = {}, onBudgetLimitChange = {},
             onCurrencyChange = {}, onPasswordChange = {},
             onConfirmChange = {}, onTogglePassword = {},
             onToggleConfirm = {}, onRegister = {},
-            onNavigateToLogin = {}
+            onNavigateToLogin = {},
+            initialStep = 1
+        )
+    }
+}
+
+@Preview(name = "Step 3: Security", showBackground = true)
+@Composable
+private fun RegisterPreviewStep3() {
+    MoneyTrackerTheme {
+        RegisterScreenContent(
+            uiState = AuthUiState(
+                name = "Rahul Sharma", 
+                email = "rahul@example.com",
+                password = "Password@123"
+            ),
+            onNameChange = {}, onEmailChange = {},
+            onPhoneChange = {}, onOccupationChange = {},
+            onIncomeGoalChange = {}, onBudgetLimitChange = {},
+            onCurrencyChange = {}, onPasswordChange = {},
+            onConfirmChange = {}, onTogglePassword = {},
+            onToggleConfirm = {}, onRegister = {},
+            onNavigateToLogin = {},
+            initialStep = 2
         )
     }
 }

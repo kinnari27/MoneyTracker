@@ -148,7 +148,14 @@ fun NavGraph(navController: NavHostController) {
 
         // ── Profile ───────────────────────────────────────────────────────────
         composable(BottomNavItem.Profile.route) {
-            ProfileScreen(onNavigate = { route -> navController.navigate(route) })
+            ProfileScreen(
+                onNavigate = { route -> navController.navigate(route) },
+                onSignOut = {
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
         }
 
         // ── Settings ──────────────────────────────────────────────────────────
