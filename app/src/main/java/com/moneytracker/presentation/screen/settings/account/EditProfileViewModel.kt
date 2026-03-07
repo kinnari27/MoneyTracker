@@ -41,7 +41,8 @@ class EditProfileViewModel @Inject constructor(
                             email = user.email,
                             phone = user.phone,
                             occupation = user.occupation,
-                            incomeGoal = user.incomeGoal.toString(),
+                            incomeGoal = user.incomeGoal,
+                            budgetLimit = user.budgetLimit,
                             isLoading = false
                         )
                     }
@@ -53,7 +54,8 @@ class EditProfileViewModel @Inject constructor(
     fun onEmailChange(v: String) = _uiState.update { it.copy(email = v, error = null) }
     fun onPhoneChange(v: String) = _uiState.update { it.copy(phone = v) }
     fun onOccupationChange(v: String) = _uiState.update { it.copy(occupation = v) }
-    fun onIncomeGoalChange(v: String) = _uiState.update { it.copy(incomeGoal = v) }
+    fun onIncomeGoalChange(v: Double) = _uiState.update { it.copy(incomeGoal = v) }
+    fun onBudgetLimitChange(v: Double) = _uiState.update { it.copy(budgetLimit = v) }
 
     // ── Save to Room ──────────────────────────────────────────────────────────
     fun save() {
@@ -72,7 +74,8 @@ class EditProfileViewModel @Inject constructor(
                 email = s.email.trim(),
                 phone = s.phone.trim(),
                 occupation = s.occupation.trim(),
-                incomeGoal = s.incomeGoal.toDoubleOrNull() ?: 0.0
+                incomeGoal = s.incomeGoal,
+                budgetLimit = s.budgetLimit
             )
             _uiState.update { it.copy(isSaving = false, isSaved = true) }
         }

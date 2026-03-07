@@ -3,6 +3,7 @@ package com.moneytracker.presentation.screen.splash
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moneytracker.domain.usecase.auth.HasAccountUseCase
+import com.moneytracker.domain.usecase.auth.IsUserLoggedInUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    private val hasAccount: HasAccountUseCase
+    private val hasAccount: HasAccountUseCase,
+    private val isUserLoggedIn: IsUserLoggedInUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SplashUiState())
@@ -24,7 +26,13 @@ class SplashViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             delay(2000L)
-            val dest = if (hasAccount()) SplashDestination.Home else SplashDestination.Register
+            
+            val dest = when {
+                isUserLoggedIn() -> SplashDestination.Home
+                hasAccount() -> SplashDestination.Login
+                else -> SplashDestination.Register
+            }
+            
             _destination.value = dest
             _uiState.value = SplashUiState(destination = dest, isReady = true)
         }

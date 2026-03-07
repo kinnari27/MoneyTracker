@@ -1,9 +1,6 @@
 package com.moneytracker.data.local.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.moneytracker.data.local.entity.UserEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -30,14 +27,21 @@ interface UserDao {
     @Query("DELETE FROM users")
     suspend fun deleteAllUsers()
 
-    @Query("UPDATE users SET name = :name, email = :email, phone = :phone, occupation = :occupation, incomeGoal = :incomeGoal WHERE id = :userId")
+    @Query("DELETE FROM transactions")
+    suspend fun deleteAllTransactions()
+
+    @Query("DELETE FROM budgets")
+    suspend fun deleteAllBudgets()
+
+    @Query("UPDATE users SET name = :name, email = :email, phone = :phone, occupation = :occupation, incomeGoal = :incomeGoal, budgetLimit = :budgetLimit WHERE id = :userId")
     suspend fun updateProfile(
         userId: Int,
         name: String,
         email: String,
         phone: String,
         occupation: String,
-        incomeGoal: Double
+        incomeGoal: Double,
+        budgetLimit: Double
     )
 
     @Query("UPDATE users SET currency = :code WHERE id = :userId")
@@ -45,4 +49,10 @@ interface UserDao {
 
     @Query("UPDATE users SET pin = :newPin WHERE id = :userId")
     suspend fun updatePin(userId: Int, newPin: String)
+
+    @Query("UPDATE users SET isLoggedIn = :isLoggedIn WHERE id = :userId")
+    suspend fun updateLoginStatus(userId: Int, isLoggedIn: Boolean)
+
+    @Query("SELECT * FROM users WHERE isLoggedIn = 1 LIMIT 1")
+    suspend fun getLoggedInUser(): UserEntity?
 }

@@ -9,10 +9,11 @@ fun UserEntity.toDomain(): User = User(
     email = email,
     phone = phone,
     occupation = occupation,
-    incomeGoal = incomeGoal.toDoubleOrNull() ?: 0.0,
-    budgetLimit = budgetLimit.toDoubleOrNull() ?: 0.0,
+    incomeGoal = incomeGoal,
+    budgetLimit = budgetLimit,
     currency = currency,
-    biometricEnabled = biometricEnabled
+    biometricEnabled = biometricEnabled,
+    isLoggedIn = isLoggedIn
 )
 
 fun User.toEntity(hashedPin: String = ""): UserEntity = UserEntity(
@@ -21,9 +22,10 @@ fun User.toEntity(hashedPin: String = ""): UserEntity = UserEntity(
     email = email,
     phone = phone,
     occupation = occupation,
-    incomeGoal = incomeGoal.toString(),
-    budgetLimit = budgetLimit.toString(),
+    incomeGoal = incomeGoal,
+    budgetLimit = budgetLimit,
     currency = currency,
     biometricEnabled = biometricEnabled,
+    isLoggedIn = isLoggedIn,
     pin = hashedPin
 )

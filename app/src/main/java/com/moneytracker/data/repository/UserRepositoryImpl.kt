@@ -25,6 +25,9 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun hasAccount(): Boolean =
         userDao.getUserCount() > 0
 
+    override suspend fun isUserLoggedIn(): Boolean =
+        userDao.getLoggedInUser() != null
+
     // ── Auth ──────────────────────────────────────────────────────────────────
     override suspend fun registerUser(user: User, password: String): Result<Unit> {
         return try {
@@ -32,7 +35,9 @@ class UserRepositoryImpl @Inject constructor(
             if (existing != null) {
                 return Result.failure(Exception("An account with this email already exists"))
             }
-            userDao.insertUser(user.toEntity(hashedPin = hashPassword(password)))
+            // New user is automatically logged in
+            val newUser = user.copy(isLoggedIn = true)
+            userDao.insertUser(newUser.toEntity(hashedPin = hashPassword(password)))
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -47,14 +52,22 @@ class UserRepositoryImpl @Inject constructor(
             if (entity.pin != hashPassword(password)) {
                 return Result.failure(Exception("Incorrect password"))
             }
-            Result.success(entity.toDomain())
+            
+            // Mark user as logged in
+            userDao.updateLoginStatus(entity.id, true)
+            
+            Result.success(entity.toDomain().copy(isLoggedIn = true))
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
     override suspend fun signOut() {
-        userDao.deleteAllUsers()
+        // Find current logged in user and sign them out
+        val user = userDao.getLoggedInUser()
+        if (user != null) {
+            userDao.updateLoginStatus(user.id, false)
+        }
     }
 
     // ── Profile updates ───────────────────────────────────────────────────────
@@ -64,8 +77,9 @@ class UserRepositoryImpl @Inject constructor(
         email: String,
         phone: String,
         occupation: String,
-        incomeGoal: Double
-    ) = userDao.updateProfile(userId, name, email, phone, occupation, incomeGoal)
+        incomeGoal: Double,
+        budgetLimit: Double
+    ) = userDao.updateProfile(userId, name, email, phone, occupation, incomeGoal, budgetLimit)
 
     override suspend fun updateCurrency(userId: Int, code: String) =
         userDao.updateCurrency(userId, code)

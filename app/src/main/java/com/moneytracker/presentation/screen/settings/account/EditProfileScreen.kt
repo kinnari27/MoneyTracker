@@ -86,7 +86,7 @@ fun EditProfileScreenContent(
     onEmailChange: (String) -> Unit,
     onPhoneChange: (String) -> Unit,
     onOccupationChange: (String) -> Unit,
-    onIncomeGoalChange: (String) -> Unit,
+    onIncomeGoalChange: (Double) -> Unit,
     onSave: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -214,8 +214,8 @@ fun EditProfileScreenContent(
                 Spacer(Modifier.height(12.dp))
                 ProfileField(
                     "Monthly Income Goal",
-                    uiState.incomeGoal,
-                    onIncomeGoalChange,
+                    uiState.incomeGoal.toString(),
+                    { onIncomeGoalChange(it.toDoubleOrNull() ?: 0.0) },
                     "₹ 0"
                 )
             }

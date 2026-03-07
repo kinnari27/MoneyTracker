@@ -37,6 +37,7 @@ import com.moneytracker.domain.model.Category
 import com.moneytracker.domain.model.Transaction
 import com.moneytracker.domain.model.TransactionType
 import com.moneytracker.presentation.components.TransactionCard
+import com.moneytracker.ui.theme.Accent
 import com.moneytracker.ui.theme.Error
 import com.moneytracker.ui.theme.OnSurfaceVariant
 import com.moneytracker.ui.theme.Primary
@@ -130,6 +131,7 @@ fun HistoryScreen(
                     listOf(
                         Triple("Income", "₹${uiState.totalIncome.toInt()}", Success),
                         Triple("Expense", "₹${uiState.totalExpense.toInt()}", Error),
+                        Triple("Investment", "₹${uiState.totalInvestment.toInt()}", Accent),
                         Triple(
                             "Net",
                             "₹${(uiState.totalIncome - uiState.totalExpense).toInt()}",
@@ -150,12 +152,14 @@ fun HistoryScreen(
                                     value,
                                     style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.ExtraBold,
-                                    color = color
+                                    color = color,
+                                    maxLines = 1
                                 )
                                 Text(
                                     label,
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = OnSurfaceVariant
+                                    color = OnSurfaceVariant,
+                                    maxLines = 1
                                 )
                             }
                         }
@@ -163,14 +167,22 @@ fun HistoryScreen(
                 }
 
                 // Filter Chips
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     TransactionFilter.values().forEach { f ->
                         FilterChip(
+                            modifier = Modifier.weight(1f),
                             selected = uiState.filter == f,
                             onClick = { onFilterChange(f) },
                             label = {
-                                Text(
-                                    f.name.lowercase().replaceFirstChar { it.uppercase() })
+                                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                                    Text(
+                                        f.name.lowercase().replaceFirstChar { it.uppercase() },
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                }
                             },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = Primary,
@@ -204,31 +216,51 @@ fun HistoryScreen(
                 }
             }
         } else {
-            grouped.forEach { (date, transactions) ->
+            grouped.forEach { (dateString, transactions) ->
                 item {
+                    val date = try {
+                        SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).parse(dateString)
+                    } catch (e: Exception) {
+                        null
+                    }
+                    val dayName = date?.let { SimpleDateFormat("EEEE", Locale.getDefault()).format(it) } ?: ""
+
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 4.dp),
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            date,
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = OnSurfaceVariant
-                        )
+                        Column {
+                            Text(
+                                dateString,
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                dayName,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = OnSurfaceVariant
+                            )
+                        }
                         Surface(shape = RoundedCornerShape(99.dp), color = SurfaceVariant) {
-                            val dayNet =
-                                transactions.sumOf { if (it.type == TransactionType.INCOME) it.amount else -it.amount }
+                            val dayNet = transactions.sumOf {
+                                when (it.type) {
+                                    TransactionType.INCOME -> it.amount
+                                    TransactionType.EXPENSE -> -it.amount
+                                    TransactionType.INVESTMENT -> 0.0 // Investment is usually an asset, not a daily net change component in same way as expense
+                                }
+                            }
                             Text(
                                 text = "${if (dayNet >= 0) "+" else ""}₹${
                                     Math.abs(dayNet).toInt()
                                 }",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = OnSurfaceVariant,
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = if (dayNet >= 0) Success else Error,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                             )
                         }
                     }
@@ -256,6 +288,7 @@ fun HistoryScreenPreview() {
                 isLoading = false,
                 totalIncome = 5000.0,
                 totalExpense = 2000.0,
+                totalInvestment = 1000.0,
                 filteredTransactions = listOf(
                     Transaction(
                         id = 1,
@@ -275,10 +308,10 @@ fun HistoryScreenPreview() {
                     ),
                     Transaction(
                         id = 3,
-                        title = "Uber",
-                        amount = 300.0,
-                        category = Category.TRANSPORT,
-                        type = TransactionType.EXPENSE,
+                        title = "Mutual Fund",
+                        amount = 1000.0,
+                        category = Category.OTHER,
+                        type = TransactionType.INVESTMENT,
                         date = Date()
                     )
                 )

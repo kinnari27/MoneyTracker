@@ -6,8 +6,9 @@ data class EditProfileUiState(
     val email: String = "",
     val phone: String = "",
     val occupation: String = "",
-    val incomeGoal: String = "",
-    val isLoading: Boolean = true,   // true while loading from DB
+    val incomeGoal: Double = 0.0,
+    val budgetLimit: Double = 0.0,
+    val isLoading: Boolean = true,
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
     val error: String? = null

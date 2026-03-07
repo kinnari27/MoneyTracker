@@ -15,11 +15,12 @@ data class UserEntity(
     val email: String,
     val phone: String = "",
     val occupation: String = "",
-    val incomeGoal: String = "",
-    val budgetLimit: String = "",
+    val incomeGoal: Double = 0.0,
+    val budgetLimit: Double = 0.0,
     val currency: String = "INR",
     val pin: String = "",
     val biometricEnabled: Boolean = false,
+    val isLoggedIn: Boolean = false,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis()
 )

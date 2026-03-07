@@ -37,12 +37,15 @@ class HistoryViewModel @Inject constructor(
                         .sumOf { it.amount }
                     val expense = transactions.filter { it.type == TransactionType.EXPENSE }
                         .sumOf { it.amount }
+                    val investment = transactions.filter { it.type == TransactionType.INVESTMENT }
+                        .sumOf { it.amount }
                     _uiState.update {
                         it.copy(
                             isLoading = false,
                             allTransactions = transactions,
                             totalIncome = income,
                             totalExpense = expense,
+                            totalInvestment = investment,
                             filteredTransactions = applyFilter(
                                 transactions,
                                 it.filter,
@@ -87,6 +90,7 @@ class HistoryViewModel @Inject constructor(
             TransactionFilter.ALL -> true
             TransactionFilter.INCOME -> t.type == TransactionType.INCOME
             TransactionFilter.EXPENSE -> t.type == TransactionType.EXPENSE
+            TransactionFilter.INVESTMENT -> t.type == TransactionType.INVESTMENT
         }
         val matchQuery = query.isBlank() ||
                 t.title.contains(query, ignoreCase = true) ||

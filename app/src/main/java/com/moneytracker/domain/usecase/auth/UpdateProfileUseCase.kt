@@ -12,6 +12,7 @@ class UpdateProfileUseCase @Inject constructor(
         email: String,
         phone: String,
         occupation: String,
-        incomeGoal: Double
-    ) = repo.updateProfile(id, name, email, phone, occupation, incomeGoal)
+        incomeGoal: Double,
+        budgetLimit: Double
+    ) = repo.updateProfile(id, name, email, phone, occupation, incomeGoal, budgetLimit)
 }

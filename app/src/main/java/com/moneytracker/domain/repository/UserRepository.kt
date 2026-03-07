@@ -14,6 +14,9 @@ interface UserRepository {
 
     /** Returns true if at least one account exists (used by SplashViewModel). */
     suspend fun hasAccount(): Boolean
+    
+    /** Returns true if there is a user currently marked as logged in. */
+    suspend fun isUserLoggedIn(): Boolean
 
     // ── Auth ──────────────────────────────────────────────────────────────────
     /** Persist a new user + hashed password. Fails if email already registered. */
@@ -22,7 +25,7 @@ interface UserRepository {
     /** Verify email + password; returns the matching User or a descriptive error. */
     suspend fun loginUser(email: String, password: String): Result<User>
 
-    /** Remove all local user data (full sign-out for a single-user app). */
+    /** Remove the login status for the user (full sign-out for a single-user app). */
     suspend fun signOut()
 
     // ── Profile updates ───────────────────────────────────────────────────────
@@ -33,7 +36,8 @@ interface UserRepository {
         email: String,
         phone: String,
         occupation: String,
-        incomeGoal: Double
+        incomeGoal: Double,
+        budgetLimit: Double
     )
 
     /** Swap the preferred currency code. */

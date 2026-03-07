@@ -9,5 +9,6 @@ data class User(
     val incomeGoal: Double = 0.0,
     val budgetLimit: Double = 0.0,
     val currency: String = "INR",
-    val biometricEnabled: Boolean = false
+    val biometricEnabled: Boolean = false,
+    val isLoggedIn: Boolean = false
 )
