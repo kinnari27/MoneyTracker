@@ -28,12 +28,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
@@ -100,6 +105,7 @@ fun AddTransactionScreen(
     onNoteChange: (String) -> Unit,
     onRecurringToggle: () -> Unit,
     onSave: () -> Unit,
+    onDelete: () -> Unit,
     onSaveSuccess: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -125,17 +131,39 @@ fun AddTransactionScreen(
                 .padding(top = 52.dp, start = 20.dp, end = 20.dp, bottom = 36.dp)
         ) {
             Column {
-                Text(
-                    "New Entry",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(0.7f)
-                )
-                Text(
-                    "Add Transaction",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color.White
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            if (uiState.isEditMode) "Edit Entry" else "New Entry",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White.copy(0.7f)
+                        )
+                        Text(
+                            if (uiState.isEditMode) "Update Transaction" else "Add Transaction",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.White
+                        )
+                    }
+                    if (uiState.isEditMode) {
+                        IconButton(
+                            onClick = onDelete,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Color.White.copy(0.15f))
+                        ) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Delete",
+                                tint = Color.White
+                            )
+                        }
+                    }
+                }
 
                 Spacer(Modifier.height(20.dp))
 
@@ -338,12 +366,10 @@ fun AddTransactionScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            "Today, ${
-                                java.text.SimpleDateFormat(
-                                    "MMM dd yyyy",
-                                    java.util.Locale.getDefault()
-                                ).format(java.util.Date())
-                            }",
+                            java.text.SimpleDateFormat(
+                                "MMM dd yyyy",
+                                java.util.Locale.getDefault()
+                            ).format(uiState.date),
                             style = MaterialTheme.typography.bodyMedium,
                             color = cs.onSurface
                         )
@@ -464,14 +490,32 @@ fun AddTransactionScreen(
                     )
                 } else {
                     Text(
-                        text = when (uiState.type) {
-                            TransactionType.INCOME -> "Save Income"
-                            TransactionType.EXPENSE -> "Save Expense"
-                            TransactionType.INVESTMENT -> "Save Investment"
+                        text = if (uiState.isEditMode) "Update Transaction" else {
+                            when (uiState.type) {
+                                TransactionType.INCOME -> "Save Income"
+                                TransactionType.EXPENSE -> "Save Expense"
+                                TransactionType.INVESTMENT -> "Save Investment"
+                            }
                         },
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.ExtraBold
                     )
+                }
+            }
+
+            if (uiState.isEditMode) {
+                OutlinedButton(
+                    onClick = onDelete,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(18.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Error
+                    ),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Error)
+                ) {
+                    Text("Delete Transaction", fontWeight = FontWeight.Bold)
                 }
             }
 
@@ -658,7 +702,7 @@ private fun PreviewExpenseLight() {
             uiState = AddTransactionUiState(type = TransactionType.EXPENSE),
             onTitleChange = {}, onAmountChange = {}, onCategorySelect = {},
             onTypeChange = {}, onNoteChange = {}, onRecurringToggle = {},
-            onSave = {}, onSaveSuccess = {}
+            onSave = {}, onDelete = {}, onSaveSuccess = {}
         )
     }
 }
@@ -674,7 +718,7 @@ private fun PreviewInvestmentDark() {
             ),
             onTitleChange = {}, onAmountChange = {}, onCategorySelect = {},
             onTypeChange = {}, onNoteChange = {}, onRecurringToggle = {},
-            onSave = {}, onSaveSuccess = {}
+            onSave = {}, onDelete = {}, onSaveSuccess = {}
         )
     }
 }
@@ -690,7 +734,7 @@ private fun PreviewIncomeLight() {
             ),
             onTitleChange = {}, onAmountChange = {}, onCategorySelect = {},
             onTypeChange = {}, onNoteChange = {}, onRecurringToggle = {},
-            onSave = {}, onSaveSuccess = {}
+            onSave = {}, onDelete = {}, onSaveSuccess = {}
         )
     }
 }

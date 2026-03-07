@@ -11,6 +11,7 @@ data class HistoryUiState(
     val totalInvestment: Double = 0.0,
     val filter: TransactionFilter = TransactionFilter.ALL,
     val searchQuery: String = "",
+    val transactionToDelete: Transaction? = null,
     val error: String? = null
 )
 

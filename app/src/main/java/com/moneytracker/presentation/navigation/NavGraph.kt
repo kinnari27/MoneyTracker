@@ -17,12 +17,12 @@ import com.moneytracker.presentation.screen.dashboard.history.HistoryScreen
 import com.moneytracker.presentation.screen.dashboard.history.HistoryViewModel
 import com.moneytracker.presentation.screen.dashboard.home.HomeScreen
 import com.moneytracker.presentation.screen.dashboard.home.HomeViewModel
-import com.moneytracker.presentation.screen.settings.account.CurrencyScreen
-import com.moneytracker.presentation.screen.settings.account.EditProfileScreen
+import com.moneytracker.presentation.screen.settings.biometricLock.BiometricLockScreen
+import com.moneytracker.presentation.screen.settings.changePin.ChangePinScreen
+import com.moneytracker.presentation.screen.settings.editProfile.CurrencyScreen
+import com.moneytracker.presentation.screen.settings.editProfile.EditProfileScreen
 import com.moneytracker.presentation.screen.settings.notifications.NotificationsScreen
 import com.moneytracker.presentation.screen.settings.profile.ProfileScreen
-import com.moneytracker.presentation.screen.settings.security.BiometricLockScreen
-import com.moneytracker.presentation.screen.settings.security.ChangePinScreen
 import com.moneytracker.presentation.screen.splash.SplashScreen
 import com.moneytracker.presentation.screen.transaction.add.AddTransactionScreen
 import com.moneytracker.presentation.screen.transaction.add.AddTransactionViewModel
@@ -103,7 +103,9 @@ fun NavGraph(navController: NavHostController) {
                 uiState = uiState,
                 onFilterChange = viewModel::onFilterChange,
                 onSearchChange = viewModel::onSearchChange,
-                onDeleteTransaction = viewModel::deleteTransaction,
+                onDeleteTransaction = viewModel::showDeleteConfirmation,
+                onConfirmDelete = viewModel::deleteTransaction,
+                onDismissDelete = viewModel::hideDeleteConfirmation,
                 onEditTransaction = { tx -> navController.navigate(Routes.editTransaction(tx.id)) }
             )
         }
@@ -121,6 +123,7 @@ fun NavGraph(navController: NavHostController) {
                 onNoteChange = viewModel::onNoteChange,
                 onRecurringToggle = viewModel::onRecurringToggle,
                 onSave = viewModel::saveTransaction,
+                onDelete = viewModel::deleteTransaction,
                 onSaveSuccess = { navController.navigate(BottomNavItem.Home.route) }
             )
         }

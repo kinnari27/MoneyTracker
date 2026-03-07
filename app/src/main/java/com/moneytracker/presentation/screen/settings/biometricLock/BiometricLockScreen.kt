@@ -5,7 +5,6 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,10 +17,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -49,17 +51,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moneytracker.R
-import com.moneytracker.ui.theme.OnSurface
-import com.moneytracker.ui.theme.OnSurfaceVariant
-import com.moneytracker.ui.theme.Outline
-import com.moneytracker.ui.theme.Primary
+import com.moneytracker.ui.theme.AppTheme
+import com.moneytracker.ui.theme.MoneyTrackerTheme
 import com.moneytracker.ui.theme.PrimaryDark
-import com.moneytracker.ui.theme.Secondary
-import com.moneytracker.ui.theme.Surface
-import com.moneytracker.ui.theme.SurfaceVariant
-import com.moneytracker.ui.theme.Warning
-import com.moneytracker.ui.theme.moneytrackerTheme
 
+// ── Entry point ───────────────────────────────────────────────────────────────
 @Composable
 fun BiometricLockScreen(
     onBack: () -> Unit,
@@ -68,46 +64,56 @@ fun BiometricLockScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    BiometricLockScreenContent(
+    BiometricLockContent(
         uiState = uiState,
-        onBack = onBack,
         onBiometricToggle = viewModel::onBiometricToggle,
         onFaceIdToggle = viewModel::onFaceIdToggle,
         onAutoLockSelect = viewModel::onAutoLockSelect,
+        onBack = onBack,
         modifier = modifier
     )
 }
 
+// ── Stateless content ─────────────────────────────────────────────────────────
 @Composable
-fun BiometricLockScreenContent(
+fun BiometricLockContent(
     uiState: BiometricLockUiState,
-    onBack: () -> Unit,
     onBiometricToggle: () -> Unit,
     onFaceIdToggle: () -> Unit,
     onAutoLockSelect: (Int) -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Pulse animation for fingerprint icon
+    val cs = MaterialTheme.colorScheme
+    val colors = AppTheme.colors
+
+    // Pulsing fingerprint icon when enabled
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulseScale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = if (uiState.biometricEnabled) 1.08f else 1f,
+        targetValue = if (uiState.biometricEnabled || uiState.faceIdEnabled) 1.08f else 1f,
         animationSpec = infiniteRepeatable(tween(1000), RepeatMode.Reverse),
         label = "pulse_scale"
     )
 
-    Column(modifier = modifier.fillMaxSize()) {
+    val isAnyEnabled = uiState.biometricEnabled || uiState.faceIdEnabled
 
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(cs.background)
+            .verticalScroll(rememberScrollState())
+    ) {
         // ── Header ────────────────────────────────────────────────────────────
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Brush.linearGradient(listOf(PrimaryDark, Primary)))
+                .background(Brush.linearGradient(listOf(PrimaryDark, cs.primary)))
                 .padding(top = 52.dp, start = 4.dp, end = 20.dp, bottom = 32.dp)
         ) {
             Column {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.Default.ArrowBackIosNew, null, tint = Color.White)
+                    Icon(Icons.Default.ArrowBackIosNew, "Back", tint = Color.White)
                 }
                 Spacer(Modifier.height(4.dp))
                 Text(
@@ -127,18 +133,21 @@ fun BiometricLockScreenContent(
         }
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp),
+            modifier = Modifier.padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            // ── Fingerprint visual ────────────────────────────────────────────
+            // ── Status card ───────────────────────────────────────────────────
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = Surface),
-                elevation = CardDefaults.cardElevation(2.dp)
+                colors = CardDefaults.cardColors(
+                    containerColor = cs.surface,
+                    contentColor = cs.onSurface
+                ),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = if (colors.isDark) 0.dp else 2.dp
+                )
             ) {
                 Column(
                     modifier = Modifier
@@ -153,8 +162,7 @@ fun BiometricLockScreenContent(
                             .scale(pulseScale)
                             .clip(CircleShape)
                             .background(
-                                if (uiState.biometricEnabled) Primary.copy(0.12f)
-                                else SurfaceVariant
+                                if (isAnyEnabled) cs.primary.copy(0.12f) else cs.surfaceVariant
                             ),
                         contentAlignment = Alignment.Center
                     ) {
@@ -162,155 +170,90 @@ fun BiometricLockScreenContent(
                             imageVector = Icons.Default.Fingerprint,
                             contentDescription = "Fingerprint",
                             modifier = Modifier.size(72.dp),
-                            tint = if (uiState.biometricEnabled) Primary else OnSurfaceVariant.copy(
-                                0.4f
-                            )
+                            tint = if (isAnyEnabled) cs.primary
+                            else colors.textSecondary.copy(0.4f)
                         )
                     }
                     Text(
-                        text = if (uiState.biometricEnabled) "Biometric Active" else "Biometric Disabled",
+                        text = if (isAnyEnabled) "Biometric Active" else "Biometric Disabled",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.ExtraBold,
-                        color = if (uiState.biometricEnabled) Primary else OnSurfaceVariant
+                        color = if (isAnyEnabled) cs.primary else colors.textSecondary
                     )
                     Text(
-                        text = if (uiState.biometricEnabled)
-                            "Your app is protected with biometrics. You'll be asked to authenticate on every launch."
+                        text = if (isAnyEnabled)
+                            "Your app is protected. You'll be asked to authenticate on every launch."
                         else
-                            "Enable biometric authentication to add an extra layer of security to your account.",
+                            "Enable biometric authentication to add an extra layer of security.",
                         style = MaterialTheme.typography.bodySmall,
-                        color = OnSurfaceVariant,
+                        color = colors.textSecondary,
                         textAlign = TextAlign.Center
                     )
                 }
             }
 
-            // ── Toggle ────────────────────────────────────────────────────────
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Surface),
-                elevation = CardDefaults.cardElevation(1.dp)
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(14.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(Primary.copy(0.08f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            Icons.Default.Fingerprint,
-                            null,
-                            tint = Primary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                    Column(Modifier.weight(1f)) {
-                        Text(
-                            "Fingerprint Lock",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = OnSurface
-                        )
-                        Text(
-                            "Use fingerprint to unlock",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = OnSurfaceVariant
-                        )
-                    }
-                    Switch(
-                        checked = uiState.biometricEnabled,
-                        onCheckedChange = { onBiometricToggle() },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = Color.White,
-                            checkedTrackColor = Primary
-                        )
+            // ── Fingerprint toggle ────────────────────────────────────────────
+            BiometricToggleCard(
+                iconContent = {
+                    Icon(
+                        Icons.Default.Fingerprint,
+                        null,
+                        tint = cs.primary,
+                        modifier = Modifier.size(24.dp)
                     )
-                }
-            }
+                },
+                title = "Fingerprint Lock",
+                subtitle = "Use fingerprint to unlock the app",
+                checked = uiState.biometricEnabled,
+                onToggle = onBiometricToggle,
+                trackColor = cs.primary
+            )
 
-            // Face ID toggle (secondary option)
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Surface),
-                elevation = CardDefaults.cardElevation(1.dp)
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(14.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(Secondary.copy(0.08f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.ic_locked),
-                            contentDescription = null,
-                            modifier = Modifier.size(24.dp),
-                        )
-                    }
-                    Column(Modifier.weight(1f)) {
-                        Text(
-                            "Face ID",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = OnSurface
-                        )
-                        Text(
-                            "Use face to unlock",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = OnSurfaceVariant
-                        )
-                    }
-                    Switch(
-                        checked = uiState.faceIdEnabled,
-                        onCheckedChange = { onFaceIdToggle() },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = Color.White,
-                            checkedTrackColor = Secondary
-                        )
+            // ── Face ID toggle ────────────────────────────────────────────────
+            BiometricToggleCard(
+                iconContent = {
+                    Icon(
+                        painterResource(R.drawable.ic_locked),
+                        null,
+                        tint = cs.secondary,
+                        modifier = Modifier.size(24.dp)
                     )
-                }
-            }
+                },
+                title = "Face ID",
+                subtitle = "Use face recognition to unlock",
+                checked = uiState.faceIdEnabled,
+                onToggle = onFaceIdToggle,
+                trackColor = cs.secondary
+            )
 
-            // ── Auto-lock timing ──────────────────────────────────────────────
-            if (uiState.biometricEnabled || uiState.faceIdEnabled) {
+            // ── Auto-lock timing — only shown when any biometric is on ────────
+            if (isAnyEnabled) {
                 Column {
                     Text(
                         text = "AUTO-LOCK AFTER",
                         style = MaterialTheme.typography.labelSmall,
-                        color = OnSurfaceVariant,
+                        color = colors.textSecondary,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp,
                         modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
                     )
                     Card(
                         shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(containerColor = Surface),
-                        elevation = CardDefaults.cardElevation(1.dp)
+                        colors = CardDefaults.cardColors(
+                            containerColor = cs.surface,
+                            contentColor = cs.onSurface
+                        ),
+                        elevation = CardDefaults.cardElevation(
+                            defaultElevation = if (colors.isDark) 0.dp else 1.dp
+                        )
                     ) {
-                        listOf(
-                            "Immediately",
-                            "1 minute",
-                            "5 minutes",
-                            "15 minutes"
-                        ).forEachIndexed { idx, option ->
+                        val options = listOf("Immediately", "1 minute", "5 minutes", "15 minutes")
+                        options.forEachIndexed { idx, option ->
                             val isSelected = uiState.autoLockOption == idx
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clickable(onClick = { onAutoLockSelect(idx) })
+                                    .clickable { onAutoLockSelect(idx) }
                                     .padding(horizontal = 20.dp, vertical = 14.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
@@ -318,31 +261,38 @@ fun BiometricLockScreenContent(
                                 Text(
                                     option,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = if (isSelected) Primary else OnSurface,
+                                    color = if (isSelected) cs.primary else cs.onSurface,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                                 )
                                 if (isSelected) {
                                     Icon(
-                                        Icons.Default.ArrowBackIosNew, null, tint = Primary,
-                                        modifier = Modifier.size(16.dp)
+                                        Icons.Default.Check,
+                                        null,
+                                        tint = cs.primary,
+                                        modifier = Modifier.size(18.dp)
                                     )
                                 }
                             }
-                            if (idx < 3) HorizontalDivider(
-                                color = Outline.copy(0.3f),
-                                thickness = 0.5.dp,
-                                modifier = Modifier.padding(horizontal = 20.dp)
-                            )
+                            if (idx < options.lastIndex) {
+                                HorizontalDivider(
+                                    color = colors.outline.copy(0.3f),
+                                    thickness = 0.5.dp,
+                                    modifier = Modifier.padding(horizontal = 20.dp)
+                                )
+                            }
                         }
                     }
                 }
             }
 
-            // Security note
+            // ── Security info pill ────────────────────────────────────────────
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Warning.copy(0.06f)),
+                colors = CardDefaults.cardColors(
+                    containerColor = colors.warningContainer,
+                    contentColor = colors.warning
+                ),
                 elevation = CardDefaults.cardElevation(0.dp)
             ) {
                 Row(
@@ -354,29 +304,108 @@ fun BiometricLockScreenContent(
                     Text(
                         "Biometric data stays on your device and is never shared with us.",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Warning,
+                        color = colors.warning,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
             }
+
+            Spacer(Modifier.height(80.dp))
         }
     }
 }
 
-@Preview(showBackground = true)
+// ── Reusable toggle row card ──────────────────────────────────────────────────
 @Composable
-fun BiometricLockScreenPreview() {
-    moneytrackerTheme {
-        BiometricLockScreenContent(
-            uiState = BiometricLockUiState(
-                biometricEnabled = true,
-                faceIdEnabled = false,
-                autoLockOption = 1
-            ),
-            onBack = {},
+private fun BiometricToggleCard(
+    iconContent: @Composable () -> Unit,
+    title: String,
+    subtitle: String,
+    checked: Boolean,
+    onToggle: () -> Unit,
+    trackColor: Color = MaterialTheme.colorScheme.primary
+) {
+    val cs = MaterialTheme.colorScheme
+    val colors = AppTheme.colors
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = cs.surface,
+            contentColor = cs.onSurface
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (colors.isDark) 0.dp else 1.dp
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(trackColor.copy(alpha = 0.10f)),
+                contentAlignment = Alignment.Center,
+                content = { iconContent() }
+            )
+            Column(Modifier.weight(1f)) {
+                Text(
+                    title,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = cs.onSurface
+                )
+                Text(
+                    subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.textSecondary
+                )
+            }
+            Switch(
+                checked = checked,
+                onCheckedChange = { onToggle() },
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = Color.White,
+                    checkedTrackColor = trackColor
+                )
+            )
+        }
+    }
+}
+
+// ── Previews ──────────────────────────────────────────────────────────────────
+@Preview(name = "Biometric — Light Disabled", showBackground = true)
+@Composable
+private fun BiometricPreviewLight() {
+    MoneyTrackerTheme(darkTheme = false) {
+        BiometricLockContent(
+            uiState = BiometricLockUiState(isLoading = false),
             onBiometricToggle = {},
             onFaceIdToggle = {},
-            onAutoLockSelect = {}
+            onAutoLockSelect = {},
+            onBack = {}
+        )
+    }
+}
+
+@Preview(name = "Biometric — Dark Enabled", showBackground = true)
+@Composable
+private fun BiometricPreviewDark() {
+    MoneyTrackerTheme(darkTheme = true) {
+        BiometricLockContent(
+            uiState = BiometricLockUiState(
+                biometricEnabled = true,
+                autoLockOption = 1,
+                isLoading = false
+            ),
+            onBiometricToggle = {},
+            onFaceIdToggle = {},
+            onAutoLockSelect = {},
+            onBack = {}
         )
     }
 }

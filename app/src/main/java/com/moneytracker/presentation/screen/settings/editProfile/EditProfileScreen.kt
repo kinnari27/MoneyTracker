@@ -1,4 +1,4 @@
-package com.moneytracker.presentation.screen.settings.account
+package com.moneytracker.presentation.screen.settings.editProfile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -73,6 +73,7 @@ fun EditProfileScreen(
         onPhoneChange = viewModel::onPhoneChange,
         onOccupationChange = viewModel::onOccupationChange,
         onIncomeGoalChange = viewModel::onIncomeGoalChange,
+        onBudgetLimitChange = viewModel::onBudgetLimitChange,
         onSave = viewModel::save,
         modifier = modifier
     )
@@ -87,6 +88,7 @@ fun EditProfileScreenContent(
     onPhoneChange: (String) -> Unit,
     onOccupationChange: (String) -> Unit,
     onIncomeGoalChange: (Double) -> Unit,
+    onBudgetLimitChange: (Double) -> Unit,
     onSave: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -204,7 +206,7 @@ fun EditProfileScreenContent(
                 )
             }
 
-            ProfileFormCard(title = "About") {
+            ProfileFormCard(title = "Financial & Professional") {
                 ProfileField(
                     "Occupation",
                     uiState.occupation,
@@ -216,6 +218,13 @@ fun EditProfileScreenContent(
                     "Monthly Income Goal",
                     uiState.incomeGoal.toString(),
                     { onIncomeGoalChange(it.toDoubleOrNull() ?: 0.0) },
+                    "₹ 0"
+                )
+                Spacer(Modifier.height(12.dp))
+                ProfileField(
+                    "Monthly Budget Limit",
+                    uiState.budgetLimit.toString(),
+                    { onBudgetLimitChange(it.toDoubleOrNull() ?: 0.0) },
                     "₹ 0"
                 )
             }
@@ -251,7 +260,7 @@ fun EditProfileScreenContent(
                     contentColor = cs.onPrimary
                 )
             ) {
-                if (uiState.isLoading) {
+                if (uiState.isSaving) {
                     CircularProgressIndicator(
                         color = cs.onPrimary,
                         modifier = Modifier.size(20.dp),
@@ -371,6 +380,7 @@ fun EditProfileScreenPreview() {
             onPhoneChange = {},
             onOccupationChange = {},
             onIncomeGoalChange = {},
+            onBudgetLimitChange = {},
             onSave = {}
         )
     }

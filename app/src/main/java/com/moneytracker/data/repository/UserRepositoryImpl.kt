@@ -52,10 +52,10 @@ class UserRepositoryImpl @Inject constructor(
             if (entity.pin != hashPassword(password)) {
                 return Result.failure(Exception("Incorrect password"))
             }
-            
+
             // Mark user as logged in
             userDao.updateLoginStatus(entity.id, true)
-            
+
             Result.success(entity.toDomain().copy(isLoggedIn = true))
         } catch (e: Exception) {
             Result.failure(e)

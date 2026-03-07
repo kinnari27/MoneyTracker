@@ -1,4 +1,4 @@
-package com.moneytracker.presentation.screen.settings.account
+package com.moneytracker.presentation.screen.settings.editProfile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

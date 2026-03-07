@@ -75,9 +75,19 @@ class HistoryViewModel @Inject constructor(
         }
     }
 
-    fun deleteTransaction(transaction: Transaction) {
+    fun showDeleteConfirmation(transaction: Transaction) {
+        _uiState.update { it.copy(transactionToDelete = transaction) }
+    }
+
+    fun hideDeleteConfirmation() {
+        _uiState.update { it.copy(transactionToDelete = null) }
+    }
+
+    fun deleteTransaction() {
+        val transaction = _uiState.value.transactionToDelete ?: return
         viewModelScope.launch {
             deleteTransactionUseCase(transaction)
+            hideDeleteConfirmation()
         }
     }
 

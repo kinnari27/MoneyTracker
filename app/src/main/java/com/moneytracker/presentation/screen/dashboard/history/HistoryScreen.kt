@@ -14,6 +14,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -25,6 +28,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,12 +60,35 @@ fun HistoryScreen(
     onFilterChange: (TransactionFilter) -> Unit,
     onSearchChange: (String) -> Unit,
     onDeleteTransaction: (Transaction) -> Unit,
+    onConfirmDelete: () -> Unit,
+    onDismissDelete: () -> Unit,
     onEditTransaction: (Transaction) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val grouped = uiState.filteredTransactions.groupBy { transaction ->
         val sdf = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
         sdf.format(transaction.date)
+    }
+
+    if (uiState.transactionToDelete != null) {
+        AlertDialog(
+            onDismissRequest = onDismissDelete,
+            title = { Text("Delete Transaction") },
+            text = { Text("Are you sure you want to delete this transaction?") },
+            confirmButton = {
+                Button(
+                    onClick = onConfirmDelete,
+                    colors = ButtonDefaults.buttonColors(containerColor = Error)
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismissDelete) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 
     LazyColumn(
@@ -177,7 +204,10 @@ fun HistoryScreen(
                             selected = uiState.filter == f,
                             onClick = { onFilterChange(f) },
                             label = {
-                                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
                                     Text(
                                         f.name.lowercase().replaceFirstChar { it.uppercase() },
                                         style = MaterialTheme.typography.labelSmall
@@ -223,7 +253,8 @@ fun HistoryScreen(
                     } catch (e: Exception) {
                         null
                     }
-                    val dayName = date?.let { SimpleDateFormat("EEEE", Locale.getDefault()).format(it) } ?: ""
+                    val dayName =
+                        date?.let { SimpleDateFormat("EEEE", Locale.getDefault()).format(it) } ?: ""
 
                     Row(
                         modifier = Modifier
@@ -269,6 +300,7 @@ fun HistoryScreen(
                     TransactionCard(
                         transaction = transaction,
                         onClick = { onEditTransaction(transaction) },
+                        onLongClick = { onDeleteTransaction(transaction) },
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
                             .padding(bottom = 8.dp)
@@ -319,6 +351,8 @@ fun HistoryScreenPreview() {
             onFilterChange = {},
             onSearchChange = {},
             onDeleteTransaction = {},
+            onConfirmDelete = {},
+            onDismissDelete = {},
             onEditTransaction = {}
         )
     }

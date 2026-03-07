@@ -1,8 +1,9 @@
 package com.moneytracker.presentation.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,18 +33,24 @@ import com.moneytracker.ui.theme.OnSurfaceVariant
 import com.moneytracker.ui.theme.Success
 import com.moneytracker.ui.theme.Surface
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TransactionCard(
     transaction: Transaction,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {}
 ) {
     val categoryColor = categoryColor(transaction.category)
 
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onClick() },
+            .clip(RoundedCornerShape(16.dp))
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            ),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.5.dp)

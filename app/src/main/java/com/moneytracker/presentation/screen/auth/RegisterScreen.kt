@@ -410,7 +410,7 @@ fun RegisterScreenContent(
                     modifier = Modifier.clickable { onNavigateToLogin() }
                 )
             }
-            
+
             // Extra padding for scroll
             Spacer(Modifier.height(40.dp))
         }
@@ -795,7 +795,7 @@ private fun RegisterPreviewStep2() {
     MoneyTrackerTheme {
         RegisterScreenContent(
             uiState = AuthUiState(
-                name = "Rahul Sharma", 
+                name = "Rahul Sharma",
                 email = "rahul@example.com",
                 phone = "9876543210",
                 occupation = "Software Engineer"
@@ -818,7 +818,7 @@ private fun RegisterPreviewStep3() {
     MoneyTrackerTheme {
         RegisterScreenContent(
             uiState = AuthUiState(
-                name = "Rahul Sharma", 
+                name = "Rahul Sharma",
                 email = "rahul@example.com",
                 password = "Password@123"
             ),

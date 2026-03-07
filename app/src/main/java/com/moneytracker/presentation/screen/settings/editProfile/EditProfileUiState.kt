@@ -1,4 +1,4 @@
-package com.moneytracker.presentation.screen.settings.account
+package com.moneytracker.presentation.screen.settings.editProfile
 
 data class EditProfileUiState(
     val userId: Int = 0,

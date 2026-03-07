@@ -18,6 +18,7 @@ val OnPrimary = Color(0xFFFFFFFF)
 val Success = Color(0xFF43A047)
 val Error = Color(0xFFEF5350)
 val Warning = Color(0xFFFB8C00)
+
 // Dark color
 val DarkBackground = Color(0xFF0F172A)
 val DarkSurface = Color(0xFF1E293B)

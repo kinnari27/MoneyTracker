@@ -14,7 +14,7 @@ interface UserRepository {
 
     /** Returns true if at least one account exists (used by SplashViewModel). */
     suspend fun hasAccount(): Boolean
-    
+
     /** Returns true if there is a user currently marked as logged in. */
     suspend fun isUserLoggedIn(): Boolean
 
