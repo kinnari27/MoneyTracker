@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -64,6 +65,7 @@ class AddTransactionViewModel @Inject constructor(
     fun onAmountChange(value: String) = _uiState.update { it.copy(amount = value, error = null) }
     fun onNoteChange(value: String) = _uiState.update { it.copy(note = value) }
     fun onRecurringToggle() = _uiState.update { it.copy(isRecurring = !it.isRecurring) }
+    fun onDateChange(date: Date) = _uiState.update { it.copy(date = date) }
 
     fun onCategorySelect(cat: String) =
         _uiState.update { it.copy(selectedCategory = cat, error = null) }
@@ -74,9 +76,6 @@ class AddTransactionViewModel @Inject constructor(
     fun saveTransaction() {
         val state = _uiState.value
 
-        if (state.title.isBlank()) {
-            _uiState.update { it.copy(error = "Please enter a title") }; return
-        }
         val amount = state.amount.toDoubleOrNull()
         if (amount == null || amount <= 0) {
             _uiState.update { it.copy(error = "Please enter a valid amount") }; return
@@ -90,7 +89,7 @@ class AddTransactionViewModel @Inject constructor(
 
             val transaction = Transaction(
                 id = state.id ?: 0,
-                title = state.title.trim(),
+                title = state.title.trim().ifBlank { state.selectedCategory },
                 amount = amount,
                 category = state.selectedCategory,
                 type = state.type,

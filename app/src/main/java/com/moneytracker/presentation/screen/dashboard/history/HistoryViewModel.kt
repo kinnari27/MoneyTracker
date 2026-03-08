@@ -33,24 +33,19 @@ class HistoryViewModel @Inject constructor(
             getAllTransactionsUseCase()
                 .catch { e -> _uiState.update { it.copy(isLoading = false, error = e.message) } }
                 .collect { transactions ->
-                    val income = transactions.filter { it.type == TransactionType.INCOME }
-                        .sumOf { it.amount }
-                    val expense = transactions.filter { it.type == TransactionType.EXPENSE }
-                        .sumOf { it.amount }
-                    val investment = transactions.filter { it.type == TransactionType.INVESTMENT }
-                        .sumOf { it.amount }
                     _uiState.update {
+                        val filtered = applyFilter(transactions, it.filter, it.searchQuery)
+                        val income = filtered.filter { t -> t.type == TransactionType.INCOME }.sumOf { t -> t.amount }
+                        val expense = filtered.filter { t -> t.type == TransactionType.EXPENSE }.sumOf { t -> t.amount }
+                        val investment = filtered.filter { t -> t.type == TransactionType.INVESTMENT }.sumOf { t -> t.amount }
+
                         it.copy(
                             isLoading = false,
                             allTransactions = transactions,
+                            filteredTransactions = filtered,
                             totalIncome = income,
                             totalExpense = expense,
-                            totalInvestment = investment,
-                            filteredTransactions = applyFilter(
-                                transactions,
-                                it.filter,
-                                it.searchQuery
-                            )
+                            totalInvestment = investment
                         )
                     }
                 }
@@ -59,18 +54,34 @@ class HistoryViewModel @Inject constructor(
 
     fun onFilterChange(filter: TransactionFilter) {
         _uiState.update {
+            val filtered = applyFilter(it.allTransactions, filter, it.searchQuery)
+            val income = filtered.filter { t -> t.type == TransactionType.INCOME }.sumOf { t -> t.amount }
+            val expense = filtered.filter { t -> t.type == TransactionType.EXPENSE }.sumOf { t -> t.amount }
+            val investment = filtered.filter { t -> t.type == TransactionType.INVESTMENT }.sumOf { t -> t.amount }
+
             it.copy(
                 filter = filter,
-                filteredTransactions = applyFilter(it.allTransactions, filter, it.searchQuery)
+                filteredTransactions = filtered,
+                totalIncome = income,
+                totalExpense = expense,
+                totalInvestment = investment
             )
         }
     }
 
     fun onSearchChange(query: String) {
         _uiState.update {
+            val filtered = applyFilter(it.allTransactions, it.filter, query)
+            val income = filtered.filter { t -> t.type == TransactionType.INCOME }.sumOf { t -> t.amount }
+            val expense = filtered.filter { t -> t.type == TransactionType.EXPENSE }.sumOf { t -> t.amount }
+            val investment = filtered.filter { t -> t.type == TransactionType.INVESTMENT }.sumOf { t -> t.amount }
+
             it.copy(
                 searchQuery = query,
-                filteredTransactions = applyFilter(it.allTransactions, it.filter, query)
+                filteredTransactions = filtered,
+                totalIncome = income,
+                totalExpense = expense,
+                totalInvestment = investment
             )
         }
     }

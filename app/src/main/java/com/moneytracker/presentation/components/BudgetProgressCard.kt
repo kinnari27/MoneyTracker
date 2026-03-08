@@ -162,23 +162,25 @@ fun BudgetProgressCard(
                 trackColor = cs.surfaceVariant
             )
 
-            Spacer(Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    "₹0",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = colors.textSecondary
-                )
-                Text(
-                    "Goal: ₹${total.toInt()}",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = colors.textSecondary,
-                    fontWeight = FontWeight.SemiBold
-                )
+            // ── Only show ₹0 / Goal row when a budget limit is actually set ──────
+            if (total > 0) {
+                Spacer(Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        "₹0",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = colors.textSecondary
+                    )
+                    Text(
+                        "Goal: ₹${total.toInt()}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = colors.textSecondary,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
 
             // Over-budget warning

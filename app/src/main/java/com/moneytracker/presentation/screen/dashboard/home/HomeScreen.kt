@@ -1,5 +1,7 @@
 package com.moneytracker.presentation.screen.dashboard.home
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -21,14 +23,20 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -52,7 +60,6 @@ import java.util.Date
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
-    onAddClick: () -> Unit,
     onSeeAllClick: () -> Unit,
     onTransactionClick: (Transaction) -> Unit,
     modifier: Modifier = Modifier
@@ -60,168 +67,192 @@ fun HomeScreen(
     val greeting = remember { getGreeting() }
     val userName = uiState.userName.ifBlank { "User" }
 
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 16.dp)
-    ) {
-        // ── Header ────────────────────────────────────────────────────────────
-        item {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        Brush.linearGradient(
-                            colors = listOf(PrimaryDark, Primary, PrimaryLight)
+    Scaffold(modifier = modifier.fillMaxSize()) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentPadding = PaddingValues(bottom = 16.dp)
+        ) {
+
+            // ── Header ──────────────────────────────────────────────────────────
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            Brush.linearGradient(listOf(PrimaryDark, Primary, PrimaryLight))
                         )
-                    )
-                    .statusBarsPadding()
-                    .padding(top = 24.dp, start = 20.dp, end = 20.dp, bottom = 80.dp)
-            ) {
-                Column {
-                    // Greeting
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(
-                                "$greeting 👋",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.White.copy(alpha = 0.7f)
-                            )
-                            Text(
-                                userName,
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = Color.White
-                            )
+                        .statusBarsPadding()
+                        .padding(top = 20.dp, start = 20.dp, end = 20.dp, bottom = 80.dp)
+                ) {
+                    Column {
+
+                        // Greeting row
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(
+                                    "$greeting 👋",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.White.copy(alpha = 0.75f)
+                                )
+                                Text(
+                                    userName,
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = Color.White
+                                )
+                            }
                         }
-                        Box(
-                            modifier = Modifier
-                                .size(44.dp)
-                                .clip(CircleShape)
-                                .background(Color.White.copy(alpha = 0.2f)),
-                            contentAlignment = Alignment.Center
+
+                        Spacer(Modifier.height(20.dp))
+
+                        // Balance
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                uiState.userInitial,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
+                                "Total Balance",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White.copy(alpha = 0.7f),
+                                letterSpacing = 0.5.sp
+                            )
+                            Spacer(Modifier.height(2.dp))
+                            AnimatedBalanceText(uiState.totalBalance)
+                        }
+
+                        Spacer(Modifier.height(16.dp))
+
+                        // Income / Expense tiles
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            BalanceTile(
+                                label = "Income",
+                                value = "₹${uiState.totalIncome.toInt()}",
+                                color = Success,
+                                prefix = "↑",
+                                modifier = Modifier.weight(1f)
+                            )
+                            BalanceTile(
+                                label = "Expense",
+                                value = "₹${uiState.totalExpense.toInt()}",
+                                color = Error,
+                                prefix = "↓",
+                                modifier = Modifier.weight(1f)
                             )
                         }
-                    }
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    // Balance
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            "Total Balance",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.White.copy(alpha = 0.7f)
-                        )
-                        Text(
-                            "₹${uiState.totalBalance.toInt()}",
-                            style = MaterialTheme.typography.displaySmall,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color.White
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    // Income / Expense Row
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        BalanceTile(
-                            label = "Income",
-                            value = "₹${uiState.totalIncome.toInt()}",
-                            color = Success,
-                            prefix = "↑",
-                            modifier = Modifier.weight(1f)
-                        )
-                        BalanceTile(
-                            label = "Expense",
-                            value = "₹${uiState.totalExpense.toInt()}",
-                            color = Error,
-                            prefix = "↓",
-                            modifier = Modifier.weight(1f)
-                        )
                     }
                 }
             }
-        }
 
-        // ── Pull-up Cards ─────────────────────────────────────────────────────
-        item {
-            Column(
-                modifier = Modifier
-                    .offset(y = (-36).dp)
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                BudgetProgressCard(
-                    spent = uiState.totalExpense,
-                    total = uiState.budgetLimit
-                )
+            // ── Budget card ──────────────────────────────────────────────────────
+            item {
+                Box(
+                    modifier = Modifier
+                        .offset(y = (-58).dp)
+                        .padding(horizontal = 16.dp)
+                ) {
+                    BudgetProgressCard(
+                        spent = uiState.totalExpense,
+                        total = uiState.budgetLimit
+                    )
+                }
+            }
+            // ── "Recent Transactions" header — pulled up, zero gap ───────────────
+            item {
                 SectionHeader(
                     title = "Recent Transactions",
                     actionText = "See all",
-                    onAction = onSeeAllClick
+                    onAction = onSeeAllClick,
+                    modifier = Modifier
+                        .offset(y = (-20).dp)
+                        .padding(horizontal = 16.dp)
                 )
             }
-        }
 
-        // ── Transactions List ─────────────────────────────────────────────────
-        if (uiState.isLoading) {
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(32.dp),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator(color = Primary) }
-            }
-        } else if (uiState.recentTransactions.isEmpty()) {
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(32.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("No transactions yet", color = OnSurfaceVariant)
+            // ── Transactions list ────────────────────────────────────────────────
+            when {
+                uiState.isLoading -> item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .offset(y = (-16).dp)
+                            .padding(40.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = Primary, strokeCap = StrokeCap.Round)
+                    }
+                }
+
+                uiState.recentTransactions.isEmpty() -> item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .offset(y = (-16).dp)
+                            .padding(vertical = 32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("🧾", fontSize = 32.sp)
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            "No transactions yet",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            color = OnSurfaceVariant
+                        )
+                        Text(
+                            "Add one to start tracking",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = OnSurfaceVariant.copy(alpha = 0.6f)
+                        )
+                    }
+                }
+
+                else -> items(
+                    items = uiState.recentTransactions,
+                    key = { it.id }
+                ) { transaction ->
+                    TransactionCard(
+                        transaction = transaction,
+                        onClick = { onTransactionClick(transaction) },
+                        modifier = Modifier
+                            .offset(y = (-16).dp)
+                            .padding(horizontal = 16.dp)
+                            .padding(bottom = 6.dp)
+                    )
                 }
             }
-        } else {
-            items(uiState.recentTransactions) { transaction ->
-                TransactionCard(
-                    transaction = transaction,
-                    onClick = { onTransactionClick(transaction) },
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 8.dp)
-                )
-            }
         }
     }
 }
 
-private fun getGreeting(): String {
-    return when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
-        in 0..11 -> "Good Morning"
-        in 12..15 -> "Good Afternoon"
-        in 16..20 -> "Good Evening"
-        else -> "Good Night"
-    }
+// ── Animated balance ──────────────────────────────────────────────────────────
+
+@Composable
+private fun AnimatedBalanceText(balance: Double) {
+    var triggered by remember { mutableStateOf(false) }
+    val animated by animateFloatAsState(
+        targetValue = if (triggered) balance.toFloat() else 0f,
+        animationSpec = tween(800),
+        label = "balance"
+    )
+    LaunchedEffect(balance) { triggered = true }
+    Text(
+        "₹${animated.toInt()}",
+        style = MaterialTheme.typography.displaySmall,
+        fontWeight = FontWeight.ExtraBold,
+        color = Color.White
+    )
 }
+
+// ── BalanceTile ───────────────────────────────────────────────────────────────
 
 @Composable
 private fun BalanceTile(
@@ -233,10 +264,10 @@ private fun BalanceTile(
 ) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(color.copy(alpha = 0.2f))
-            .border(1.dp, color.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
-            .padding(14.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .background(color.copy(alpha = 0.18f))
+            .border(1.dp, color.copy(alpha = 0.3f), RoundedCornerShape(14.dp))
+            .padding(12.dp)
     ) {
         Column {
             Row(
@@ -245,17 +276,12 @@ private fun BalanceTile(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(22.dp)
+                        .size(20.dp)
                         .clip(CircleShape)
                         .background(color),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        prefix,
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Text(prefix, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                 }
                 Text(
                     label,
@@ -273,6 +299,17 @@ private fun BalanceTile(
         }
     }
 }
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+private fun getGreeting(): String = when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
+    in 0..11  -> "Good Morning"
+    in 12..15 -> "Good Afternoon"
+    in 16..20 -> "Good Evening"
+    else      -> "Good Night"
+}
+
+// ── Preview ───────────────────────────────────────────────────────────────────
 
 @Preview(showBackground = true)
 @Composable
@@ -305,7 +342,7 @@ fun HomeScreenPreview() {
                     ),
                     Transaction(
                         id = 3,
-                        title = "Netflix Subscription",
+                        title = "Netflix",
                         amount = 499.0,
                         category = Category.ENTERTAINMENT,
                         type = TransactionType.EXPENSE,
@@ -313,7 +350,6 @@ fun HomeScreenPreview() {
                     )
                 )
             ),
-            onAddClick = {},
             onSeeAllClick = {},
             onTransactionClick = {}
         )

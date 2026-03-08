@@ -89,7 +89,6 @@ fun NavGraph(navController: NavHostController) {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             HomeScreen(
                 uiState = uiState,
-                onAddClick = { navController.navigate(BottomNavItem.Add.route) },
                 onSeeAllClick = { navController.navigate(BottomNavItem.History.route) },
                 onTransactionClick = { tx -> navController.navigate(Routes.editTransaction(tx.id)) }
             )
@@ -120,6 +119,7 @@ fun NavGraph(navController: NavHostController) {
                 onAmountChange = viewModel::onAmountChange,
                 onCategorySelect = viewModel::onCategorySelect,
                 onTypeChange = viewModel::onTypeChange,
+                onDateChange = viewModel::onDateChange,
                 onNoteChange = viewModel::onNoteChange,
                 onRecurringToggle = viewModel::onRecurringToggle,
                 onSave = viewModel::saveTransaction,

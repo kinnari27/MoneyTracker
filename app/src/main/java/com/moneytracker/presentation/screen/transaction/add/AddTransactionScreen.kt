@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -30,28 +29,45 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Repeat
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -71,6 +87,9 @@ import com.moneytracker.ui.theme.MoneyTrackerTheme
 import com.moneytracker.ui.theme.PrimaryDark
 import com.moneytracker.ui.theme.Success
 import com.moneytracker.ui.theme.Warning
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 // ── Colour per type ───────────────────────────────────────────────────────────
 private val TransactionType.accentColor: Color
@@ -95,6 +114,7 @@ private val TransactionType.arrow: String
     }
 
 // ── Entry point ───────────────────────────────────────────────────────────────
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionScreen(
     uiState: AddTransactionUiState,
@@ -102,6 +122,7 @@ fun AddTransactionScreen(
     onAmountChange: (String) -> Unit,
     onCategorySelect: (String) -> Unit,
     onTypeChange: (TransactionType) -> Unit,
+    onDateChange: (Date) -> Unit,
     onNoteChange: (String) -> Unit,
     onRecurringToggle: () -> Unit,
     onSave: () -> Unit,
@@ -114,6 +135,44 @@ fun AddTransactionScreen(
 
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) onSaveSuccess()
+    }
+
+    // Date Picker State
+    var showDatePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = uiState.date.time,
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                val today = System.currentTimeMillis()
+                return utcTimeMillis <= today
+            }
+        }
+    )
+
+    // FIX: Focus requester for amount field to improve tap-to-edit UX
+    val amountFocusRequester = remember { FocusRequester() }
+
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let {
+                        onDateChange(Date(it))
+                    }
+                    showDatePicker = false
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Cancel")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
     }
 
     Column(
@@ -130,13 +189,13 @@ fun AddTransactionScreen(
                 .background(Brush.linearGradient(listOf(PrimaryDark, cs.primary)))
                 .padding(top = 52.dp, start = 20.dp, end = 20.dp, bottom = 36.dp)
         ) {
-            Column {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
                             if (uiState.isEditMode) "Edit Entry" else "New Entry",
                             style = MaterialTheme.typography.bodyMedium,
@@ -149,23 +208,24 @@ fun AddTransactionScreen(
                             color = Color.White
                         )
                     }
+                    // FIX: Only show delete icon in edit mode with a clearer red tint for destructive action
                     if (uiState.isEditMode) {
                         IconButton(
                             onClick = onDelete,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(12.dp))
-                                .background(Color.White.copy(0.15f))
+                                .background(Error.copy(alpha = 0.25f))
                         ) {
                             Icon(
                                 Icons.Default.Delete,
-                                contentDescription = "Delete",
+                                contentDescription = "Delete transaction",
                                 tint = Color.White
                             )
                         }
                     }
                 }
 
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(24.dp))
 
                 // ── 3-way type toggle ─────────────────────────────────────────
                 Row(
@@ -209,11 +269,14 @@ fun AddTransactionScreen(
                     }
                 }
 
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(32.dp))
 
                 // ── Amount input ──────────────────────────────────────────────
+                // FIX: Wrap amount area in a clickable box to focus the text field on tap
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { amountFocusRequester.requestFocus() },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
@@ -222,45 +285,62 @@ fun AddTransactionScreen(
                         color = Color.White.copy(0.6f)
                     )
                     Spacer(Modifier.height(8.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            "₹",
-                            style = MaterialTheme.typography.headlineMedium,
-                            color = Color.White.copy(0.5f)
-                        )
-                        BasicTextField(
-                            value = uiState.amount,
-                            onValueChange = onAmountChange,
-                            textStyle = MaterialTheme.typography.displaySmall.copy(
-                                color = Color.White,
-                                fontWeight = FontWeight.ExtraBold,
-                                textAlign = TextAlign.Center
-                            ),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            singleLine = true,
-                            modifier = Modifier.widthIn(min = 80.dp, max = 240.dp),
-                            decorationBox = { inner ->
-                                if (uiState.amount.isEmpty()) {
-                                    Text(
-                                        "0",
-                                        style = MaterialTheme.typography.displaySmall.copy(
-                                            color = Color.White.copy(0.35f),
-                                            fontWeight = FontWeight.ExtraBold,
-                                            textAlign = TextAlign.Center
+
+                    BasicTextField(
+                        value = uiState.amount,
+                        onValueChange = onAmountChange,
+                        textStyle = MaterialTheme.typography.displaySmall.copy(
+                            color = Color.White,
+                            fontWeight = FontWeight.ExtraBold,
+                            textAlign = TextAlign.Center
+                        ),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true,
+                        // FIX: Use white cursor color so it's visible on dark header background
+                        cursorBrush = SolidColor(Color.White),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(amountFocusRequester),
+                        decorationBox = { inner ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center,
+                                // FIX: Align to Bottom so ₹ and number share the same baseline
+                                verticalAlignment = Alignment.Bottom
+                            ) {
+                                // FIX: Match ₹ font size to the number's displaySmall size
+                                // and add a small bottom padding to optically align the glyphs
+                                Text(
+                                    "₹",
+                                    style = MaterialTheme.typography.displaySmall.copy(
+                                        color = Color.White.copy(0.5f),
+                                        fontWeight = FontWeight.Bold
+                                    ),
+                                    modifier = Modifier.padding(bottom = 4.dp)
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                Box(contentAlignment = Alignment.Center) {
+                                    if (uiState.amount.isEmpty()) {
+                                        Text(
+                                            "0",
+                                            style = MaterialTheme.typography.displaySmall.copy(
+                                                color = Color.White.copy(0.35f),
+                                                fontWeight = FontWeight.ExtraBold,
+                                                textAlign = TextAlign.Center
+                                            )
                                         )
-                                    )
+                                    }
+                                    inner()
                                 }
-                                inner()
                             }
-                        )
-                    }
+                        }
+                    )
+
                     Spacer(Modifier.height(8.dp))
+                    // FIX: Use fillMaxWidth fraction so underline scales with amount text
                     Box(
                         modifier = Modifier
-                            .width(72.dp)
+                            .fillMaxWidth(0.5f)
                             .height(2.dp)
                             .clip(RoundedCornerShape(2.dp))
                             .background(Color.White.copy(0.35f))
@@ -269,17 +349,20 @@ fun AddTransactionScreen(
                     // Investment: show maturity hint
                     if (uiState.type == TransactionType.INVESTMENT) {
                         Spacer(Modifier.height(10.dp))
+                        // FIX: Use fillMaxWidth so text doesn't get cramped on small screens
                         Box(
                             modifier = Modifier
+                                .fillMaxWidth(0.9f)
                                 .clip(RoundedCornerShape(99.dp))
                                 .background(Color.White.copy(0.12f))
                                 .padding(horizontal = 14.dp, vertical = 6.dp)
                         ) {
                             Text(
-                                "Amount will be tracked as investment, not spending",
+                                "Tracked as investment, not spending",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = Color.White.copy(0.8f),
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
                     }
@@ -295,7 +378,7 @@ fun AddTransactionScreen(
 
             // Title
             FormCard {
-                FormLabel("Title")
+                FormLabel("Title (optional)")
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     value = uiState.title,
@@ -358,21 +441,33 @@ fun AddTransactionScreen(
                 Surface(
                     shape = RoundedCornerShape(14.dp),
                     color = colors.inputBackground,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(14.dp))
+                        .clickable { showDatePicker = true }
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(
-                            java.text.SimpleDateFormat(
-                                "MMM dd yyyy",
-                                java.util.Locale.getDefault()
-                            ).format(uiState.date),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = cs.onSurface
-                        )
+                        // FIX: Added calendar icon for better affordance
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.CalendarMonth,
+                                contentDescription = null,
+                                tint = cs.primary,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Text(
+                                SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(uiState.date),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = cs.onSurface
+                            )
+                        }
                         Text(
                             "Change",
                             style = MaterialTheme.typography.labelSmall,
@@ -415,18 +510,38 @@ fun AddTransactionScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column {
-                            Text(
-                                "Recurring",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = cs.onSurface
-                            )
-                            Text(
-                                "Repeat monthly",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = colors.textSecondary
-                            )
+                        // FIX: Added repeat icon to anchor the toggle row visually
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(38.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(cs.primary.copy(alpha = 0.10f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Repeat,
+                                    contentDescription = null,
+                                    tint = cs.primary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                            Column {
+                                Text(
+                                    "Recurring",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = cs.onSurface
+                                )
+                                Text(
+                                    "Repeat monthly",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = colors.textSecondary
+                                )
+                            }
                         }
                         Switch(
                             checked = uiState.isRecurring,
@@ -442,32 +557,61 @@ fun AddTransactionScreen(
 
             // Error
             AnimatedVisibility(visible = uiState.error != null) {
+                // FIX: Removed redundant contentColor on CardDefaults — text color is set directly
                 Card(
                     colors = CardDefaults.cardColors(
-                        containerColor = colors.errorContainer,
-                        contentColor = colors.error
+                        containerColor = colors.errorContainer
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text(
-                        text = uiState.error ?: "",
-                        color = colors.error,
+                    Row(
                         modifier = Modifier.padding(14.dp),
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // FIX: Added info icon to error card for better visual communication
+                        Icon(
+                            imageVector = Icons.Outlined.Info,
+                            contentDescription = null,
+                            tint = colors.error,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Text(
+                            text = uiState.error ?: "",
+                            color = colors.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
                 }
             }
 
             // Save button
             val canSave = uiState.amount.isNotBlank()
                     && uiState.selectedCategory.isNotBlank()
-                    && uiState.title.isNotBlank()
 
             val buttonColor = when (uiState.type) {
                 TransactionType.INCOME -> Success
                 TransactionType.EXPENSE -> cs.primary
                 TransactionType.INVESTMENT -> Warning
+            }
+
+            // FIX: Show hint text when button is disabled so user knows what's missing
+            if (!canSave && !uiState.isLoading) {
+                val hint = when {
+                    uiState.amount.isBlank() -> "Enter an amount to continue"
+                    uiState.selectedCategory.isBlank() -> "Select a category to continue"
+                    else -> null
+                }
+                if (hint != null) {
+                    Text(
+                        text = hint,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = colors.textSecondary,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
 
             Button(
@@ -479,7 +623,10 @@ fun AddTransactionScreen(
                 shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = buttonColor,
-                    contentColor = Color.White
+                    contentColor = Color.White,
+                    // FIX: Explicit disabled colors so the muted state is clear
+                    disabledContainerColor = buttonColor.copy(alpha = 0.38f),
+                    disabledContentColor = Color.White.copy(alpha = 0.6f)
                 )
             ) {
                 if (uiState.isLoading) {
@@ -503,7 +650,29 @@ fun AddTransactionScreen(
                 }
             }
 
+            // FIX: In edit mode, add a visual separator before the delete button
+            // so it's clearly separated from the save action (destructive vs. constructive)
             if (uiState.isEditMode) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    HorizontalDivider(
+                        modifier = Modifier.weight(1f),
+                        color = colors.outline.copy(alpha = 0.5f)
+                    )
+                    Text(
+                        "or",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = colors.textSecondary
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier.weight(1f),
+                        color = colors.outline.copy(alpha = 0.5f)
+                    )
+                }
+
                 OutlinedButton(
                     onClick = onDelete,
                     modifier = Modifier
@@ -515,6 +684,14 @@ fun AddTransactionScreen(
                     ),
                     border = androidx.compose.foundation.BorderStroke(1.dp, Error)
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(18.dp)
+                            .padding(end = 0.dp)
+                    )
+                    Spacer(Modifier.width(8.dp))
                     Text("Delete Transaction", fontWeight = FontWeight.Bold)
                 }
             }
@@ -567,15 +744,24 @@ private fun InvestmentCategoryGrid(selected: String, onSelect: (String) -> Unit)
 
         // Info pill
         Spacer(Modifier.height(8.dp))
-        Box(
+        // FIX: Row layout with icon for investment info pill — more scannable than wall of text
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
                 .background(Warning.copy(0.10f))
-                .padding(horizontal = 14.dp, vertical = 10.dp)
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            Icon(
+                imageVector = Icons.Outlined.Info,
+                contentDescription = null,
+                tint = Warning,
+                modifier = Modifier.size(16.dp)
+            )
             Text(
-                "Investment transactions are tracked separately from your spending.",
+                "Tracked separately from your spending.",
                 style = MaterialTheme.typography.labelSmall,
                 color = Warning,
                 fontWeight = FontWeight.SemiBold
@@ -623,7 +809,8 @@ private fun CategoryGrid(
                                 else colors.surfaceVariant
                             )
                             .border(
-                                2.dp,
+                                // FIX: Use 1.5.dp for selected border — 2.dp felt heavy on small chips
+                                1.5.dp,
                                 if (isSelected) color else Color.Transparent,
                                 RoundedCornerShape(14.dp)
                             )
@@ -651,8 +838,11 @@ private fun CategoryGrid(
                         }
                     }
                 }
-                // fill empty slots in last row
-                repeat(4 - row.size) { Spacer(Modifier.weight(1f)) }
+                // FIX: Fill empty last-row slots with invisible boxes that match chip weight
+                // so items don't stretch to fill the full row width
+                repeat(4 - row.size) {
+                    Box(modifier = Modifier.weight(1f))
+                }
             }
         }
     }
@@ -701,7 +891,7 @@ private fun PreviewExpenseLight() {
         AddTransactionScreen(
             uiState = AddTransactionUiState(type = TransactionType.EXPENSE),
             onTitleChange = {}, onAmountChange = {}, onCategorySelect = {},
-            onTypeChange = {}, onNoteChange = {}, onRecurringToggle = {},
+            onTypeChange = {}, onDateChange = {}, onNoteChange = {}, onRecurringToggle = {},
             onSave = {}, onDelete = {}, onSaveSuccess = {}
         )
     }
@@ -717,7 +907,7 @@ private fun PreviewInvestmentDark() {
                 selectedCategory = "Fixed Deposit"
             ),
             onTitleChange = {}, onAmountChange = {}, onCategorySelect = {},
-            onTypeChange = {}, onNoteChange = {}, onRecurringToggle = {},
+            onTypeChange = {}, onDateChange = {}, onNoteChange = {}, onRecurringToggle = {},
             onSave = {}, onDelete = {}, onSaveSuccess = {}
         )
     }
@@ -733,7 +923,7 @@ private fun PreviewIncomeLight() {
                 selectedCategory = "Salary"
             ),
             onTitleChange = {}, onAmountChange = {}, onCategorySelect = {},
-            onTypeChange = {}, onNoteChange = {}, onRecurringToggle = {},
+            onTypeChange = {}, onDateChange = {}, onNoteChange = {}, onRecurringToggle = {},
             onSave = {}, onDelete = {}, onSaveSuccess = {}
         )
     }

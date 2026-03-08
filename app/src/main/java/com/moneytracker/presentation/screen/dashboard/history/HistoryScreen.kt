@@ -1,16 +1,21 @@
 package com.moneytracker.presentation.screen.dashboard.history
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -35,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.moneytracker.domain.model.Category
@@ -54,6 +60,10 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+// ─────────────────────────────────────────────────────────────────────────────
+// HistoryScreen
+// ─────────────────────────────────────────────────────────────────────────────
+
 @Composable
 fun HistoryScreen(
     uiState: HistoryUiState,
@@ -66,10 +76,10 @@ fun HistoryScreen(
     modifier: Modifier = Modifier
 ) {
     val grouped = uiState.filteredTransactions.groupBy { transaction ->
-        val sdf = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-        sdf.format(transaction.date)
+        SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(transaction.date)
     }
 
+    // ── Delete confirmation dialog ───────────────────────────────────────────
     if (uiState.transactionToDelete != null) {
         AlertDialog(
             onDismissRequest = onDismissDelete,
@@ -79,23 +89,21 @@ fun HistoryScreen(
                 Button(
                     onClick = onConfirmDelete,
                     colors = ButtonDefaults.buttonColors(containerColor = Error)
-                ) {
-                    Text("Delete")
-                }
+                ) { Text("Delete") }
             },
             dismissButton = {
-                TextButton(onClick = onDismissDelete) {
-                    Text("Cancel")
-                }
+                TextButton(onClick = onDismissDelete) { Text("Cancel") }
             }
         )
     }
 
+    // ── Main list ────────────────────────────────────────────────────────────
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 90.dp)
     ) {
-        // Header
+
+        // ── Gradient header + search bar ─────────────────────────────────────
         item {
             Box(
                 modifier = Modifier
@@ -105,37 +113,35 @@ fun HistoryScreen(
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     Text(
-                        "Transactions",
+                        text = "Transactions",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.ExtraBold,
                         color = Color.White
                     )
-
-                    // Search Bar
                     OutlinedTextField(
                         value = uiState.searchQuery,
                         onValueChange = onSearchChange,
                         placeholder = {
                             Text(
                                 "Search transactions...",
-                                color = Color.White.copy(0.6f)
+                                color = Color.White.copy(alpha = 0.6f)
                             )
                         },
                         leadingIcon = {
                             Icon(
                                 Icons.Default.Search,
-                                null,
-                                tint = Color.White.copy(0.7f)
+                                contentDescription = null,
+                                tint = Color.White.copy(alpha = 0.7f)
                             )
                         },
                         singleLine = true,
                         shape = RoundedCornerShape(14.dp),
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color.White.copy(0.3f),
+                            unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
                             focusedBorderColor = Color.White,
-                            unfocusedContainerColor = Color.White.copy(0.15f),
-                            focusedContainerColor = Color.White.copy(0.2f),
+                            unfocusedContainerColor = Color.White.copy(alpha = 0.15f),
+                            focusedContainerColor = Color.White.copy(alpha = 0.2f),
                             unfocusedTextColor = Color.White,
                             focusedTextColor = Color.White,
                             cursorColor = Color.White
@@ -145,92 +151,52 @@ fun HistoryScreen(
             }
         }
 
+        // ── Summary cards + filter chips ─────────────────────────────────────
         item {
             Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp)
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Summary Row
+                // 4-column summary row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     listOf(
-                        Triple("Income", "₹${uiState.totalIncome.toInt()}", Success),
-                        Triple("Expense", "₹${uiState.totalExpense.toInt()}", Error),
-                        Triple("Investment", "₹${uiState.totalInvestment.toInt()}", Accent),
+                        Triple("Income",     "₹${uiState.totalIncome.toInt()}",      Success),
+                        Triple("Expense",    "₹${uiState.totalExpense.toInt()}",     Error),
+                        Triple("Invest",     "₹${uiState.totalInvestment.toInt()}", Accent),
                         Triple(
                             "Net",
                             "₹${(uiState.totalIncome - uiState.totalExpense).toInt()}",
                             Primary
                         )
                     ).forEach { (label, value, color) ->
-                        Card(
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(containerColor = Surface),
-                            elevation = CardDefaults.cardElevation(1.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(12.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    value,
-                                    style = MaterialTheme.typography.titleSmall,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = color,
-                                    maxLines = 1
-                                )
-                                Text(
-                                    label,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = OnSurfaceVariant,
-                                    maxLines = 1
-                                )
-                            }
-                        }
-                    }
-                }
-
-                // Filter Chips
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    TransactionFilter.values().forEach { f ->
-                        FilterChip(
-                            modifier = Modifier.weight(1f),
-                            selected = uiState.filter == f,
-                            onClick = { onFilterChange(f) },
-                            label = {
-                                Box(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        f.name.lowercase().replaceFirstChar { it.uppercase() },
-                                        style = MaterialTheme.typography.labelSmall
-                                    )
-                                }
-                            },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = Primary,
-                                selectedLabelColor = Color.White,
-                                containerColor = Surface
-                            )
+                        SummaryCard(
+                            label = label,
+                            value = value,
+                            color = color,
+                            modifier = Modifier.weight(1f)
                         )
                     }
                 }
+
+                // Scrollable filter chips — labels never clip or wrap
+                ScrollableFilterChips(
+                    selectedFilter = uiState.filter,
+                    onFilterChange = onFilterChange
+                )
             }
         }
 
+        // ── Loading / empty / list ────────────────────────────────────────────
         if (uiState.isLoading) {
             item {
                 Box(
-                    Modifier
+                    modifier = Modifier
                         .fillMaxWidth()
-                        .padding(32.dp), contentAlignment = Alignment.Center
+                        .padding(32.dp),
+                    contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator(color = Primary)
                 }
@@ -238,23 +204,26 @@ fun HistoryScreen(
         } else if (grouped.isEmpty()) {
             item {
                 Box(
-                    Modifier
+                    modifier = Modifier
                         .fillMaxWidth()
-                        .padding(40.dp), contentAlignment = Alignment.Center
+                        .padding(40.dp),
+                    contentAlignment = Alignment.Center
                 ) {
                     Text("No transactions found", color = OnSurfaceVariant)
                 }
             }
         } else {
             grouped.forEach { (dateString, transactions) ->
+
+                // Date header row
                 item {
-                    val date = try {
+                    val date = runCatching {
                         SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).parse(dateString)
-                    } catch (e: Exception) {
-                        null
-                    }
+                    }.getOrNull()
                     val dayName =
-                        date?.let { SimpleDateFormat("EEEE", Locale.getDefault()).format(it) } ?: ""
+                        date?.let {
+                            SimpleDateFormat("EEEE", Locale.getDefault()).format(it)
+                        } ?: ""
 
                     Row(
                         modifier = Modifier
@@ -265,23 +234,28 @@ fun HistoryScreen(
                     ) {
                         Column {
                             Text(
-                                dateString,
+                                text = dateString,
                                 style = MaterialTheme.typography.labelLarge,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                dayName,
+                                text = dayName,
                                 style = MaterialTheme.typography.labelSmall,
                                 color = OnSurfaceVariant
                             )
                         }
-                        Surface(shape = RoundedCornerShape(99.dp), color = SurfaceVariant) {
+
+                        // Day net badge
+                        Surface(
+                            shape = RoundedCornerShape(99.dp),
+                            color = SurfaceVariant
+                        ) {
                             val dayNet = transactions.sumOf {
                                 when (it.type) {
-                                    TransactionType.INCOME -> it.amount
-                                    TransactionType.EXPENSE -> -it.amount
-                                    TransactionType.INVESTMENT -> 0.0 // Investment is usually an asset, not a daily net change component in same way as expense
+                                    TransactionType.INCOME     ->  it.amount
+                                    TransactionType.EXPENSE    -> -it.amount
+                                    TransactionType.INVESTMENT ->  0.0
                                 }
                             }
                             Text(
@@ -291,11 +265,16 @@ fun HistoryScreen(
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = if (dayNet >= 0) Success else Error,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                                modifier = Modifier.padding(
+                                    horizontal = 12.dp,
+                                    vertical = 6.dp
+                                )
                             )
                         }
                     }
                 }
+
+                // Transaction cards for this date
                 items(transactions) { transaction ->
                     TransactionCard(
                         transaction = transaction,
@@ -311,16 +290,105 @@ fun HistoryScreen(
     }
 }
 
-@Preview(showBackground = true)
+// ─────────────────────────────────────────────────────────────────────────────
+// SummaryCard — compact card for Income / Expense / Investment / Net
+// ─────────────────────────────────────────────────────────────────────────────
+
+@Composable
+private fun SummaryCard(
+    label: String,
+    value: String,
+    color: Color,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp, horizontal = 6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = value,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.ExtraBold,
+                color = color,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = OnSurfaceVariant,
+                maxLines = 1
+            )
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ScrollableFilterChips — horizontally scrollable row; chips never clip/wrap
+// ─────────────────────────────────────────────────────────────────────────────
+
+@Composable
+private fun ScrollableFilterChips(
+    selectedFilter: TransactionFilter,
+    onFilterChange: (TransactionFilter) -> Unit,
+    scrollState: ScrollState = rememberScrollState()
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(scrollState),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        TransactionFilter.values().forEach { f ->
+            val label = when (f) {
+                TransactionFilter.ALL        -> "All"
+                TransactionFilter.INCOME     -> "Income"
+                TransactionFilter.EXPENSE    -> "Expense"
+                TransactionFilter.INVESTMENT -> "Investment"
+            }
+            FilterChip(
+                selected = selectedFilter == f,
+                onClick = { onFilterChange(f) },
+                label = {
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.labelMedium,
+                        maxLines = 1
+                    )
+                },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = Primary,
+                    selectedLabelColor = Color.White,
+                    containerColor = Surface
+                )
+            )
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Previews
+// ─────────────────────────────────────────────────────────────────────────────
+
+@Preview(showBackground = true, name = "History — with data")
 @Composable
 fun HistoryScreenPreview() {
     moneytrackerTheme {
         HistoryScreen(
             uiState = HistoryUiState(
                 isLoading = false,
-                totalIncome = 5000.0,
-                totalExpense = 2000.0,
-                totalInvestment = 1000.0,
+                totalIncome = 50000.0,
+                totalExpense = 12500.0,
+                totalInvestment = 10000.0,
                 filteredTransactions = listOf(
                     Transaction(
                         id = 1,
@@ -332,18 +400,90 @@ fun HistoryScreenPreview() {
                     ),
                     Transaction(
                         id = 2,
-                        title = "Freelance",
-                        amount = 5000.0,
+                        title = "Freelance Payment",
+                        amount = 50000.0,
                         category = Category.OTHER,
                         type = TransactionType.INCOME,
                         date = Date()
                     ),
                     Transaction(
                         id = 3,
-                        title = "Mutual Fund",
-                        amount = 1000.0,
+                        title = "Mutual Fund SIP",
+                        amount = 10000.0,
                         category = Category.OTHER,
                         type = TransactionType.INVESTMENT,
+                        date = Date()
+                    )
+                )
+            ),
+            onFilterChange = {},
+            onSearchChange = {},
+            onDeleteTransaction = {},
+            onConfirmDelete = {},
+            onDismissDelete = {},
+            onEditTransaction = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "History — loading")
+@Composable
+fun HistoryScreenLoadingPreview() {
+    moneytrackerTheme {
+        HistoryScreen(
+            uiState = HistoryUiState(isLoading = true),
+            onFilterChange = {},
+            onSearchChange = {},
+            onDeleteTransaction = {},
+            onConfirmDelete = {},
+            onDismissDelete = {},
+            onEditTransaction = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "History — empty")
+@Composable
+fun HistoryScreenEmptyPreview() {
+    moneytrackerTheme {
+        HistoryScreen(
+            uiState = HistoryUiState(isLoading = false),
+            onFilterChange = {},
+            onSearchChange = {},
+            onDeleteTransaction = {},
+            onConfirmDelete = {},
+            onDismissDelete = {},
+            onEditTransaction = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "History — expense filter active")
+@Composable
+fun HistoryScreenFilteredPreview() {
+    moneytrackerTheme {
+        HistoryScreen(
+            uiState = HistoryUiState(
+                isLoading = false,
+                filter = TransactionFilter.EXPENSE,
+                totalIncome = 50000.0,
+                totalExpense = 12500.0,
+                totalInvestment = 10000.0,
+                filteredTransactions = listOf(
+                    Transaction(
+                        id = 1,
+                        title = "Grocery Shopping",
+                        amount = 2300.0,
+                        category = Category.FOOD,
+                        type = TransactionType.EXPENSE,
+                        date = Date()
+                    ),
+                    Transaction(
+                        id = 4,
+                        title = "Electricity Bill",
+                        amount = 1800.0,
+                        category = Category.OTHER,
+                        type = TransactionType.EXPENSE,
                         date = Date()
                     )
                 )
