@@ -118,7 +118,6 @@ private val TransactionType.arrow: String
 @Composable
 fun AddTransactionScreen(
     uiState: AddTransactionUiState,
-    onTitleChange: (String) -> Unit,
     onAmountChange: (String) -> Unit,
     onCategorySelect: (String) -> Unit,
     onTypeChange: (TransactionType) -> Unit,
@@ -375,38 +374,6 @@ fun AddTransactionScreen(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-
-            // Title
-            FormCard {
-                FormLabel("Title (optional)")
-                Spacer(Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = uiState.title,
-                    onValueChange = onTitleChange,
-                    placeholder = {
-                        Text(
-                            when (uiState.type) {
-                                TransactionType.INCOME -> "e.g. Monthly Salary"
-                                TransactionType.EXPENSE -> "e.g. Grocery Store"
-                                TransactionType.INVESTMENT -> "e.g. HDFC FD — 12 months"
-                            },
-                            color = colors.textSecondary.copy(0.5f)
-                        )
-                    },
-                    singleLine = true,
-                    shape = RoundedCornerShape(14.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedContainerColor = colors.inputBackground,
-                        focusedContainerColor = colors.inputBackground,
-                        unfocusedBorderColor = colors.outline,
-                        focusedBorderColor = cs.primary,
-                        unfocusedTextColor = cs.onSurface,
-                        focusedTextColor = cs.onSurface,
-                        cursorColor = cs.primary
-                    )
-                )
-            }
 
             // ── Category — switches based on type ─────────────────────────────
             AnimatedContent(
@@ -890,7 +857,7 @@ private fun PreviewExpenseLight() {
     MoneyTrackerTheme(darkTheme = false) {
         AddTransactionScreen(
             uiState = AddTransactionUiState(type = TransactionType.EXPENSE),
-            onTitleChange = {}, onAmountChange = {}, onCategorySelect = {},
+            onAmountChange = {}, onCategorySelect = {},
             onTypeChange = {}, onDateChange = {}, onNoteChange = {}, onRecurringToggle = {},
             onSave = {}, onDelete = {}, onSaveSuccess = {}
         )
@@ -906,7 +873,7 @@ private fun PreviewInvestmentDark() {
                 type = TransactionType.INVESTMENT,
                 selectedCategory = "Fixed Deposit"
             ),
-            onTitleChange = {}, onAmountChange = {}, onCategorySelect = {},
+            onAmountChange = {}, onCategorySelect = {},
             onTypeChange = {}, onDateChange = {}, onNoteChange = {}, onRecurringToggle = {},
             onSave = {}, onDelete = {}, onSaveSuccess = {}
         )
@@ -922,7 +889,7 @@ private fun PreviewIncomeLight() {
                 type = TransactionType.INCOME,
                 selectedCategory = "Salary"
             ),
-            onTitleChange = {}, onAmountChange = {}, onCategorySelect = {},
+            onAmountChange = {}, onCategorySelect = {},
             onTypeChange = {}, onDateChange = {}, onNoteChange = {}, onRecurringToggle = {},
             onSave = {}, onDelete = {}, onSaveSuccess = {}
         )

@@ -49,7 +49,6 @@ class EditTransactionViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     id = tx.id,
-                    title = tx.title,
                     amount = tx.amount.toInt().toString(),
                     selectedCategory = tx.category,
                     type = tx.type,
@@ -61,7 +60,6 @@ class EditTransactionViewModel @Inject constructor(
         }
     }
 
-    fun onTitleChange(v: String) = _uiState.update { it.copy(title = v, error = null) }
     fun onAmountChange(v: String) = _uiState.update { it.copy(amount = v, error = null) }
     fun onNoteChange(v: String) = _uiState.update { it.copy(note = v) }
     fun onRecurringToggle() = _uiState.update { it.copy(isRecurring = !it.isRecurring) }
@@ -74,9 +72,6 @@ class EditTransactionViewModel @Inject constructor(
     // ── Save update to Room ───────────────────────────────────────────────────
     fun save() {
         val s = _uiState.value
-        if (s.title.isBlank()) {
-            _uiState.update { it.copy(error = "Please enter a title") }; return
-        }
         val amount = s.amount.toDoubleOrNull()
         if (amount == null || amount <= 0) {
             _uiState.update { it.copy(error = "Please enter a valid amount") }; return
@@ -89,7 +84,6 @@ class EditTransactionViewModel @Inject constructor(
             val result = updateTransactionUseCase(
                 Transaction(
                     id = s.id,
-                    title = s.title.trim(),
                     amount = amount,
                     category = s.selectedCategory,
                     type = s.type,

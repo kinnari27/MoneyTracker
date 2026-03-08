@@ -114,8 +114,8 @@ class HistoryViewModel @Inject constructor(
             TransactionFilter.INVESTMENT -> t.type == TransactionType.INVESTMENT
         }
         val matchQuery = query.isBlank() ||
-                t.title.contains(query, ignoreCase = true) ||
-                t.category.contains(query, ignoreCase = true)
+                t.category.contains(query, ignoreCase = true) ||
+                t.note.contains(query, ignoreCase = true)
         matchType && matchQuery
     }
 }

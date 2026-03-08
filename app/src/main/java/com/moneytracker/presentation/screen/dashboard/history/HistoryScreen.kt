@@ -392,7 +392,6 @@ fun HistoryScreenPreview() {
                 filteredTransactions = listOf(
                     Transaction(
                         id = 1,
-                        title = "Lunch",
                         amount = 500.0,
                         category = Category.FOOD,
                         type = TransactionType.EXPENSE,
@@ -400,7 +399,6 @@ fun HistoryScreenPreview() {
                     ),
                     Transaction(
                         id = 2,
-                        title = "Freelance Payment",
                         amount = 50000.0,
                         category = Category.OTHER,
                         type = TransactionType.INCOME,
@@ -408,7 +406,6 @@ fun HistoryScreenPreview() {
                     ),
                     Transaction(
                         id = 3,
-                        title = "Mutual Fund SIP",
                         amount = 10000.0,
                         category = Category.OTHER,
                         type = TransactionType.INVESTMENT,
@@ -472,7 +469,6 @@ fun HistoryScreenFilteredPreview() {
                 filteredTransactions = listOf(
                     Transaction(
                         id = 1,
-                        title = "Grocery Shopping",
                         amount = 2300.0,
                         category = Category.FOOD,
                         type = TransactionType.EXPENSE,
@@ -480,7 +476,6 @@ fun HistoryScreenFilteredPreview() {
                     ),
                     Transaction(
                         id = 4,
-                        title = "Electricity Bill",
                         amount = 1800.0,
                         category = Category.OTHER,
                         type = TransactionType.EXPENSE,

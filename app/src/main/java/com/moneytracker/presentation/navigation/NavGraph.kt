@@ -115,7 +115,6 @@ fun NavGraph(navController: NavHostController) {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             AddTransactionScreen(
                 uiState = uiState,
-                onTitleChange = viewModel::onTitleChange,
                 onAmountChange = viewModel::onAmountChange,
                 onCategorySelect = viewModel::onCategorySelect,
                 onTypeChange = viewModel::onTypeChange,

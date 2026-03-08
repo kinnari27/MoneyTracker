@@ -172,7 +172,7 @@ fun HomeScreen(
                     actionText = "See all",
                     onAction = onSeeAllClick,
                     modifier = Modifier
-                        .offset(y = (-20).dp)
+                        .offset(y = (-40).dp)
                         .padding(horizontal = 16.dp)
                 )
             }
@@ -183,7 +183,7 @@ fun HomeScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .offset(y = (-16).dp)
+                            .offset(y = (-24).dp)
                             .padding(40.dp),
                         contentAlignment = Alignment.Center
                     ) {
@@ -223,7 +223,7 @@ fun HomeScreen(
                         transaction = transaction,
                         onClick = { onTransactionClick(transaction) },
                         modifier = Modifier
-                            .offset(y = (-16).dp)
+                            .offset(y = (-34).dp)
                             .padding(horizontal = 16.dp)
                             .padding(bottom = 6.dp)
                     )
@@ -326,7 +326,6 @@ fun HomeScreenPreview() {
                 recentTransactions = listOf(
                     Transaction(
                         id = 1,
-                        title = "Groceries",
                         amount = 1200.0,
                         category = Category.FOOD,
                         type = TransactionType.EXPENSE,
@@ -334,7 +333,6 @@ fun HomeScreenPreview() {
                     ),
                     Transaction(
                         id = 2,
-                        title = "Salary",
                         amount = 45000.0,
                         category = Category.OTHER,
                         type = TransactionType.INCOME,
@@ -342,7 +340,6 @@ fun HomeScreenPreview() {
                     ),
                     Transaction(
                         id = 3,
-                        title = "Netflix",
                         amount = 499.0,
                         category = Category.ENTERTAINMENT,
                         type = TransactionType.EXPENSE,

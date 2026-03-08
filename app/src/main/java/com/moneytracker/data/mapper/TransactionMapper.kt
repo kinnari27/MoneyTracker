@@ -7,7 +7,6 @@ import java.util.Date
 
 fun TransactionEntity.toDomain() = Transaction(
     id = id,
-    title = title,
     amount = amount,
     category = category,
     type = TransactionType.valueOf(type.uppercase()),
@@ -18,7 +17,6 @@ fun TransactionEntity.toDomain() = Transaction(
 
 fun Transaction.toEntity() = TransactionEntity(
     id = id,
-    title = title,
     amount = amount,
     category = category,
     type = type.name.lowercase(),

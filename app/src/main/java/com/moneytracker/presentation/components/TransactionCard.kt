@@ -77,21 +77,25 @@ fun TransactionCard(
                 )
             }
 
-            // Title & Category
+            // Category & Note
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = transaction.title,
+                    text = transaction.category,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = OnSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Text(
-                    text = transaction.category,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = OnSurfaceVariant
-                )
+                if (transaction.note.isNotBlank()) {
+                    Text(
+                        text = transaction.note,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = OnSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
 
             // Amount

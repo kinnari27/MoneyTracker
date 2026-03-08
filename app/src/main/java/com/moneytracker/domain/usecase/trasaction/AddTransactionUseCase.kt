@@ -9,7 +9,6 @@ class AddTransactionUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(transaction: Transaction): Result<Long> {
         return try {
-            require(transaction.title.isNotBlank()) { "Title cannot be empty" }
             require(transaction.amount > 0) { "Amount must be greater than 0" }
             require(transaction.category.isNotBlank()) { "Category must be selected" }
             val id = repository.addTransaction(transaction)

@@ -5,7 +5,6 @@ import java.util.Date
 
 data class AddTransactionUiState(
     val id: Int? = null,
-    val title: String = "",
     val amount: String = "",
     val selectedCategory: String = "",
     val type: TransactionType = TransactionType.EXPENSE,

@@ -111,7 +111,6 @@ fun EditTransactionScreen(
 
     EditTransactionContent(
         uiState = uiState,
-        onTitleChange = viewModel::onTitleChange,
         onAmountChange = viewModel::onAmountChange,
         onCategorySelect = viewModel::onCategorySelect,
         onTypeChange = viewModel::onTypeChange,
@@ -127,7 +126,6 @@ fun EditTransactionScreen(
 @Composable
 fun EditTransactionContent(
     uiState: EditTransactionUiState,
-    onTitleChange: (String) -> Unit,
     onAmountChange: (String) -> Unit,
     onCategorySelect: (String) -> Unit,
     onTypeChange: (TransactionType) -> Unit,
@@ -151,7 +149,7 @@ fun EditTransactionContent(
             title = { Text("Delete Transaction?", fontWeight = FontWeight.Bold) },
             text = {
                 Text(
-                    "\"${uiState.title}\" (₹${uiState.amount}) will be permanently deleted.",
+                    "This ${uiState.type.name.lowercase()} (₹${uiState.amount}) will be permanently deleted.",
                     color = colors.textSecondary
                 )
             },
@@ -314,20 +312,6 @@ fun EditTransactionContent(
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
 
-            // Title
-            EditFormCard {
-                EditFormLabel("Title")
-                Spacer(Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = uiState.title,
-                    onValueChange = onTitleChange,
-                    singleLine = true,
-                    shape = RoundedCornerShape(14.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = editFieldColors()
-                )
-            }
-
             // Category — switches by type, same as Add screen
             AnimatedContent(
                 targetState = uiState.type,
@@ -438,8 +422,7 @@ fun EditTransactionContent(
             }
 
             // Save button
-            val canSave =
-                uiState.title.isNotBlank() && uiState.amount.isNotBlank() && uiState.selectedCategory.isNotBlank()
+            val canSave = uiState.amount.isNotBlank() && uiState.selectedCategory.isNotBlank()
             Button(
                 onClick = onSave,
                 enabled = canSave && !uiState.isSaving,

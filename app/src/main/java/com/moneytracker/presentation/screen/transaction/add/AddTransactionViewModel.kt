@@ -45,7 +45,6 @@ class AddTransactionViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         id = transaction.id,
-                        title = transaction.title,
                         amount = transaction.amount.toString(),
                         selectedCategory = transaction.category,
                         type = transaction.type,
@@ -61,7 +60,6 @@ class AddTransactionViewModel @Inject constructor(
         }
     }
 
-    fun onTitleChange(value: String) = _uiState.update { it.copy(title = value, error = null) }
     fun onAmountChange(value: String) = _uiState.update { it.copy(amount = value, error = null) }
     fun onNoteChange(value: String) = _uiState.update { it.copy(note = value) }
     fun onRecurringToggle() = _uiState.update { it.copy(isRecurring = !it.isRecurring) }
@@ -89,7 +87,6 @@ class AddTransactionViewModel @Inject constructor(
 
             val transaction = Transaction(
                 id = state.id ?: 0,
-                title = state.title.trim().ifBlank { state.selectedCategory },
                 amount = amount,
                 category = state.selectedCategory,
                 type = state.type,
@@ -126,7 +123,6 @@ class AddTransactionViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             val transaction = Transaction(
                 id = id,
-                title = state.title,
                 amount = state.amount.toDoubleOrNull() ?: 0.0,
                 category = state.selectedCategory,
                 type = state.type,

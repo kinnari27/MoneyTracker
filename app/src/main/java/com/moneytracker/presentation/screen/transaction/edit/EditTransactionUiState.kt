@@ -4,7 +4,6 @@ import com.moneytracker.domain.model.TransactionType
 
 data class EditTransactionUiState(
     val id: Int = 0,
-    val title: String = "",
     val amount: String = "",
     val selectedCategory: String = "",
     val type: TransactionType = TransactionType.EXPENSE,

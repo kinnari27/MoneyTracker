@@ -533,16 +533,18 @@ private fun LargestExpenseCard(tx: com.moneytracker.domain.model.Transaction) {
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    tx.title,
+                    tx.category,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
                     color = cs.onSurface
                 )
-                Text(
-                    tx.category,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = colors.textSecondary
-                )
+                if (tx.note.isNotBlank()) {
+                    Text(
+                        tx.note,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colors.textSecondary
+                    )
+                }
             }
             Text(
                 "₹${tx.amount.toInt()}",
