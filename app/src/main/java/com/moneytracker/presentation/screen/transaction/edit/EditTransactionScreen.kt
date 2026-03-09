@@ -361,8 +361,8 @@ fun EditTransactionContent(
                 )
             }
 
-            // Recurring toggle (hidden for investments)
-            if (uiState.type != TransactionType.INVESTMENT) {
+            // Recurring toggle — Enabled for Income and Investment, hidden for Expense
+            if (uiState.type != TransactionType.EXPENSE) {
                 EditFormCard {
                     Row(
                         modifier = Modifier.fillMaxWidth(),

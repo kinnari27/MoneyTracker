@@ -10,7 +10,11 @@ data class Transaction(
     val type: TransactionType,
     val note: String = "",
     val date: Date = Date(),
-    val isRecurring: Boolean = false
+    val isRecurring: Boolean = false,
+    // FD specific fields
+    val maturityDate: Date? = null,
+    val interestRate: Double? = null,
+    val maturityAmount: Double? = null
 )
 
 // ── Transaction types ─────────────────────────────────────────────────────────

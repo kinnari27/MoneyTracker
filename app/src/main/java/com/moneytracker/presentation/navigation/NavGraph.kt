@@ -119,6 +119,8 @@ fun NavGraph(navController: NavHostController) {
                 onCategorySelect = viewModel::onCategorySelect,
                 onTypeChange = viewModel::onTypeChange,
                 onDateChange = viewModel::onDateChange,
+                onMaturityDateChange = viewModel::onMaturityDateChange,
+                onInterestRateChange = viewModel::onInterestRateChange,
                 onNoteChange = viewModel::onNoteChange,
                 onRecurringToggle = viewModel::onRecurringToggle,
                 onSave = viewModel::saveTransaction,

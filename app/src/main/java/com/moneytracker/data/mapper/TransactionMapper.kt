@@ -12,7 +12,10 @@ fun TransactionEntity.toDomain() = Transaction(
     type = TransactionType.valueOf(type.uppercase()),
     note = note,
     date = Date(date),
-    isRecurring = isRecurring
+    isRecurring = isRecurring,
+    maturityDate = maturityDate?.let { Date(it) },
+    interestRate = interestRate,
+    maturityAmount = maturityAmount
 )
 
 fun Transaction.toEntity() = TransactionEntity(
@@ -22,5 +25,8 @@ fun Transaction.toEntity() = TransactionEntity(
     type = type.name.lowercase(),
     note = note,
     date = date.time,
-    isRecurring = isRecurring
+    isRecurring = isRecurring,
+    maturityDate = maturityDate?.time,
+    interestRate = interestRate,
+    maturityAmount = maturityAmount
 )

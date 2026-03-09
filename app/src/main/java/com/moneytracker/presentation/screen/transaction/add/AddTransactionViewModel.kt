@@ -3,6 +3,7 @@ package com.moneytracker.presentation.screen.transaction.add
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moneytracker.domain.model.InvestmentCategory
 import com.moneytracker.domain.model.Transaction
 import com.moneytracker.domain.model.TransactionType
 import com.moneytracker.domain.usecase.trasaction.AddTransactionUseCase
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Date
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -51,6 +53,9 @@ class AddTransactionViewModel @Inject constructor(
                         note = transaction.note,
                         date = transaction.date,
                         isRecurring = transaction.isRecurring,
+                        maturityDate = transaction.maturityDate ?: Date(),
+                        interestRate = transaction.interestRate?.toString() ?: "",
+                        maturityAmount = transaction.maturityAmount ?: 0.0,
                         isLoading = false
                     )
                 }
@@ -60,16 +65,56 @@ class AddTransactionViewModel @Inject constructor(
         }
     }
 
-    fun onAmountChange(value: String) = _uiState.update { it.copy(amount = value, error = null) }
+    fun onAmountChange(value: String) {
+        _uiState.update { it.copy(amount = value, error = null) }
+        calculateMaturity()
+    }
+
     fun onNoteChange(value: String) = _uiState.update { it.copy(note = value) }
     fun onRecurringToggle() = _uiState.update { it.copy(isRecurring = !it.isRecurring) }
-    fun onDateChange(date: Date) = _uiState.update { it.copy(date = date) }
+    fun onDateChange(date: Date) {
+        _uiState.update { it.copy(date = date) }
+        calculateMaturity()
+    }
 
-    fun onCategorySelect(cat: String) =
+    fun onMaturityDateChange(date: Date) {
+        _uiState.update { it.copy(maturityDate = date) }
+        calculateMaturity()
+    }
+
+    fun onInterestRateChange(value: String) {
+        _uiState.update { it.copy(interestRate = value) }
+        calculateMaturity()
+    }
+
+    private fun calculateMaturity() {
+        val state = _uiState.value
+        if (state.selectedCategory != InvestmentCategory.FD) return
+
+        val principle = state.amount.toDoubleOrNull() ?: 0.0
+        val rate = state.interestRate.toDoubleOrNull() ?: 0.0
+        
+        if (principle > 0 && rate > 0) {
+            val diffInMillies = state.maturityDate.time - state.date.time
+            val diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS)
+            
+            if (diffInDays > 0) {
+                val years = diffInDays / 365.0
+                // Simple interest calculation: A = P(1 + rt)
+                val total = principle * (1 + (rate / 100 * years))
+                _uiState.update { it.copy(maturityAmount = total) }
+            }
+        }
+    }
+
+    fun onCategorySelect(cat: String) {
         _uiState.update { it.copy(selectedCategory = cat, error = null) }
+        calculateMaturity()
+    }
 
-    fun onTypeChange(type: TransactionType) =
+    fun onTypeChange(type: TransactionType) {
         _uiState.update { it.copy(type = type, selectedCategory = "", error = null) }
+    }
 
     fun saveTransaction() {
         val state = _uiState.value
@@ -92,7 +137,10 @@ class AddTransactionViewModel @Inject constructor(
                 type = state.type,
                 note = state.note.trim(),
                 date = state.date,
-                isRecurring = state.isRecurring
+                isRecurring = state.isRecurring,
+                maturityDate = if (state.selectedCategory == InvestmentCategory.FD) state.maturityDate else null,
+                interestRate = if (state.selectedCategory == InvestmentCategory.FD) state.interestRate.toDoubleOrNull() else null,
+                maturityAmount = if (state.selectedCategory == InvestmentCategory.FD) state.maturityAmount else null
             )
 
             val result = if (state.isEditMode) {

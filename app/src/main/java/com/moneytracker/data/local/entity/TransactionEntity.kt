@@ -12,5 +12,9 @@ data class TransactionEntity(
     val type: String,           // "income" or "expense"
     val note: String = "",
     val date: Long = System.currentTimeMillis(),
-    val isRecurring: Boolean = false
+    val isRecurring: Boolean = false,
+    // FD specific fields
+    val maturityDate: Long? = null,
+    val interestRate: Double? = null,
+    val maturityAmount: Double? = null
 )

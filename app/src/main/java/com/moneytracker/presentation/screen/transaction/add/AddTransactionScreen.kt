@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Repeat
+import androidx.compose.material.icons.outlined.TrendingUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -122,6 +123,8 @@ fun AddTransactionScreen(
     onCategorySelect: (String) -> Unit,
     onTypeChange: (TransactionType) -> Unit,
     onDateChange: (Date) -> Unit,
+    onMaturityDateChange: (Date) -> Unit,
+    onInterestRateChange: (String) -> Unit,
     onNoteChange: (String) -> Unit,
     onRecurringToggle: () -> Unit,
     onSave: () -> Unit,
@@ -136,14 +139,26 @@ fun AddTransactionScreen(
         if (uiState.isSaved) onSaveSuccess()
     }
 
-    // Date Picker State
+    // Date Picker States
     var showDatePicker by remember { mutableStateOf(false) }
+    var showMaturityDatePicker by remember { mutableStateOf(false) }
+
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = uiState.date.time,
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                 val today = System.currentTimeMillis()
                 return utcTimeMillis <= today
+            }
+        }
+    )
+
+    val maturityDatePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = uiState.maturityDate.time,
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                // Maturity must be after start date
+                return utcTimeMillis > uiState.date.time
             }
         }
     )
@@ -171,6 +186,29 @@ fun AddTransactionScreen(
             }
         ) {
             DatePicker(state = datePickerState)
+        }
+    }
+
+    if (showMaturityDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showMaturityDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    maturityDatePickerState.selectedDateMillis?.let {
+                        onMaturityDateChange(Date(it))
+                    }
+                    showMaturityDatePicker = false
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showMaturityDatePicker = false }) {
+                    Text("Cancel")
+                }
+            }
+        ) {
+            DatePicker(state = maturityDatePickerState)
         }
     }
 
@@ -279,7 +317,7 @@ fun AddTransactionScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        "Enter Amount",
+                        if (uiState.selectedCategory == InvestmentCategory.FD) "Enter Principle Amount" else "Enter Amount",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.White.copy(0.6f)
                     )
@@ -401,9 +439,120 @@ fun AddTransactionScreen(
                 }
             }
 
+            // ── FD Specific Fields ──────────────────────────────────────────
+            if (uiState.selectedCategory == InvestmentCategory.FD) {
+                FormCard {
+                    FormLabel("Fixed Deposit Details")
+                    Spacer(Modifier.height(12.dp))
+                    
+                    // Interest Rate
+                    OutlinedTextField(
+                        value = uiState.interestRate,
+                        onValueChange = onInterestRateChange,
+                        label = { Text("Interest Rate (% p.a.)") },
+                        placeholder = { Text("e.g. 7.5") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        singleLine = true,
+                        shape = RoundedCornerShape(14.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedContainerColor = colors.inputBackground,
+                            focusedContainerColor = colors.inputBackground,
+                            unfocusedBorderColor = colors.outline,
+                            focusedBorderColor = cs.primary
+                        )
+                    )
+                    
+                    Spacer(Modifier.height(14.dp))
+                    
+                    // Maturity Date
+                    Surface(
+                        shape = RoundedCornerShape(14.dp),
+                        color = colors.inputBackground,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(14.dp))
+                            .clickable { showMaturityDatePicker = true }
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.CalendarMonth,
+                                    contentDescription = null,
+                                    tint = Warning,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Column {
+                                    Text(
+                                        "Maturity Date",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = colors.textSecondary
+                                    )
+                                    Text(
+                                        SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(uiState.maturityDate),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = cs.onSurface
+                                    )
+                                }
+                            }
+                            Text(
+                                "Select",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = cs.primary,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                    
+                    // Calculated Maturity Amount
+                    if (uiState.maturityAmount > 0) {
+                        Spacer(Modifier.height(16.dp))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Success.copy(alpha = 0.1f))
+                                .padding(16.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Icon(
+                                    Icons.Outlined.TrendingUp,
+                                    contentDescription = null,
+                                    tint = Success,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Column {
+                                    Text(
+                                        "Estimated Maturity Value",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = Success
+                                    )
+                                    Text(
+                                        "₹${String.format("%.2f", uiState.maturityAmount)}",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = Success
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // Date row
             FormCard {
-                FormLabel("Date")
+                FormLabel(if (uiState.selectedCategory == InvestmentCategory.FD) "Start Date" else "Date")
                 Spacer(Modifier.height(8.dp))
                 Surface(
                     shape = RoundedCornerShape(14.dp),
@@ -469,8 +618,8 @@ fun AddTransactionScreen(
                 )
             }
 
-            // Recurring toggle — hide for investments (FD/RD already have fixed tenures)
-            if (uiState.type != TransactionType.INVESTMENT) {
+            // Recurring toggle — Enabled for Income and Investment, hidden for Expense
+            if (uiState.type != TransactionType.EXPENSE) {
                 FormCard {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -858,7 +1007,9 @@ private fun PreviewExpenseLight() {
         AddTransactionScreen(
             uiState = AddTransactionUiState(type = TransactionType.EXPENSE),
             onAmountChange = {}, onCategorySelect = {},
-            onTypeChange = {}, onDateChange = {}, onNoteChange = {}, onRecurringToggle = {},
+            onTypeChange = {}, onDateChange = {}, 
+            onMaturityDateChange = {}, onInterestRateChange = {},
+            onNoteChange = {}, onRecurringToggle = {},
             onSave = {}, onDelete = {}, onSaveSuccess = {}
         )
     }
@@ -874,7 +1025,9 @@ private fun PreviewInvestmentDark() {
                 selectedCategory = "Fixed Deposit"
             ),
             onAmountChange = {}, onCategorySelect = {},
-            onTypeChange = {}, onDateChange = {}, onNoteChange = {}, onRecurringToggle = {},
+            onTypeChange = {}, onDateChange = {}, 
+            onMaturityDateChange = {}, onInterestRateChange = {},
+            onNoteChange = {}, onRecurringToggle = {},
             onSave = {}, onDelete = {}, onSaveSuccess = {}
         )
     }
@@ -890,7 +1043,9 @@ private fun PreviewIncomeLight() {
                 selectedCategory = "Salary"
             ),
             onAmountChange = {}, onCategorySelect = {},
-            onTypeChange = {}, onDateChange = {}, onNoteChange = {}, onRecurringToggle = {},
+            onTypeChange = {}, onDateChange = {}, 
+            onMaturityDateChange = {}, onInterestRateChange = {},
+            onNoteChange = {}, onRecurringToggle = {},
             onSave = {}, onDelete = {}, onSaveSuccess = {}
         )
     }
