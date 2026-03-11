@@ -40,6 +40,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moneytracker.ui.theme.MoneyTrackerTheme
 import com.moneytracker.ui.theme.Primary
 import com.moneytracker.ui.theme.PrimaryDark
+import com.moneytracker.ui.theme.PrimaryLight
 
 // ── Entry point ───────────────────────────────────────────────────────────────
 @Composable
@@ -126,7 +127,7 @@ fun SplashScreenContent() {
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    listOf(PrimaryDark, Primary, Color(0xFF1976D2))
+                    listOf(PrimaryDark, Primary, PrimaryLight)
                 )
             ),
         contentAlignment = Alignment.Center
