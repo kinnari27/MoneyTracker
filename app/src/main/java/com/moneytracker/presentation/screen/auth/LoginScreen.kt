@@ -60,6 +60,7 @@ import com.moneytracker.ui.theme.PrimaryDark
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
     onNavigateToRegister: () -> Unit,
+    onNavigateToForgotPassword: () -> Unit,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -77,7 +78,8 @@ fun LoginScreen(
         onPasswordChange = viewModel::onPasswordChange,
         onTogglePassword = viewModel::togglePasswordVisible,
         onLogin = viewModel::login,
-        onNavigateToRegister = onNavigateToRegister
+        onNavigateToRegister = onNavigateToRegister,
+        onNavigateToForgotPassword = onNavigateToForgotPassword
     )
 }
 
@@ -90,6 +92,7 @@ fun LoginScreenContent(
     onTogglePassword: () -> Unit,
     onLogin: () -> Unit,
     onNavigateToRegister: () -> Unit,
+    onNavigateToForgotPassword: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val cs = MaterialTheme.colorScheme
@@ -228,7 +231,7 @@ fun LoginScreenContent(
                             style = MaterialTheme.typography.labelMedium,
                             color = cs.primary,
                             fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.clickable { }
+                            modifier = Modifier.clickable { onNavigateToForgotPassword() }
                         )
                     }
 
@@ -333,7 +336,8 @@ private fun LoginPreviewLight() {
             onPasswordChange = {},
             onTogglePassword = {},
             onLogin = {},
-            onNavigateToRegister = {}
+            onNavigateToRegister = {},
+            onNavigateToForgotPassword = {}
         )
     }
 }
@@ -348,7 +352,8 @@ private fun LoginPreviewDark() {
             onPasswordChange = {},
             onTogglePassword = {},
             onLogin = {},
-            onNavigateToRegister = {}
+            onNavigateToRegister = {},
+            onNavigateToForgotPassword = {}
         )
     }
 }

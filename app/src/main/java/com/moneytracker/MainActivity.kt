@@ -33,10 +33,11 @@ class MainActivity : ComponentActivity() {
                 val currentEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = currentEntry?.destination?.route
 
-                val hideBottomBarRoutes = setOf<String>(
+                val hideBottomBarRoutes = setOf(
                     Routes.SPLASH,
                     Routes.LOGIN,
-                    Routes.REGISTER
+                    Routes.REGISTER,
+                    Routes.FORGOT_PASSWORD
                 )
                 val showBottomBar = currentRoute != null
                         && currentRoute !in hideBottomBarRoutes

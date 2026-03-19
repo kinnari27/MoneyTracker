@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.moneytracker.domain.usecase.auth.LoginUserUseCase
 import com.moneytracker.domain.usecase.auth.RegisterUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,7 +40,6 @@ class AuthViewModel @Inject constructor(
     fun toggleConfirmVisible() = _uiState.update { it.copy(confirmVisible = !it.confirmVisible) }
 
     // ── Shared ────────────────────────────────────────────────────────────────
-    fun clearError() = _uiState.update { it.copy(error = null) }
     fun resetSuccess() = _uiState.update { it.copy(isSuccess = false) }
 
     // ── Login ─────────────────────────────────────────────────────────────────
@@ -123,6 +123,22 @@ class AuthViewModel @Inject constructor(
                     }
                 }
             )
+        }
+    }
+
+    // ── Forgot Password ───────────────────────────────────────────────────────
+    fun sendResetLink() {
+        val email = _uiState.value.email
+        if (email.isBlank() || !email.contains("@")) {
+            _uiState.update { it.copy(error = "Enter a valid email address") }
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null, isSuccess = false) }
+            // Mocking a network delay for the reset link
+            delay(1500)
+            _uiState.update { it.copy(isLoading = false, isSuccess = true) }
         }
     }
 }

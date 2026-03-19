@@ -9,6 +9,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.moneytracker.presentation.screen.auth.ForgotPasswordScreen
 import com.moneytracker.presentation.screen.auth.LoginScreen
 import com.moneytracker.presentation.screen.auth.RegisterScreen
 import com.moneytracker.presentation.screen.dashboard.analytics.AnalyticsScreen
@@ -67,7 +68,8 @@ fun NavGraph(navController: NavHostController) {
                         }
                     }
                 },
-                onNavigateToRegister = { navController.navigate(Routes.REGISTER) }
+                onNavigateToRegister = { navController.navigate(Routes.REGISTER) },
+                onNavigateToForgotPassword = { navController.navigate(Routes.FORGOT_PASSWORD) }
             )
         }
         composable(Routes.REGISTER) {
@@ -80,6 +82,11 @@ fun NavGraph(navController: NavHostController) {
                     }
                 },
                 onNavigateToLogin = { navController.navigate(Routes.LOGIN) }
+            )
+        }
+        composable(Routes.FORGOT_PASSWORD) {
+            ForgotPasswordScreen(
+                onBack = { navController.popBackStack() }
             )
         }
 
