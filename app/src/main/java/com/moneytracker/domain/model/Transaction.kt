@@ -14,7 +14,13 @@ data class Transaction(
     // FD specific fields
     val maturityDate: Date? = null,
     val interestRate: Double? = null,
-    val maturityAmount: Double? = null
+    val maturityAmount: Double? = null,
+    // RD specific fields
+    val rdMonthlyAmount: Double? = null,
+    val rdTenureMonths: Int? = null,
+    val rdMaturityDate: Date? = null,
+    val rdInterestRate: Double? = null,
+    val rdMaturityAmount: Double? = null
 )
 
 // ── Transaction types ─────────────────────────────────────────────────────────

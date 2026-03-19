@@ -28,11 +28,11 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Repeat
-import androidx.compose.material.icons.outlined.TrendingUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -123,8 +123,15 @@ fun AddTransactionScreen(
     onCategorySelect: (String) -> Unit,
     onTypeChange: (TransactionType) -> Unit,
     onDateChange: (Date) -> Unit,
+    // FD callbacks
     onMaturityDateChange: (Date) -> Unit,
     onInterestRateChange: (String) -> Unit,
+    // RD callbacks
+    onRdMonthlyAmountChange: (String) -> Unit,
+    onRdTenureMonthsChange: (String) -> Unit,
+    onRdMaturityDateChange: (Date) -> Unit,
+    onRdInterestRateChange: (String) -> Unit,
+    // Common
     onNoteChange: (String) -> Unit,
     onRecurringToggle: () -> Unit,
     onSave: () -> Unit,
@@ -139,54 +146,51 @@ fun AddTransactionScreen(
         if (uiState.isSaved) onSaveSuccess()
     }
 
-    // Date Picker States
+    // ── Date Picker States ────────────────────────────────────────────────────
     var showDatePicker by remember { mutableStateOf(false) }
     var showMaturityDatePicker by remember { mutableStateOf(false) }
+    var showRdMaturityDatePicker by remember { mutableStateOf(false) }
 
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = uiState.date.time,
         selectableDates = object : SelectableDates {
-            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                val today = System.currentTimeMillis()
-                return utcTimeMillis <= today
-            }
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean =
+                utcTimeMillis <= System.currentTimeMillis()
         }
     )
 
     val maturityDatePickerState = rememberDatePickerState(
         initialSelectedDateMillis = uiState.maturityDate.time,
         selectableDates = object : SelectableDates {
-            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                // Maturity must be after start date
-                return utcTimeMillis > uiState.date.time
-            }
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean =
+                utcTimeMillis > uiState.date.time
         }
     )
 
-    // FIX: Focus requester for amount field to improve tap-to-edit UX
+    val rdMaturityDatePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = uiState.rdMaturityDate.time,
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean =
+                utcTimeMillis > uiState.date.time
+        }
+    )
+
     val amountFocusRequester = remember { FocusRequester() }
 
+    // ── Date Picker Dialogs ───────────────────────────────────────────────────
     if (showDatePicker) {
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let {
-                        onDateChange(Date(it))
-                    }
+                    datePickerState.selectedDateMillis?.let { onDateChange(Date(it)) }
                     showDatePicker = false
-                }) {
-                    Text("OK")
-                }
+                }) { Text("OK") }
             },
             dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancel")
-                }
+                TextButton(onClick = { showDatePicker = false }) { Text("Cancel") }
             }
-        ) {
-            DatePicker(state = datePickerState)
-        }
+        ) { DatePicker(state = datePickerState) }
     }
 
     if (showMaturityDatePicker) {
@@ -194,24 +198,32 @@ fun AddTransactionScreen(
             onDismissRequest = { showMaturityDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    maturityDatePickerState.selectedDateMillis?.let {
-                        onMaturityDateChange(Date(it))
-                    }
+                    maturityDatePickerState.selectedDateMillis?.let { onMaturityDateChange(Date(it)) }
                     showMaturityDatePicker = false
-                }) {
-                    Text("OK")
-                }
+                }) { Text("OK") }
             },
             dismissButton = {
-                TextButton(onClick = { showMaturityDatePicker = false }) {
-                    Text("Cancel")
-                }
+                TextButton(onClick = { showMaturityDatePicker = false }) { Text("Cancel") }
             }
-        ) {
-            DatePicker(state = maturityDatePickerState)
-        }
+        ) { DatePicker(state = maturityDatePickerState) }
     }
 
+    if (showRdMaturityDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showRdMaturityDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    rdMaturityDatePickerState.selectedDateMillis?.let { onRdMaturityDateChange(Date(it)) }
+                    showRdMaturityDatePicker = false
+                }) { Text("OK") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRdMaturityDatePicker = false }) { Text("Cancel") }
+            }
+        ) { DatePicker(state = rdMaturityDatePickerState) }
+    }
+
+    // ── Screen ────────────────────────────────────────────────────────────────
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -245,7 +257,6 @@ fun AddTransactionScreen(
                             color = Color.White
                         )
                     }
-                    // FIX: Only show delete icon in edit mode with a clearer red tint for destructive action
                     if (uiState.isEditMode) {
                         IconButton(
                             onClick = onDelete,
@@ -308,8 +319,20 @@ fun AddTransactionScreen(
 
                 Spacer(Modifier.height(32.dp))
 
-                // ── Amount input ──────────────────────────────────────────────
-                // FIX: Wrap amount area in a clickable box to focus the text field on tap
+                // ── Amount input — label changes per investment sub-type ───────
+                val amountLabel = when (uiState.selectedCategory) {
+                    InvestmentCategory.FD -> "Enter Principal Amount"
+                    InvestmentCategory.RD -> "Enter Monthly Installment"
+                    else -> "Enter Amount"
+                }
+
+                // For RD we bind the header input to rdMonthlyAmount, not amount
+                val amountValue = if (uiState.selectedCategory == InvestmentCategory.RD)
+                    uiState.rdMonthlyAmount else uiState.amount
+                val amountOnChange: (String) -> Unit =
+                    if (uiState.selectedCategory == InvestmentCategory.RD)
+                        onRdMonthlyAmountChange else onAmountChange
+
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -317,15 +340,15 @@ fun AddTransactionScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        if (uiState.selectedCategory == InvestmentCategory.FD) "Enter Principle Amount" else "Enter Amount",
+                        amountLabel,
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.White.copy(0.6f)
                     )
                     Spacer(Modifier.height(8.dp))
 
                     BasicTextField(
-                        value = uiState.amount,
-                        onValueChange = onAmountChange,
+                        value = amountValue,
+                        onValueChange = amountOnChange,
                         textStyle = MaterialTheme.typography.displaySmall.copy(
                             color = Color.White,
                             fontWeight = FontWeight.ExtraBold,
@@ -333,7 +356,6 @@ fun AddTransactionScreen(
                         ),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         singleLine = true,
-                        // FIX: Use white cursor color so it's visible on dark header background
                         cursorBrush = SolidColor(Color.White),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -342,11 +364,8 @@ fun AddTransactionScreen(
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Center,
-                                // FIX: Align to Bottom so ₹ and number share the same baseline
                                 verticalAlignment = Alignment.Bottom
                             ) {
-                                // FIX: Match ₹ font size to the number's displaySmall size
-                                // and add a small bottom padding to optically align the glyphs
                                 Text(
                                     "₹",
                                     style = MaterialTheme.typography.displaySmall.copy(
@@ -357,7 +376,7 @@ fun AddTransactionScreen(
                                 )
                                 Spacer(Modifier.width(4.dp))
                                 Box(contentAlignment = Alignment.Center) {
-                                    if (uiState.amount.isEmpty()) {
+                                    if (amountValue.isEmpty()) {
                                         Text(
                                             "0",
                                             style = MaterialTheme.typography.displaySmall.copy(
@@ -374,7 +393,6 @@ fun AddTransactionScreen(
                     )
 
                     Spacer(Modifier.height(8.dp))
-                    // FIX: Use fillMaxWidth fraction so underline scales with amount text
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(0.5f)
@@ -383,10 +401,8 @@ fun AddTransactionScreen(
                             .background(Color.White.copy(0.35f))
                     )
 
-                    // Investment: show maturity hint
                     if (uiState.type == TransactionType.INVESTMENT) {
                         Spacer(Modifier.height(10.dp))
-                        // FIX: Use fillMaxWidth so text doesn't get cramped on small screens
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth(0.9f)
@@ -413,39 +429,25 @@ fun AddTransactionScreen(
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
 
-            // ── Category — switches based on type ─────────────────────────────
+            // ── Category panel — switches based on type ───────────────────────
             AnimatedContent(
                 targetState = uiState.type,
-                transitionSpec = {
-                    fadeIn(tween(300)) togetherWith fadeOut(tween(200))
-                },
+                transitionSpec = { fadeIn(tween(300)) togetherWith fadeOut(tween(200)) },
                 label = "category_panel"
             ) { type ->
                 when (type) {
-                    TransactionType.EXPENSE -> ExpenseCategoryGrid(
-                        uiState.selectedCategory,
-                        onCategorySelect
-                    )
-
-                    TransactionType.INVESTMENT -> InvestmentCategoryGrid(
-                        uiState.selectedCategory,
-                        onCategorySelect
-                    )
-
-                    TransactionType.INCOME -> IncomeCategoryGrid(
-                        uiState.selectedCategory,
-                        onCategorySelect
-                    )
+                    TransactionType.EXPENSE -> ExpenseCategoryGrid(uiState.selectedCategory, onCategorySelect)
+                    TransactionType.INVESTMENT -> InvestmentCategoryGrid(uiState.selectedCategory, onCategorySelect)
+                    TransactionType.INCOME -> IncomeCategoryGrid(uiState.selectedCategory, onCategorySelect)
                 }
             }
 
-            // ── FD Specific Fields ──────────────────────────────────────────
+            // ── FD Specific Fields ────────────────────────────────────────────
             if (uiState.selectedCategory == InvestmentCategory.FD) {
                 FormCard {
                     FormLabel("Fixed Deposit Details")
                     Spacer(Modifier.height(12.dp))
-                    
-                    // Interest Rate
+
                     OutlinedTextField(
                         value = uiState.interestRate,
                         onValueChange = onInterestRateChange,
@@ -462,139 +464,125 @@ fun AddTransactionScreen(
                             focusedBorderColor = cs.primary
                         )
                     )
-                    
+
                     Spacer(Modifier.height(14.dp))
-                    
-                    // Maturity Date
-                    Surface(
-                        shape = RoundedCornerShape(14.dp),
-                        color = colors.inputBackground,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(14.dp))
-                            .clickable { showMaturityDatePicker = true }
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.CalendarMonth,
-                                    contentDescription = null,
-                                    tint = Warning,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                                Column {
-                                    Text(
-                                        "Maturity Date",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = colors.textSecondary
-                                    )
-                                    Text(
-                                        SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(uiState.maturityDate),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = cs.onSurface
-                                    )
-                                }
-                            }
-                            Text(
-                                "Select",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = cs.primary,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                    
-                    // Calculated Maturity Amount
+
+                    // Maturity Date picker
+                    DatePickerRow(
+                        label = "Maturity Date",
+                        date = uiState.maturityDate,
+                        tint = Warning,
+                        inputBackground = colors.inputBackground,
+                        onSurface = cs.onSurface,
+                        primary = cs.primary,
+                        textSecondary = colors.textSecondary,
+                        onClick = { showMaturityDatePicker = true }
+                    )
+
+                    // Estimated maturity amount
                     if (uiState.maturityAmount > 0) {
                         Spacer(Modifier.height(16.dp))
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(Success.copy(alpha = 0.1f))
-                                .padding(16.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Icon(
-                                    Icons.Outlined.TrendingUp,
-                                    contentDescription = null,
-                                    tint = Success,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Column {
-                                    Text(
-                                        "Estimated Maturity Value",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = Success
-                                    )
-                                    Text(
-                                        "₹${String.format("%.2f", uiState.maturityAmount)}",
-                                        style = MaterialTheme.typography.titleLarge,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        color = Success
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Date row
-            FormCard {
-                FormLabel(if (uiState.selectedCategory == InvestmentCategory.FD) "Start Date" else "Date")
-                Spacer(Modifier.height(8.dp))
-                Surface(
-                    shape = RoundedCornerShape(14.dp),
-                    color = colors.inputBackground,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(14.dp))
-                        .clickable { showDatePicker = true }
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        // FIX: Added calendar icon for better affordance
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.CalendarMonth,
-                                contentDescription = null,
-                                tint = cs.primary,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Text(
-                                SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(uiState.date),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = cs.onSurface
-                            )
-                        }
-                        Text(
-                            "Change",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = cs.primary,
-                            fontWeight = FontWeight.Bold
+                        MaturityAmountCard(
+                            maturityAmount = uiState.maturityAmount,
+                            extraLine = null
                         )
                     }
                 }
             }
 
-            // Note
+            // ── RD Specific Fields ────────────────────────────────────────────
+            if (uiState.selectedCategory == InvestmentCategory.RD) {
+                FormCard {
+                    FormLabel("Recurring Deposit Details")
+                    Spacer(Modifier.height(12.dp))
+
+                    // Tenure in months
+                    OutlinedTextField(
+                        value = uiState.rdTenureMonths,
+                        onValueChange = onRdTenureMonthsChange,
+                        label = { Text("Tenure (Months)") },
+                        placeholder = { Text("e.g. 12") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true,
+                        shape = RoundedCornerShape(14.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedContainerColor = colors.inputBackground,
+                            focusedContainerColor = colors.inputBackground,
+                            unfocusedBorderColor = colors.outline,
+                            focusedBorderColor = cs.primary
+                        )
+                    )
+
+                    Spacer(Modifier.height(14.dp))
+
+                    // Interest Rate
+                    OutlinedTextField(
+                        value = uiState.rdInterestRate,
+                        onValueChange = onRdInterestRateChange,
+                        label = { Text("Interest Rate (% p.a.)") },
+                        placeholder = { Text("e.g. 6.5") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        singleLine = true,
+                        shape = RoundedCornerShape(14.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedContainerColor = colors.inputBackground,
+                            focusedContainerColor = colors.inputBackground,
+                            unfocusedBorderColor = colors.outline,
+                            focusedBorderColor = cs.primary
+                        )
+                    )
+
+                    Spacer(Modifier.height(14.dp))
+
+                    // Maturity Date picker
+                    DatePickerRow(
+                        label = "Maturity Date",
+                        date = uiState.rdMaturityDate,
+                        tint = Warning,
+                        inputBackground = colors.inputBackground,
+                        onSurface = cs.onSurface,
+                        primary = cs.primary,
+                        textSecondary = colors.textSecondary,
+                        onClick = { showRdMaturityDatePicker = true }
+                    )
+
+                    // Estimated maturity amount
+                    if (uiState.rdMaturityAmount > 0) {
+                        Spacer(Modifier.height(16.dp))
+                        val totalInvested = (uiState.rdMonthlyAmount.toDoubleOrNull() ?: 0.0) *
+                                (uiState.rdTenureMonths.toIntOrNull() ?: 0)
+                        MaturityAmountCard(
+                            maturityAmount = uiState.rdMaturityAmount,
+                            extraLine = "Total invested: ₹${String.format("%.2f", totalInvested)}"
+                        )
+                    }
+                }
+            }
+
+            // ── Start Date ────────────────────────────────────────────────────
+            FormCard {
+                val dateLabel = when (uiState.selectedCategory) {
+                    InvestmentCategory.FD, InvestmentCategory.RD -> "Start Date"
+                    else -> "Date"
+                }
+                FormLabel(dateLabel)
+                Spacer(Modifier.height(8.dp))
+                DatePickerRow(
+                    label = null,
+                    date = uiState.date,
+                    tint = cs.primary,
+                    inputBackground = colors.inputBackground,
+                    onSurface = cs.onSurface,
+                    primary = cs.primary,
+                    textSecondary = colors.textSecondary,
+                    actionLabel = "Change",
+                    onClick = { showDatePicker = true }
+                )
+            }
+
+            // ── Note ──────────────────────────────────────────────────────────
             FormCard {
                 FormLabel("Note (optional)")
                 Spacer(Modifier.height(8.dp))
@@ -618,7 +606,7 @@ fun AddTransactionScreen(
                 )
             }
 
-            // Recurring toggle — Enabled for Income and Investment, hidden for Expense
+            // ── Recurring toggle — hidden for Expense ─────────────────────────
             if (uiState.type != TransactionType.EXPENSE) {
                 FormCard {
                     Row(
@@ -626,7 +614,6 @@ fun AddTransactionScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // FIX: Added repeat icon to anchor the toggle row visually
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -671,13 +658,10 @@ fun AddTransactionScreen(
                 }
             }
 
-            // Error
+            // ── Error card ────────────────────────────────────────────────────
             AnimatedVisibility(visible = uiState.error != null) {
-                // FIX: Removed redundant contentColor on CardDefaults — text color is set directly
                 Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = colors.errorContainer
-                    ),
+                    colors = CardDefaults.cardColors(containerColor = colors.errorContainer),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Row(
@@ -685,7 +669,6 @@ fun AddTransactionScreen(
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // FIX: Added info icon to error card for better visual communication
                         Icon(
                             imageVector = Icons.Outlined.Info,
                             contentDescription = null,
@@ -702,9 +685,16 @@ fun AddTransactionScreen(
                 }
             }
 
-            // Save button
-            val canSave = uiState.amount.isNotBlank()
-                    && uiState.selectedCategory.isNotBlank()
+            // ── Save button ───────────────────────────────────────────────────
+            val canSave = when (uiState.selectedCategory) {
+                InvestmentCategory.RD ->
+                    uiState.rdMonthlyAmount.isNotBlank() &&
+                            uiState.rdTenureMonths.isNotBlank() &&
+                            uiState.rdInterestRate.isNotBlank() &&
+                            uiState.selectedCategory.isNotBlank()
+                else ->
+                    uiState.amount.isNotBlank() && uiState.selectedCategory.isNotBlank()
+            }
 
             val buttonColor = when (uiState.type) {
                 TransactionType.INCOME -> Success
@@ -712,9 +702,14 @@ fun AddTransactionScreen(
                 TransactionType.INVESTMENT -> Warning
             }
 
-            // FIX: Show hint text when button is disabled so user knows what's missing
             if (!canSave && !uiState.isLoading) {
                 val hint = when {
+                    uiState.selectedCategory == InvestmentCategory.RD &&
+                            uiState.rdMonthlyAmount.isBlank() -> "Enter monthly installment to continue"
+                    uiState.selectedCategory == InvestmentCategory.RD &&
+                            uiState.rdTenureMonths.isBlank() -> "Enter tenure to continue"
+                    uiState.selectedCategory == InvestmentCategory.RD &&
+                            uiState.rdInterestRate.isBlank() -> "Enter interest rate to continue"
                     uiState.amount.isBlank() -> "Enter an amount to continue"
                     uiState.selectedCategory.isBlank() -> "Select a category to continue"
                     else -> null
@@ -740,7 +735,6 @@ fun AddTransactionScreen(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = buttonColor,
                     contentColor = Color.White,
-                    // FIX: Explicit disabled colors so the muted state is clear
                     disabledContainerColor = buttonColor.copy(alpha = 0.38f),
                     disabledContentColor = Color.White.copy(alpha = 0.6f)
                 )
@@ -753,12 +747,10 @@ fun AddTransactionScreen(
                     )
                 } else {
                     Text(
-                        text = if (uiState.isEditMode) "Update Transaction" else {
-                            when (uiState.type) {
-                                TransactionType.INCOME -> "Save Income"
-                                TransactionType.EXPENSE -> "Save Expense"
-                                TransactionType.INVESTMENT -> "Save Investment"
-                            }
+                        text = if (uiState.isEditMode) "Update Transaction" else when (uiState.type) {
+                            TransactionType.INCOME -> "Save Income"
+                            TransactionType.EXPENSE -> "Save Expense"
+                            TransactionType.INVESTMENT -> "Save Investment"
                         },
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.ExtraBold
@@ -766,8 +758,7 @@ fun AddTransactionScreen(
                 }
             }
 
-            // FIX: In edit mode, add a visual separator before the delete button
-            // so it's clearly separated from the save action (destructive vs. constructive)
+            // ── Delete section in edit mode ───────────────────────────────────
             if (uiState.isEditMode) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -795,17 +786,13 @@ fun AddTransactionScreen(
                         .fillMaxWidth()
                         .height(56.dp),
                     shape = RoundedCornerShape(18.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Error
-                    ),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Error),
                     border = androidx.compose.foundation.BorderStroke(1.dp, Error)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = null,
-                        modifier = Modifier
-                            .size(18.dp)
-                            .padding(end = 0.dp)
+                        modifier = Modifier.size(18.dp)
                     )
                     Spacer(Modifier.width(8.dp))
                     Text("Delete Transaction", fontWeight = FontWeight.Bold)
@@ -813,6 +800,116 @@ fun AddTransactionScreen(
             }
 
             Spacer(Modifier.height(80.dp))
+        }
+    }
+}
+
+// ── Reusable date picker row ──────────────────────────────────────────────────
+
+@Composable
+private fun DatePickerRow(
+    label: String?,
+    date: Date,
+    tint: Color,
+    inputBackground: Color,
+    onSurface: Color,
+    primary: Color,
+    textSecondary: Color,
+    actionLabel: String = "Select",
+    onClick: () -> Unit
+) {
+    Surface(
+        shape = RoundedCornerShape(14.dp),
+        color = inputBackground,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .clickable(onClick = onClick)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.CalendarMonth,
+                    contentDescription = null,
+                    tint = tint,
+                    modifier = Modifier.size(18.dp)
+                )
+                Column {
+                    if (label != null) {
+                        Text(
+                            label,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = textSecondary
+                        )
+                    }
+                    Text(
+                        SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(date),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = onSurface
+                    )
+                }
+            }
+            Text(
+                actionLabel,
+                style = MaterialTheme.typography.labelSmall,
+                color = primary,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+// ── Reusable maturity amount card ─────────────────────────────────────────────
+
+@Composable
+private fun MaturityAmountCard(
+    maturityAmount: Double,
+    extraLine: String?
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(Success.copy(alpha = 0.1f))
+            .padding(16.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Icon(
+                Icons.AutoMirrored.Outlined.TrendingUp,
+                contentDescription = null,
+                tint = Success,
+                modifier = Modifier.size(24.dp)
+            )
+            Column {
+                Text(
+                    "Estimated Maturity Value",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Success
+                )
+                Text(
+                    "₹${String.format("%.2f", maturityAmount)}",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Success
+                )
+                if (extraLine != null) {
+                    Text(
+                        extraLine,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Success.copy(alpha = 0.7f)
+                    )
+                }
+            }
         }
     }
 }
@@ -853,14 +950,9 @@ private fun IncomeCategoryGrid(selected: String, onSelect: (String) -> Unit) {
 
 @Composable
 private fun InvestmentCategoryGrid(selected: String, onSelect: (String) -> Unit) {
-    MaterialTheme.colorScheme
-    AppTheme.colors
     FormCard {
         FormLabel("Investment Type")
-
-        // Info pill
         Spacer(Modifier.height(8.dp))
-        // FIX: Row layout with icon for investment info pill — more scannable than wall of text
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -883,7 +975,6 @@ private fun InvestmentCategoryGrid(selected: String, onSelect: (String) -> Unit)
                 fontWeight = FontWeight.SemiBold
             )
         }
-
         Spacer(Modifier.height(14.dp))
         CategoryGrid(
             items = InvestmentCategory.ALL,
@@ -897,6 +988,7 @@ private fun InvestmentCategoryGrid(selected: String, onSelect: (String) -> Unit)
 }
 
 // ── Generic category grid ─────────────────────────────────────────────────────
+
 @Composable
 private fun CategoryGrid(
     items: List<String>,
@@ -925,7 +1017,6 @@ private fun CategoryGrid(
                                 else colors.surfaceVariant
                             )
                             .border(
-                                // FIX: Use 1.5.dp for selected border — 2.dp felt heavy on small chips
                                 1.5.dp,
                                 if (isSelected) color else Color.Transparent,
                                 RoundedCornerShape(14.dp)
@@ -941,7 +1032,7 @@ private fun CategoryGrid(
                             Image(
                                 painter = painterResource(iconRes(cat)),
                                 contentDescription = cat,
-                                modifier = Modifier.size(22.dp),
+                                modifier = Modifier.size(22.dp)
                             )
                             Text(
                                 text = label(cat),
@@ -954,8 +1045,6 @@ private fun CategoryGrid(
                         }
                     }
                 }
-                // FIX: Fill empty last-row slots with invisible boxes that match chip weight
-                // so items don't stretch to fill the full row width
                 repeat(4 - row.size) {
                     Box(modifier = Modifier.weight(1f))
                 }
@@ -995,38 +1084,59 @@ private fun FormCard(content: @Composable ColumnScope.() -> Unit) {
     }
 }
 
-// ── AppColors extension for surfaceVariant ────────────────────────────────────
 private val AppColors.surfaceVariant: Color
     @Composable get() = MaterialTheme.colorScheme.surfaceVariant
 
 // ── Previews ──────────────────────────────────────────────────────────────────
+
 @Preview(name = "Add — Expense Light", showBackground = true)
 @Composable
 private fun PreviewExpenseLight() {
     MoneyTrackerTheme(darkTheme = false) {
         AddTransactionScreen(
             uiState = AddTransactionUiState(type = TransactionType.EXPENSE),
-            onAmountChange = {}, onCategorySelect = {},
-            onTypeChange = {}, onDateChange = {}, 
-            onMaturityDateChange = {}, onInterestRateChange = {},
+            onAmountChange = {}, onCategorySelect = {}, onTypeChange = {},
+            onDateChange = {}, onMaturityDateChange = {}, onInterestRateChange = {},
+            onRdMonthlyAmountChange = {}, onRdTenureMonthsChange = {},
+            onRdMaturityDateChange = {}, onRdInterestRateChange = {},
             onNoteChange = {}, onRecurringToggle = {},
             onSave = {}, onDelete = {}, onSaveSuccess = {}
         )
     }
 }
 
-@Preview(name = "Add — Investment Dark", showBackground = true)
+@Preview(name = "Add — FD Dark", showBackground = true)
 @Composable
-private fun PreviewInvestmentDark() {
+private fun PreviewFdDark() {
     MoneyTrackerTheme(darkTheme = true) {
         AddTransactionScreen(
             uiState = AddTransactionUiState(
                 type = TransactionType.INVESTMENT,
-                selectedCategory = "Fixed Deposit"
+                selectedCategory = InvestmentCategory.FD
             ),
-            onAmountChange = {}, onCategorySelect = {},
-            onTypeChange = {}, onDateChange = {}, 
-            onMaturityDateChange = {}, onInterestRateChange = {},
+            onAmountChange = {}, onCategorySelect = {}, onTypeChange = {},
+            onDateChange = {}, onMaturityDateChange = {}, onInterestRateChange = {},
+            onRdMonthlyAmountChange = {}, onRdTenureMonthsChange = {},
+            onRdMaturityDateChange = {}, onRdInterestRateChange = {},
+            onNoteChange = {}, onRecurringToggle = {},
+            onSave = {}, onDelete = {}, onSaveSuccess = {}
+        )
+    }
+}
+
+@Preview(name = "Add — RD Light", showBackground = true)
+@Composable
+private fun PreviewRdLight() {
+    MoneyTrackerTheme(darkTheme = false) {
+        AddTransactionScreen(
+            uiState = AddTransactionUiState(
+                type = TransactionType.INVESTMENT,
+                selectedCategory = InvestmentCategory.RD
+            ),
+            onAmountChange = {}, onCategorySelect = {}, onTypeChange = {},
+            onDateChange = {}, onMaturityDateChange = {}, onInterestRateChange = {},
+            onRdMonthlyAmountChange = {}, onRdTenureMonthsChange = {},
+            onRdMaturityDateChange = {}, onRdInterestRateChange = {},
             onNoteChange = {}, onRecurringToggle = {},
             onSave = {}, onDelete = {}, onSaveSuccess = {}
         )
@@ -1042,9 +1152,10 @@ private fun PreviewIncomeLight() {
                 type = TransactionType.INCOME,
                 selectedCategory = "Salary"
             ),
-            onAmountChange = {}, onCategorySelect = {},
-            onTypeChange = {}, onDateChange = {}, 
-            onMaturityDateChange = {}, onInterestRateChange = {},
+            onAmountChange = {}, onCategorySelect = {}, onTypeChange = {},
+            onDateChange = {}, onMaturityDateChange = {}, onInterestRateChange = {},
+            onRdMonthlyAmountChange = {}, onRdTenureMonthsChange = {},
+            onRdMaturityDateChange = {}, onRdInterestRateChange = {},
             onNoteChange = {}, onRecurringToggle = {},
             onSave = {}, onDelete = {}, onSaveSuccess = {}
         )

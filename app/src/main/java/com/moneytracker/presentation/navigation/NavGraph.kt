@@ -128,6 +128,12 @@ fun NavGraph(navController: NavHostController) {
                 onDateChange = viewModel::onDateChange,
                 onMaturityDateChange = viewModel::onMaturityDateChange,
                 onInterestRateChange = viewModel::onInterestRateChange,
+                // ── Add these 4 lines ──
+                onRdMonthlyAmountChange = viewModel::onRdMonthlyAmountChange,
+                onRdTenureMonthsChange = viewModel::onRdTenureMonthsChange,
+                onRdMaturityDateChange = viewModel::onRdMaturityDateChange,
+                onRdInterestRateChange = viewModel::onRdInterestRateChange,
+                // ──────────────────────
                 onNoteChange = viewModel::onNoteChange,
                 onRecurringToggle = viewModel::onRecurringToggle,
                 onSave = viewModel::saveTransaction,

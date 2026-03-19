@@ -3,10 +3,11 @@ package com.moneytracker.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // ─── Primary ─────────────────────────────────────────────────────────────────
-val Primary = Color(0xFF111111)           // Near-black — strong, clean
-val PrimaryLight = Color(0xFF444444)      // Medium grey
-val PrimaryDark = Color(0xFF000000)       // Pure black
-val PrimaryContainer = Color(0xFFEEEEEE) // Light grey container
+
+val Primary = Color(0xFF054D3A)
+val PrimaryLight = Color(0xFF0A7C5C)
+val PrimaryDark = Color(0xFF022B1E)
+val PrimaryContainer = Color(0xFFEEEEEE)
 val OnPrimaryContainer = Color(0xFF111111)
 val OnPrimary = Color(0xFFFFFFFF)
 
