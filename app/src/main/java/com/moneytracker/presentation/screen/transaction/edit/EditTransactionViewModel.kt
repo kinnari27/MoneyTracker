@@ -3,6 +3,7 @@ package com.moneytracker.presentation.screen.transaction.edit
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moneytracker.domain.model.InvestmentCategory
 import com.moneytracker.domain.model.Transaction
 import com.moneytracker.domain.model.TransactionType
 import com.moneytracker.domain.usecase.trasaction.DeleteTransactionUseCase
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Date
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,14 +32,15 @@ class EditTransactionViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(EditTransactionUiState())
     val uiState: StateFlow<EditTransactionUiState> = _uiState.asStateFlow()
 
-    // Original transaction to preserve date on save
+    // Preserve original date — never changed in edit mode
     private var originalDate: Date = Date()
 
     init {
         loadTransaction()
     }
 
-    // ── Load from Room by ID ──────────────────────────────────────────────────
+    // ── Load from Room ────────────────────────────────────────────────────────
+
     private fun loadTransaction() {
         viewModelScope.launch {
             val tx = getTransactionByIdUseCase(transactionId)
@@ -54,33 +57,142 @@ class EditTransactionViewModel @Inject constructor(
                     type = tx.type,
                     note = tx.note,
                     isRecurring = tx.isRecurring,
+                    // FD fields
+                    maturityDate = tx.maturityDate ?: Date(System.currentTimeMillis() + 31536000000L),
+                    interestRate = tx.interestRate?.toString() ?: "",
+                    maturityAmount = tx.maturityAmount ?: 0.0,
+                    // RD fields
+                    rdMonthlyAmount = tx.rdMonthlyAmount?.toString() ?: "",
+                    rdTenureMonths = tx.rdTenureMonths?.toString() ?: "",
+                    rdMaturityDate = tx.rdMaturityDate ?: Date(System.currentTimeMillis() + 31536000000L),
+                    rdInterestRate = tx.rdInterestRate?.toString() ?: "",
+                    rdMaturityAmount = tx.rdMaturityAmount ?: 0.0,
                     isLoading = false
                 )
             }
         }
     }
 
-    fun onAmountChange(v: String) = _uiState.update { it.copy(amount = v, error = null) }
+    // ── Common field handlers ─────────────────────────────────────────────────
+
+    fun onAmountChange(v: String) {
+        _uiState.update { it.copy(amount = v, error = null) }
+        calculateMaturity()
+    }
+
     fun onNoteChange(v: String) = _uiState.update { it.copy(note = v) }
+
     fun onRecurringToggle() = _uiState.update { it.copy(isRecurring = !it.isRecurring) }
-    fun onCategorySelect(c: String) =
+
+    fun onCategorySelect(c: String) {
         _uiState.update { it.copy(selectedCategory = c, error = null) }
+        calculateMaturity()
+    }
 
     fun onTypeChange(t: TransactionType) =
         _uiState.update { it.copy(type = t, selectedCategory = "", error = null) }
 
-    // ── Save update to Room ───────────────────────────────────────────────────
+    // ── FD field handlers ─────────────────────────────────────────────────────
+
+    fun onMaturityDateChange(date: Date) {
+        _uiState.update { it.copy(maturityDate = date) }
+        calculateMaturity()
+    }
+
+    fun onInterestRateChange(value: String) {
+        _uiState.update { it.copy(interestRate = value) }
+        calculateMaturity()
+    }
+
+    // ── RD field handlers ─────────────────────────────────────────────────────
+
+    fun onRdMonthlyAmountChange(value: String) {
+        _uiState.update { it.copy(rdMonthlyAmount = value, error = null) }
+        calculateMaturity()
+    }
+
+    fun onRdTenureMonthsChange(value: String) {
+        _uiState.update { it.copy(rdTenureMonths = value) }
+        calculateMaturity()
+    }
+
+    fun onRdMaturityDateChange(date: Date) {
+        _uiState.update { it.copy(rdMaturityDate = date) }
+        calculateMaturity()
+    }
+
+    fun onRdInterestRateChange(value: String) {
+        _uiState.update { it.copy(rdInterestRate = value) }
+        calculateMaturity()
+    }
+
+    // ── Maturity calculation ──────────────────────────────────────────────────
+
+    private fun calculateMaturity() {
+        val state = _uiState.value
+
+        when (state.selectedCategory) {
+            InvestmentCategory.FD -> {
+                val principle = state.amount.toDoubleOrNull() ?: return
+                val rate = state.interestRate.toDoubleOrNull() ?: return
+                if (principle <= 0 || rate <= 0) return
+
+                val diffInMillies = state.maturityDate.time - originalDate.time
+                val diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS)
+                if (diffInDays <= 0) return
+
+                val years = diffInDays / 365.0
+                // Simple interest: A = P(1 + rt)
+                val total = principle * (1 + (rate / 100 * years))
+                _uiState.update { it.copy(maturityAmount = total) }
+            }
+
+            InvestmentCategory.RD -> {
+                val monthly = state.rdMonthlyAmount.toDoubleOrNull() ?: return
+                val rate = state.rdInterestRate.toDoubleOrNull() ?: return
+                val months = state.rdTenureMonths.toIntOrNull() ?: return
+                if (monthly <= 0 || rate <= 0 || months <= 0) return
+
+                // Standard RD maturity formula: M = P*n + P*n*(n+1)*r / (2*12*100)
+                val total = monthly * months +
+                        (monthly * months * (months + 1) * rate) / (2 * 12 * 100)
+                _uiState.update { it.copy(rdMaturityAmount = total) }
+            }
+        }
+    }
+
+    // ── Save ──────────────────────────────────────────────────────────────────
+
     fun save() {
         val s = _uiState.value
-        val amount = s.amount.toDoubleOrNull()
+        val isRd = s.selectedCategory == InvestmentCategory.RD
+        val isFd = s.selectedCategory == InvestmentCategory.FD
+
+        val amountToValidate = if (isRd) s.rdMonthlyAmount else s.amount
+        val amount = amountToValidate.toDoubleOrNull()
+
         if (amount == null || amount <= 0) {
-            _uiState.update { it.copy(error = "Please enter a valid amount") }; return
+            _uiState.update { it.copy(error = "Please enter a valid amount") }
+            return
         }
         if (s.selectedCategory.isBlank()) {
-            _uiState.update { it.copy(error = "Please select a category") }; return
+            _uiState.update { it.copy(error = "Please select a category") }
+            return
         }
+        if (isRd) {
+            if (s.rdTenureMonths.toIntOrNull() == null || s.rdTenureMonths.toInt() <= 0) {
+                _uiState.update { it.copy(error = "Please enter a valid tenure in months") }
+                return
+            }
+            if (s.rdInterestRate.toDoubleOrNull() == null) {
+                _uiState.update { it.copy(error = "Please enter a valid interest rate") }
+                return
+            }
+        }
+
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, error = null) }
+
             val result = updateTransactionUseCase(
                 Transaction(
                     id = s.id,
@@ -89,24 +201,35 @@ class EditTransactionViewModel @Inject constructor(
                     type = s.type,
                     note = s.note.trim(),
                     date = originalDate,     // keep original date
-                    isRecurring = s.isRecurring
+                    isRecurring = s.isRecurring,
+                    // FD fields
+                    maturityDate = if (isFd) s.maturityDate else null,
+                    interestRate = if (isFd) s.interestRate.toDoubleOrNull() else null,
+                    maturityAmount = when {
+                        isFd -> s.maturityAmount
+                        isRd -> s.rdMaturityAmount
+                        else -> null
+                    },
+                    // RD fields
+                    rdMonthlyAmount = if (isRd) amount else null,
+                    rdTenureMonths = if (isRd) s.rdTenureMonths.toIntOrNull() else null,
+                    rdMaturityDate = if (isRd) s.rdMaturityDate else null,
+                    rdInterestRate = if (isRd) s.rdInterestRate.toDoubleOrNull() else null,
+                    rdMaturityAmount = if (isRd) s.rdMaturityAmount else null
                 )
             )
+
             result.fold(
                 onSuccess = { _uiState.update { it.copy(isSaving = false, isSaved = true) } },
                 onFailure = { e ->
-                    _uiState.update {
-                        it.copy(
-                            isSaving = false,
-                            error = e.message
-                        )
-                    }
+                    _uiState.update { it.copy(isSaving = false, error = e.message) }
                 }
             )
         }
     }
 
-    // ── Delete from Room ──────────────────────────────────────────────────────
+    // ── Delete ────────────────────────────────────────────────────────────────
+
     fun delete() {
         viewModelScope.launch {
             deleteTransactionUseCase(transactionId)
