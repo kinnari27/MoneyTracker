@@ -66,7 +66,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
@@ -85,10 +84,10 @@ import com.moneytracker.ui.theme.AppColors
 import com.moneytracker.ui.theme.AppTheme
 import com.moneytracker.ui.theme.Error
 import com.moneytracker.ui.theme.MoneyTrackerTheme
-import com.moneytracker.ui.theme.PrimaryDark
 import com.moneytracker.ui.theme.Success
 import com.moneytracker.ui.theme.Warning
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -128,7 +127,6 @@ fun AddTransactionScreen(
     onInterestRateChange: (String) -> Unit,
     // RD callbacks
     onRdMonthlyAmountChange: (String) -> Unit,
-    onRdTenureMonthsChange: (String) -> Unit,
     onRdMaturityDateChange: (Date) -> Unit,
     onRdInterestRateChange: (String) -> Unit,
     // Common
@@ -235,7 +233,7 @@ fun AddTransactionScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Brush.linearGradient(listOf(PrimaryDark, cs.primary)))
+                .background(cs.primary)
                 .padding(top = 52.dp, start = 20.dp, end = 20.dp, bottom = 36.dp)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -496,26 +494,6 @@ fun AddTransactionScreen(
                     FormLabel("Recurring Deposit Details")
                     Spacer(Modifier.height(12.dp))
 
-                    // Tenure in months
-                    OutlinedTextField(
-                        value = uiState.rdTenureMonths,
-                        onValueChange = onRdTenureMonthsChange,
-                        label = { Text("Tenure (Months)") },
-                        placeholder = { Text("e.g. 12") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        singleLine = true,
-                        shape = RoundedCornerShape(14.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedContainerColor = colors.inputBackground,
-                            focusedContainerColor = colors.inputBackground,
-                            unfocusedBorderColor = colors.outline,
-                            focusedBorderColor = cs.primary
-                        )
-                    )
-
-                    Spacer(Modifier.height(14.dp))
-
                     // Interest Rate
                     OutlinedTextField(
                         value = uiState.rdInterestRate,
@@ -551,8 +529,13 @@ fun AddTransactionScreen(
                     // Estimated maturity amount
                     if (uiState.rdMaturityAmount > 0) {
                         Spacer(Modifier.height(16.dp))
-                        val totalInvested = (uiState.rdMonthlyAmount.toDoubleOrNull() ?: 0.0) *
-                                (uiState.rdTenureMonths.toIntOrNull() ?: 0)
+                        
+                        val start = Calendar.getInstance().apply { time = uiState.date }
+                        val end = Calendar.getInstance().apply { time = uiState.rdMaturityDate }
+                        val months = (end.get(Calendar.YEAR) - start.get(Calendar.YEAR)) * 12 +
+                                (end.get(Calendar.MONTH) - start.get(Calendar.MONTH))
+                        
+                        val totalInvested = (uiState.rdMonthlyAmount.toDoubleOrNull() ?: 0.0) * months
                         MaturityAmountCard(
                             maturityAmount = uiState.rdMaturityAmount,
                             extraLine = "Total invested: ₹${String.format("%.2f", totalInvested)}"
@@ -689,7 +672,6 @@ fun AddTransactionScreen(
             val canSave = when (uiState.selectedCategory) {
                 InvestmentCategory.RD ->
                     uiState.rdMonthlyAmount.isNotBlank() &&
-                            uiState.rdTenureMonths.isNotBlank() &&
                             uiState.rdInterestRate.isNotBlank() &&
                             uiState.selectedCategory.isNotBlank()
                 else ->
@@ -706,8 +688,6 @@ fun AddTransactionScreen(
                 val hint = when {
                     uiState.selectedCategory == InvestmentCategory.RD &&
                             uiState.rdMonthlyAmount.isBlank() -> "Enter monthly installment to continue"
-                    uiState.selectedCategory == InvestmentCategory.RD &&
-                            uiState.rdTenureMonths.isBlank() -> "Enter tenure to continue"
                     uiState.selectedCategory == InvestmentCategory.RD &&
                             uiState.rdInterestRate.isBlank() -> "Enter interest rate to continue"
                     uiState.amount.isBlank() -> "Enter an amount to continue"
@@ -1097,7 +1077,7 @@ private fun PreviewExpenseLight() {
             uiState = AddTransactionUiState(type = TransactionType.EXPENSE),
             onAmountChange = {}, onCategorySelect = {}, onTypeChange = {},
             onDateChange = {}, onMaturityDateChange = {}, onInterestRateChange = {},
-            onRdMonthlyAmountChange = {}, onRdTenureMonthsChange = {},
+            onRdMonthlyAmountChange = {},
             onRdMaturityDateChange = {}, onRdInterestRateChange = {},
             onNoteChange = {}, onRecurringToggle = {},
             onSave = {}, onDelete = {}, onSaveSuccess = {}
@@ -1116,7 +1096,7 @@ private fun PreviewFdDark() {
             ),
             onAmountChange = {}, onCategorySelect = {}, onTypeChange = {},
             onDateChange = {}, onMaturityDateChange = {}, onInterestRateChange = {},
-            onRdMonthlyAmountChange = {}, onRdTenureMonthsChange = {},
+            onRdMonthlyAmountChange = {},
             onRdMaturityDateChange = {}, onRdInterestRateChange = {},
             onNoteChange = {}, onRecurringToggle = {},
             onSave = {}, onDelete = {}, onSaveSuccess = {}
@@ -1135,7 +1115,7 @@ private fun PreviewRdLight() {
             ),
             onAmountChange = {}, onCategorySelect = {}, onTypeChange = {},
             onDateChange = {}, onMaturityDateChange = {}, onInterestRateChange = {},
-            onRdMonthlyAmountChange = {}, onRdTenureMonthsChange = {},
+            onRdMonthlyAmountChange = {},
             onRdMaturityDateChange = {}, onRdInterestRateChange = {},
             onNoteChange = {}, onRecurringToggle = {},
             onSave = {}, onDelete = {}, onSaveSuccess = {}
@@ -1154,7 +1134,7 @@ private fun PreviewIncomeLight() {
             ),
             onAmountChange = {}, onCategorySelect = {}, onTypeChange = {},
             onDateChange = {}, onMaturityDateChange = {}, onInterestRateChange = {},
-            onRdMonthlyAmountChange = {}, onRdTenureMonthsChange = {},
+            onRdMonthlyAmountChange = {},
             onRdMaturityDateChange = {}, onRdInterestRateChange = {},
             onNoteChange = {}, onRecurringToggle = {},
             onSave = {}, onDelete = {}, onSaveSuccess = {}

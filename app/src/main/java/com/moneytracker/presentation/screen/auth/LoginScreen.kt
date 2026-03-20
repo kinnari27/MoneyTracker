@@ -40,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
@@ -53,7 +52,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moneytracker.ui.theme.AppTheme
 import com.moneytracker.ui.theme.MoneyTrackerTheme
-import com.moneytracker.ui.theme.PrimaryDark
 
 // ── Entry point ───────────────────────────────────────────────────────────────
 @Composable
@@ -104,12 +102,12 @@ fun LoginScreenContent(
             .fillMaxSize()
             .background(cs.background)
     ) {
-        // ── Gradient header blob ──────────────────────────────────────────────
+        // ── Header blob ──────────────────────────────────────────────────────
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(300.dp)
-                .background(Brush.verticalGradient(listOf(PrimaryDark, cs.primary)))
+                .background(cs.primary)
         ) {
             Box(
                 modifier = Modifier

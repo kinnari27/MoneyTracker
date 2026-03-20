@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -59,7 +60,6 @@ class AddTransactionViewModel @Inject constructor(
                         maturityAmount = transaction.maturityAmount ?: 0.0,
                         // RD fields
                         rdMonthlyAmount = transaction.rdMonthlyAmount?.toString() ?: "",
-                        rdTenureMonths = transaction.rdTenureMonths?.toString() ?: "",
                         rdMaturityDate = transaction.rdMaturityDate ?: Date(),
                         rdInterestRate = transaction.rdInterestRate?.toString() ?: "",
                         rdMaturityAmount = transaction.rdMaturityAmount ?: 0.0,
@@ -116,11 +116,6 @@ class AddTransactionViewModel @Inject constructor(
         calculateMaturity()
     }
 
-    fun onRdTenureMonthsChange(value: String) {
-        _uiState.update { it.copy(rdTenureMonths = value) }
-        calculateMaturity()
-    }
-
     fun onRdMaturityDateChange(date: Date) {
         _uiState.update { it.copy(rdMaturityDate = date) }
         calculateMaturity()
@@ -155,7 +150,13 @@ class AddTransactionViewModel @Inject constructor(
             InvestmentCategory.RD -> {
                 val monthly = state.rdMonthlyAmount.toDoubleOrNull() ?: return
                 val rate = state.rdInterestRate.toDoubleOrNull() ?: return
-                val months = state.rdTenureMonths.toIntOrNull() ?: return
+                
+                // Calculate tenure in months from dates
+                val start = Calendar.getInstance().apply { time = state.date }
+                val end = Calendar.getInstance().apply { time = state.rdMaturityDate }
+                val months = (end.get(Calendar.YEAR) - start.get(Calendar.YEAR)) * 12 +
+                        (end.get(Calendar.MONTH) - start.get(Calendar.MONTH))
+
                 if (monthly <= 0 || rate <= 0 || months <= 0) return
 
                 // Standard RD maturity formula:
@@ -188,10 +189,6 @@ class AddTransactionViewModel @Inject constructor(
             return
         }
         if (isRd) {
-            if (state.rdTenureMonths.toIntOrNull() == null || state.rdTenureMonths.toInt() <= 0) {
-                _uiState.update { it.copy(error = "Please enter a valid tenure in months") }
-                return
-            }
             if (state.rdInterestRate.toDoubleOrNull() == null) {
                 _uiState.update { it.copy(error = "Please enter a valid interest rate") }
                 return
@@ -200,6 +197,11 @@ class AddTransactionViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
+
+            val start = Calendar.getInstance().apply { time = state.date }
+            val end = Calendar.getInstance().apply { time = state.rdMaturityDate }
+            val months = (end.get(Calendar.YEAR) - start.get(Calendar.YEAR)) * 12 +
+                    (end.get(Calendar.MONTH) - start.get(Calendar.MONTH))
 
             val transaction = Transaction(
                 id = state.id ?: 0,
@@ -219,7 +221,7 @@ class AddTransactionViewModel @Inject constructor(
                 },
                 // RD fields
                 rdMonthlyAmount = if (isRd) amount else null,
-                rdTenureMonths = if (isRd) state.rdTenureMonths.toIntOrNull() else null,
+                rdTenureMonths = if (isRd) months else null,
                 rdMaturityDate = if (isRd) state.rdMaturityDate else null,
                 rdInterestRate = if (isRd) state.rdInterestRate.toDoubleOrNull() else null,
                 rdMaturityAmount = if (isRd) state.rdMaturityAmount else null

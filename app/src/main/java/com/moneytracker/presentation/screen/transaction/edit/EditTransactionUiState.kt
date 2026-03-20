@@ -1,6 +1,7 @@
 package com.moneytracker.presentation.screen.transaction.edit
 
 import com.moneytracker.domain.model.TransactionType
+import java.util.Date
 
 data class EditTransactionUiState(
     val id: Int = 0,
@@ -14,5 +15,16 @@ data class EditTransactionUiState(
     val isSaved: Boolean = false,
     val isDeleted: Boolean = false,
     val error: String? = null,
-    val notFound: Boolean = false
+    val notFound: Boolean = false,
+
+    // FD specific fields
+    val maturityDate: Date = Date(System.currentTimeMillis() + 31536000000L),
+    val interestRate: String = "",
+    val maturityAmount: Double = 0.0,
+
+    // RD specific fields
+    val rdMonthlyAmount: String = "",
+    val rdMaturityDate: Date = Date(System.currentTimeMillis() + 31536000000L),
+    val rdInterestRate: String = "",
+    val rdMaturityAmount: Double = 0.0
 )
