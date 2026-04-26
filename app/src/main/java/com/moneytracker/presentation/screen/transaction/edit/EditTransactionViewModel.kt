@@ -32,7 +32,7 @@ class EditTransactionViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(EditTransactionUiState())
     val uiState: StateFlow<EditTransactionUiState> = _uiState.asStateFlow()
 
-    // Preserve original date — never changed in edit mode
+    // Preserve original date — never changed in edit mode; also used as RD start date for tenure calc
     private var originalDate: Date = Date()
 
     init {
@@ -56,14 +56,14 @@ class EditTransactionViewModel @Inject constructor(
                     selectedCategory = tx.category,
                     type = tx.type,
                     note = tx.note,
-                    isRecurring = tx.isRecurring,
+                    // RD is always recurring — enforce on load too
+                    isRecurring = if (tx.category == InvestmentCategory.RD) true else tx.isRecurring,
                     // FD fields
                     maturityDate = tx.maturityDate ?: Date(System.currentTimeMillis() + 31536000000L),
                     interestRate = tx.interestRate?.toString() ?: "",
                     maturityAmount = tx.maturityAmount ?: 0.0,
-                    // RD fields
+                    // RD fields (rdTenureMonths no longer stored in UI state)
                     rdMonthlyAmount = tx.rdMonthlyAmount?.toString() ?: "",
-                    rdTenureMonths = tx.rdTenureMonths?.toString() ?: "",
                     rdMaturityDate = tx.rdMaturityDate ?: Date(System.currentTimeMillis() + 31536000000L),
                     rdInterestRate = tx.rdInterestRate?.toString() ?: "",
                     rdMaturityAmount = tx.rdMaturityAmount ?: 0.0,
@@ -82,10 +82,21 @@ class EditTransactionViewModel @Inject constructor(
 
     fun onNoteChange(v: String) = _uiState.update { it.copy(note = v) }
 
-    fun onRecurringToggle() = _uiState.update { it.copy(isRecurring = !it.isRecurring) }
+    fun onRecurringToggle() {
+        // RD is always recurring — ignore toggle attempts
+        if (_uiState.value.selectedCategory == InvestmentCategory.RD) return
+        _uiState.update { it.copy(isRecurring = !it.isRecurring) }
+    }
 
     fun onCategorySelect(c: String) {
-        _uiState.update { it.copy(selectedCategory = c, error = null) }
+        _uiState.update {
+            it.copy(
+                selectedCategory = c,
+                error = null,
+                // Force recurring on when RD is selected
+                isRecurring = if (c == InvestmentCategory.RD) true else it.isRecurring
+            )
+        }
         calculateMaturity()
     }
 
@@ -108,11 +119,6 @@ class EditTransactionViewModel @Inject constructor(
 
     fun onRdMonthlyAmountChange(value: String) {
         _uiState.update { it.copy(rdMonthlyAmount = value, error = null) }
-        calculateMaturity()
-    }
-
-    fun onRdTenureMonthsChange(value: String) {
-        _uiState.update { it.copy(rdTenureMonths = value) }
         calculateMaturity()
     }
 
@@ -150,8 +156,12 @@ class EditTransactionViewModel @Inject constructor(
             InvestmentCategory.RD -> {
                 val monthly = state.rdMonthlyAmount.toDoubleOrNull() ?: return
                 val rate = state.rdInterestRate.toDoubleOrNull() ?: return
-                val months = state.rdTenureMonths.toIntOrNull() ?: return
-                if (monthly <= 0 || rate <= 0 || months <= 0) return
+                if (monthly <= 0 || rate <= 0) return
+
+                // Derive tenure in months from originalDate → rdMaturityDate
+                val diffInMillies = state.rdMaturityDate.time - originalDate.time
+                val months = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS) / 30
+                if (months <= 0) return
 
                 // Standard RD maturity formula: M = P*n + P*n*(n+1)*r / (2*12*100)
                 val total = monthly * months +
@@ -180,18 +190,27 @@ class EditTransactionViewModel @Inject constructor(
             return
         }
         if (isRd) {
-            if (s.rdTenureMonths.toIntOrNull() == null || s.rdTenureMonths.toInt() <= 0) {
-                _uiState.update { it.copy(error = "Please enter a valid tenure in months") }
-                return
-            }
             if (s.rdInterestRate.toDoubleOrNull() == null) {
                 _uiState.update { it.copy(error = "Please enter a valid interest rate") }
+                return
+            }
+            // Validate that rdMaturityDate is after originalDate (giving at least 1 month)
+            val diffInMillies = s.rdMaturityDate.time - originalDate.time
+            val months = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS) / 30
+            if (months <= 0) {
+                _uiState.update { it.copy(error = "Maturity date must be at least 1 month from start date") }
                 return
             }
         }
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, error = null) }
+
+            // Derive RD tenure months at save time
+            val rdTenureMonths: Int? = if (isRd) {
+                val diffInMillies = s.rdMaturityDate.time - originalDate.time
+                (TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS) / 30).toInt()
+            } else null
 
             val result = updateTransactionUseCase(
                 Transaction(
@@ -212,7 +231,7 @@ class EditTransactionViewModel @Inject constructor(
                     },
                     // RD fields
                     rdMonthlyAmount = if (isRd) amount else null,
-                    rdTenureMonths = if (isRd) s.rdTenureMonths.toIntOrNull() else null,
+                    rdTenureMonths = rdTenureMonths,
                     rdMaturityDate = if (isRd) s.rdMaturityDate else null,
                     rdInterestRate = if (isRd) s.rdInterestRate.toDoubleOrNull() else null,
                     rdMaturityAmount = if (isRd) s.rdMaturityAmount else null

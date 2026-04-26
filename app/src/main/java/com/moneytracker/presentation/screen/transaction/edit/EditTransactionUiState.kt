@@ -10,7 +10,7 @@ data class EditTransactionUiState(
     val type: TransactionType = TransactionType.EXPENSE,
     val note: String = "",
     val isRecurring: Boolean = false,
-    val isLoading: Boolean = true,   // loading from DB
+    val isLoading: Boolean = true,
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
     val isDeleted: Boolean = false,
@@ -22,9 +22,8 @@ data class EditTransactionUiState(
     val interestRate: String = "",
     val maturityAmount: Double = 0.0,
 
-    // RD specific fields
+    // RD specific fields  (tenure removed — derived from originalDate → rdMaturityDate)
     val rdMonthlyAmount: String = "",
-    val rdTenureMonths: String = "",
     val rdMaturityDate: Date = Date(System.currentTimeMillis() + 31536000000L),
     val rdInterestRate: String = "",
     val rdMaturityAmount: Double = 0.0

@@ -74,6 +74,9 @@ import com.moneytracker.ui.theme.AppTheme
 import com.moneytracker.ui.theme.MoneyTrackerTheme
 import com.moneytracker.ui.theme.PrimaryDark
 
+import androidx.compose.ui.res.painterResource
+import com.moneytracker.R
+
 // ── Entry point ───────────────────────────────────────────────────────────────
 @Composable
 fun RegisterScreen(
@@ -82,6 +85,7 @@ fun RegisterScreen(
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
@@ -104,6 +108,7 @@ fun RegisterScreen(
         onTogglePassword = viewModel::togglePasswordVisible,
         onToggleConfirm = viewModel::toggleConfirmVisible,
         onRegister = viewModel::register,
+        onGoogleSignIn = { viewModel.signInWithGoogle(context) },
         onNavigateToLogin = onNavigateToLogin
     )
 }
@@ -124,6 +129,7 @@ fun RegisterScreenContent(
     onTogglePassword: () -> Unit,
     onToggleConfirm: () -> Unit,
     onRegister: () -> Unit,
+    onGoogleSignIn: () -> Unit,
     onNavigateToLogin: () -> Unit,
     initialStep: Int = 0,
     modifier: Modifier = Modifier
@@ -387,6 +393,51 @@ fun RegisterScreenContent(
                             }
                         }
                     }
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            // Divider
+            Row(
+                modifier = Modifier.padding(horizontal = 40.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Box(modifier = Modifier.weight(1f).height(1.dp).background(colors.outline.copy(0.2f)))
+                Text("OR", style = MaterialTheme.typography.labelSmall, color = colors.textSecondary)
+                Box(modifier = Modifier.weight(1f).height(1.dp).background(colors.outline.copy(0.2f)))
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            // Google Sign In Button
+            androidx.compose.material3.OutlinedButton(
+                onClick = onGoogleSignIn,
+                enabled = !uiState.isLoading,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .height(52.dp),
+                shape = RoundedCornerShape(16.dp),
+                border = androidx.compose.foundation.BorderStroke(1.dp, colors.outline.copy(0.4f)),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = cs.onSurface)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_google),
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                        tint = Color.Unspecified
+                    )
+                    Text(
+                        "Continue with Google",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
 
@@ -783,6 +834,7 @@ private fun RegisterPreviewStep1() {
             onCurrencyChange = {}, onPasswordChange = {},
             onConfirmChange = {}, onTogglePassword = {},
             onToggleConfirm = {}, onRegister = {},
+            onGoogleSignIn = {},
             onNavigateToLogin = {},
             initialStep = 0
         )
@@ -806,6 +858,7 @@ private fun RegisterPreviewStep2() {
             onCurrencyChange = {}, onPasswordChange = {},
             onConfirmChange = {}, onTogglePassword = {},
             onToggleConfirm = {}, onRegister = {},
+            onGoogleSignIn = {},
             onNavigateToLogin = {},
             initialStep = 1
         )
@@ -828,6 +881,7 @@ private fun RegisterPreviewStep3() {
             onCurrencyChange = {}, onPasswordChange = {},
             onConfirmChange = {}, onTogglePassword = {},
             onToggleConfirm = {}, onRegister = {},
+            onGoogleSignIn = {},
             onNavigateToLogin = {},
             initialStep = 2
         )

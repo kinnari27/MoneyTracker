@@ -48,6 +48,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.painterResource
+import com.moneytracker.R
+import kotlinx.coroutines.launch
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -64,6 +67,7 @@ fun LoginScreen(
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
@@ -78,6 +82,7 @@ fun LoginScreen(
         onPasswordChange = viewModel::onPasswordChange,
         onTogglePassword = viewModel::togglePasswordVisible,
         onLogin = viewModel::login,
+        onGoogleSignIn = { viewModel.signInWithGoogle(context) },
         onNavigateToRegister = onNavigateToRegister,
         onNavigateToForgotPassword = onNavigateToForgotPassword
     )
@@ -91,6 +96,7 @@ fun LoginScreenContent(
     onPasswordChange: (String) -> Unit,
     onTogglePassword: () -> Unit,
     onLogin: () -> Unit,
+    onGoogleSignIn: () -> Unit,
     onNavigateToRegister: () -> Unit,
     onNavigateToForgotPassword: () -> Unit,
     modifier: Modifier = Modifier
@@ -296,6 +302,46 @@ fun LoginScreenContent(
                             )
                         }
                     }
+
+                    // Divider
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Box(modifier = Modifier.weight(1f).height(1.dp).background(colors.outline.copy(0.3f)))
+                        Text("OR", style = MaterialTheme.typography.labelSmall, color = colors.textSecondary)
+                        Box(modifier = Modifier.weight(1f).height(1.dp).background(colors.outline.copy(0.3f)))
+                    }
+
+                    // Google Sign In Button
+                    androidx.compose.material3.OutlinedButton(
+                        onClick = onGoogleSignIn,
+                        enabled = !uiState.isLoading,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = RoundedCornerShape(18.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, colors.outline.copy(0.5f))
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_google),
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp),
+                                tint = Color.Unspecified
+                            )
+                            Text(
+                                "Sign in with Google",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = cs.onSurface
+                            )
+                        }
+                    }
                 }
             }
 
@@ -336,6 +382,7 @@ private fun LoginPreviewLight() {
             onPasswordChange = {},
             onTogglePassword = {},
             onLogin = {},
+            onGoogleSignIn = {},
             onNavigateToRegister = {},
             onNavigateToForgotPassword = {}
         )
@@ -352,6 +399,7 @@ private fun LoginPreviewDark() {
             onPasswordChange = {},
             onTogglePassword = {},
             onLogin = {},
+            onGoogleSignIn = {},
             onNavigateToRegister = {},
             onNavigateToForgotPassword = {}
         )

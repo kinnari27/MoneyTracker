@@ -25,6 +25,9 @@ interface UserRepository {
     /** Verify email + password; returns the matching User or a descriptive error. */
     suspend fun loginUser(email: String, password: String): Result<User>
 
+    /** Sign in with Firebase using Google ID Token. */
+    suspend fun signInWithGoogle(idToken: String): Result<User>
+
     /** Remove the login status for the user (full sign-out for a single-user app). */
     suspend fun signOut()
 

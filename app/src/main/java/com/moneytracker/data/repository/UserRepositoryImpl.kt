@@ -5,13 +5,17 @@ import com.moneytracker.data.mapper.toDomain
 import com.moneytracker.data.mapper.toEntity
 import com.moneytracker.domain.model.User
 import com.moneytracker.domain.repository.UserRepository
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.flow.map
 import java.security.MessageDigest
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
-    private val userDao: UserDao
+    private val userDao: UserDao,
+    private val firebaseAuth: FirebaseAuth
 ) : UserRepository {
 
     // ── Observe (reactive) ────────────────────────────────────────────────────
@@ -62,8 +66,41 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun signInWithGoogle(idToken: String): Result<User> {
+        return try {
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            val authResult = firebaseAuth.signInWithCredential(credential).await()
+            val firebaseUser = authResult.user ?: return Result.failure(Exception("Google sign-in failed"))
+
+            val email = firebaseUser.email ?: ""
+            var userEntity = userDao.getUserByEmail(email.lowercase())
+
+            if (userEntity == null) {
+                // Create new user if not exists
+                val newUser = User(
+                    name = firebaseUser.displayName ?: "User",
+                    email = email,
+                    firebaseUid = firebaseUser.uid,
+                    isLoggedIn = true
+                )
+                userDao.insertUser(newUser.toEntity())
+                userEntity = userDao.getUserByEmail(email.lowercase())
+            } else {
+                // Update existing user with firebaseUid and login status
+                userDao.updateLoginStatus(userEntity.id, true)
+                // We could also update firebaseUid if it was null
+            }
+
+            Result.success(userEntity!!.toDomain().copy(isLoggedIn = true))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun signOut() {
-        // Find current logged in user and sign them out
+        // Sign out from Firebase
+        firebaseAuth.signOut()
+        // Find current logged in user and sign them out in Room
         val user = userDao.getLoggedInUser()
         if (user != null) {
             userDao.updateLoginStatus(user.id, false)

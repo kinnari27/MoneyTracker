@@ -128,7 +128,6 @@ fun AddTransactionScreen(
     onInterestRateChange: (String) -> Unit,
     // RD callbacks
     onRdMonthlyAmountChange: (String) -> Unit,
-    onRdTenureMonthsChange: (String) -> Unit,
     onRdMaturityDateChange: (Date) -> Unit,
     onRdInterestRateChange: (String) -> Unit,
     // Common
@@ -496,26 +495,6 @@ fun AddTransactionScreen(
                     FormLabel("Recurring Deposit Details")
                     Spacer(Modifier.height(12.dp))
 
-                    // Tenure in months
-                    OutlinedTextField(
-                        value = uiState.rdTenureMonths,
-                        onValueChange = onRdTenureMonthsChange,
-                        label = { Text("Tenure (Months)") },
-                        placeholder = { Text("e.g. 12") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        singleLine = true,
-                        shape = RoundedCornerShape(14.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedContainerColor = colors.inputBackground,
-                            focusedContainerColor = colors.inputBackground,
-                            unfocusedBorderColor = colors.outline,
-                            focusedBorderColor = cs.primary
-                        )
-                    )
-
-                    Spacer(Modifier.height(14.dp))
-
                     // Interest Rate
                     OutlinedTextField(
                         value = uiState.rdInterestRate,
@@ -551,11 +530,9 @@ fun AddTransactionScreen(
                     // Estimated maturity amount
                     if (uiState.rdMaturityAmount > 0) {
                         Spacer(Modifier.height(16.dp))
-                        val totalInvested = (uiState.rdMonthlyAmount.toDoubleOrNull() ?: 0.0) *
-                                (uiState.rdTenureMonths.toIntOrNull() ?: 0)
                         MaturityAmountCard(
                             maturityAmount = uiState.rdMaturityAmount,
-                            extraLine = "Total invested: ₹${String.format("%.2f", totalInvested)}"
+                            extraLine = null
                         )
                     }
                 }
@@ -689,7 +666,6 @@ fun AddTransactionScreen(
             val canSave = when (uiState.selectedCategory) {
                 InvestmentCategory.RD ->
                     uiState.rdMonthlyAmount.isNotBlank() &&
-                            uiState.rdTenureMonths.isNotBlank() &&
                             uiState.rdInterestRate.isNotBlank() &&
                             uiState.selectedCategory.isNotBlank()
                 else ->
@@ -706,8 +682,6 @@ fun AddTransactionScreen(
                 val hint = when {
                     uiState.selectedCategory == InvestmentCategory.RD &&
                             uiState.rdMonthlyAmount.isBlank() -> "Enter monthly installment to continue"
-                    uiState.selectedCategory == InvestmentCategory.RD &&
-                            uiState.rdTenureMonths.isBlank() -> "Enter tenure to continue"
                     uiState.selectedCategory == InvestmentCategory.RD &&
                             uiState.rdInterestRate.isBlank() -> "Enter interest rate to continue"
                     uiState.amount.isBlank() -> "Enter an amount to continue"
@@ -1097,7 +1071,7 @@ private fun PreviewExpenseLight() {
             uiState = AddTransactionUiState(type = TransactionType.EXPENSE),
             onAmountChange = {}, onCategorySelect = {}, onTypeChange = {},
             onDateChange = {}, onMaturityDateChange = {}, onInterestRateChange = {},
-            onRdMonthlyAmountChange = {}, onRdTenureMonthsChange = {},
+            onRdMonthlyAmountChange = {},
             onRdMaturityDateChange = {}, onRdInterestRateChange = {},
             onNoteChange = {}, onRecurringToggle = {},
             onSave = {}, onDelete = {}, onSaveSuccess = {}
@@ -1116,7 +1090,7 @@ private fun PreviewFdDark() {
             ),
             onAmountChange = {}, onCategorySelect = {}, onTypeChange = {},
             onDateChange = {}, onMaturityDateChange = {}, onInterestRateChange = {},
-            onRdMonthlyAmountChange = {}, onRdTenureMonthsChange = {},
+            onRdMonthlyAmountChange = {},
             onRdMaturityDateChange = {}, onRdInterestRateChange = {},
             onNoteChange = {}, onRecurringToggle = {},
             onSave = {}, onDelete = {}, onSaveSuccess = {}
@@ -1135,7 +1109,7 @@ private fun PreviewRdLight() {
             ),
             onAmountChange = {}, onCategorySelect = {}, onTypeChange = {},
             onDateChange = {}, onMaturityDateChange = {}, onInterestRateChange = {},
-            onRdMonthlyAmountChange = {}, onRdTenureMonthsChange = {},
+            onRdMonthlyAmountChange = {},
             onRdMaturityDateChange = {}, onRdInterestRateChange = {},
             onNoteChange = {}, onRecurringToggle = {},
             onSave = {}, onDelete = {}, onSaveSuccess = {}
@@ -1154,7 +1128,7 @@ private fun PreviewIncomeLight() {
             ),
             onAmountChange = {}, onCategorySelect = {}, onTypeChange = {},
             onDateChange = {}, onMaturityDateChange = {}, onInterestRateChange = {},
-            onRdMonthlyAmountChange = {}, onRdTenureMonthsChange = {},
+            onRdMonthlyAmountChange = {},
             onRdMaturityDateChange = {}, onRdInterestRateChange = {},
             onNoteChange = {}, onRecurringToggle = {},
             onSave = {}, onDelete = {}, onSaveSuccess = {}

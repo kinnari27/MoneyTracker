@@ -59,7 +59,6 @@ class AddTransactionViewModel @Inject constructor(
                         maturityAmount = transaction.maturityAmount ?: 0.0,
                         // RD fields
                         rdMonthlyAmount = transaction.rdMonthlyAmount?.toString() ?: "",
-                        rdTenureMonths = transaction.rdTenureMonths?.toString() ?: "",
                         rdMaturityDate = transaction.rdMaturityDate ?: Date(),
                         rdInterestRate = transaction.rdInterestRate?.toString() ?: "",
                         rdMaturityAmount = transaction.rdMaturityAmount ?: 0.0,
@@ -116,11 +115,6 @@ class AddTransactionViewModel @Inject constructor(
         calculateMaturity()
     }
 
-    fun onRdTenureMonthsChange(value: String) {
-        _uiState.update { it.copy(rdTenureMonths = value) }
-        calculateMaturity()
-    }
-
     fun onRdMaturityDateChange(date: Date) {
         _uiState.update { it.copy(rdMaturityDate = date) }
         calculateMaturity()
@@ -155,7 +149,11 @@ class AddTransactionViewModel @Inject constructor(
             InvestmentCategory.RD -> {
                 val monthly = state.rdMonthlyAmount.toDoubleOrNull() ?: return
                 val rate = state.rdInterestRate.toDoubleOrNull() ?: return
-                val months = state.rdTenureMonths.toIntOrNull() ?: return
+
+                // Derive tenure in months from date -> rdMaturityDate
+                val diffInMillies = state.rdMaturityDate.time - state.date.time
+                val months = (TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS) / 30).toInt()
+
                 if (monthly <= 0 || rate <= 0 || months <= 0) return
 
                 // Standard RD maturity formula:
@@ -188,18 +186,27 @@ class AddTransactionViewModel @Inject constructor(
             return
         }
         if (isRd) {
-            if (state.rdTenureMonths.toIntOrNull() == null || state.rdTenureMonths.toInt() <= 0) {
-                _uiState.update { it.copy(error = "Please enter a valid tenure in months") }
-                return
-            }
             if (state.rdInterestRate.toDoubleOrNull() == null) {
                 _uiState.update { it.copy(error = "Please enter a valid interest rate") }
+                return
+            }
+            // Validate that rdMaturityDate is after date (giving at least 1 month)
+            val diffInMillies = state.rdMaturityDate.time - state.date.time
+            val months = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS) / 30
+            if (months <= 0) {
+                _uiState.update { it.copy(error = "Maturity date must be at least 1 month from start date") }
                 return
             }
         }
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
+
+            // Derive RD tenure months at save time
+            val rdTenureMonths: Int? = if (isRd) {
+                val diffInMillies = state.rdMaturityDate.time - state.date.time
+                (TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS) / 30).toInt()
+            } else null
 
             val transaction = Transaction(
                 id = state.id ?: 0,
@@ -219,7 +226,7 @@ class AddTransactionViewModel @Inject constructor(
                 },
                 // RD fields
                 rdMonthlyAmount = if (isRd) amount else null,
-                rdTenureMonths = if (isRd) state.rdTenureMonths.toIntOrNull() else null,
+                rdTenureMonths = rdTenureMonths,
                 rdMaturityDate = if (isRd) state.rdMaturityDate else null,
                 rdInterestRate = if (isRd) state.rdInterestRate.toDoubleOrNull() else null,
                 rdMaturityAmount = if (isRd) state.rdMaturityAmount else null

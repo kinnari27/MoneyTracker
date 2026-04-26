@@ -17,6 +17,8 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     private val loginUser: LoginUserUseCase,
     private val registerUser: RegisterUserUseCase,
+    private val userRepository: com.moneytracker.domain.repository.UserRepository,
+    private val googleAuthUiClient: GoogleAuthUiClient
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AuthUiState())
@@ -122,6 +124,38 @@ class AuthViewModel @Inject constructor(
                         )
                     }
                 }
+            )
+        }
+    }
+
+    // ── Google Sign In ───────────────────────────────────────────────────────
+    fun signInWithGoogle(context: android.content.Context) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            val idToken = googleAuthUiClient.signIn(context)
+            if (idToken == null) {
+                _uiState.update { it.copy(isLoading = false, error = "Google Sign-In failed") }
+                return@launch
+            }
+
+            userRepository.signInWithGoogle(idToken).fold(
+                onSuccess = { _uiState.update { it.copy(isLoading = false, isSuccess = true) } },
+                onFailure = { e -> _uiState.update { it.copy(isLoading = false, error = e.message) } }
+            )
+        }
+    }
+
+    fun onGoogleSignInResult(idToken: String?) {
+        if (idToken == null) {
+            _uiState.update { it.copy(error = "Google Sign-In failed") }
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            userRepository.signInWithGoogle(idToken).fold(
+                onSuccess = { _uiState.update { it.copy(isLoading = false, isSuccess = true) } },
+                onFailure = { e -> _uiState.update { it.copy(isLoading = false, error = e.message) } }
             )
         }
     }

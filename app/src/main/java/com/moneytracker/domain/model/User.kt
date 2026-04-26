@@ -4,6 +4,7 @@ data class User(
     val id: Int = 0,
     val name: String,
     val email: String,
+    val firebaseUid: String? = null,
     val phone: String = "",
     val occupation: String = "",
     val incomeGoal: Double = 0.0,

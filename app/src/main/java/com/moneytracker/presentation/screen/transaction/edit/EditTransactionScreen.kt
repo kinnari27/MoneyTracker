@@ -36,7 +36,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.outlined.CalendarMonth
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.TrendingUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -132,7 +131,6 @@ fun EditTransactionScreen(
         onInterestRateChange = viewModel::onInterestRateChange,
         // RD
         onRdMonthlyAmountChange = viewModel::onRdMonthlyAmountChange,
-        onRdTenureMonthsChange = viewModel::onRdTenureMonthsChange,
         onRdMaturityDateChange = viewModel::onRdMaturityDateChange,
         onRdInterestRateChange = viewModel::onRdInterestRateChange,
         onSave = viewModel::save,
@@ -156,7 +154,6 @@ fun EditTransactionContent(
     onInterestRateChange: (String) -> Unit,
     // RD
     onRdMonthlyAmountChange: (String) -> Unit,
-    onRdTenureMonthsChange: (String) -> Unit,
     onRdMaturityDateChange: (Date) -> Unit,
     onRdInterestRateChange: (String) -> Unit,
     onSave: () -> Unit,
@@ -479,20 +476,6 @@ fun EditTransactionContent(
                     Spacer(Modifier.height(12.dp))
 
                     OutlinedTextField(
-                        value = uiState.rdTenureMonths,
-                        onValueChange = onRdTenureMonthsChange,
-                        label = { Text("Tenure (Months)") },
-                        placeholder = { Text("e.g. 12") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        singleLine = true,
-                        shape = RoundedCornerShape(14.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = editFieldColors()
-                    )
-
-                    Spacer(Modifier.height(14.dp))
-
-                    OutlinedTextField(
                         value = uiState.rdInterestRate,
                         onValueChange = onRdInterestRateChange,
                         label = { Text("Interest Rate (% p.a.)") },
@@ -519,11 +502,9 @@ fun EditTransactionContent(
 
                     if (uiState.rdMaturityAmount > 0) {
                         Spacer(Modifier.height(16.dp))
-                        val totalInvested = (uiState.rdMonthlyAmount.toDoubleOrNull() ?: 0.0) *
-                                (uiState.rdTenureMonths.toIntOrNull() ?: 0)
                         EditMaturityAmountCard(
                             maturityAmount = uiState.rdMaturityAmount,
-                            extraLine = "Total invested: ₹${String.format("%.2f", totalInvested)}"
+                            extraLine = null
                         )
                     }
                 }
@@ -545,8 +526,10 @@ fun EditTransactionContent(
                 )
             }
 
-            // ── Recurring toggle — hidden for Expense ─────────────────────────
+            // ── Recurring toggle ──────────────────────────────────────────────
+            // Hidden for Expense. Locked ON (disabled) when RD is selected.
             if (uiState.type != TransactionType.EXPENSE) {
+                val isRd = uiState.selectedCategory == InvestmentCategory.RD
                 EditFormCard {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -561,17 +544,24 @@ fun EditTransactionContent(
                                 color = cs.onSurface
                             )
                             Text(
-                                "Repeat monthly",
+                                // Explain to the user why it's locked when RD
+                                if (isRd) "Always on for Recurring Deposit"
+                                else "Repeat monthly",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = colors.textSecondary
                             )
                         }
                         Switch(
                             checked = uiState.isRecurring,
-                            onCheckedChange = { onRecurringToggle() },
+                            onCheckedChange = { if (!isRd) onRecurringToggle() },
+                            // Visually disable the switch for RD so user can't toggle it off
+                            enabled = !isRd,
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color.White,
-                                checkedTrackColor = cs.primary
+                                checkedTrackColor = cs.primary,
+                                // Keep a distinct amber tint when locked on for RD
+                                disabledCheckedThumbColor = Color.White,
+                                disabledCheckedTrackColor = Warning
                             )
                         )
                     }
@@ -609,7 +599,6 @@ fun EditTransactionContent(
             val canSave = when (uiState.selectedCategory) {
                 InvestmentCategory.RD ->
                     uiState.rdMonthlyAmount.isNotBlank() &&
-                            uiState.rdTenureMonths.isNotBlank() &&
                             uiState.rdInterestRate.isNotBlank() &&
                             uiState.selectedCategory.isNotBlank()
                 else ->

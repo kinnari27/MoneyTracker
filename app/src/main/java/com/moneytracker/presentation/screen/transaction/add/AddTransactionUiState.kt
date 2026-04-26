@@ -22,7 +22,6 @@ data class AddTransactionUiState(
 
     // RD specific fields
     val rdMonthlyAmount: String = "",
-    val rdTenureMonths: String = "",
     val rdMaturityDate: Date = Date(System.currentTimeMillis() + 31536000000L), // Default 1 year later
     val rdInterestRate: String = "",
     val rdMaturityAmount: Double = 0.0
