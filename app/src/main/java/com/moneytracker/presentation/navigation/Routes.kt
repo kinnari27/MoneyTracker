@@ -12,5 +12,5 @@ object Routes {
     const val NOTIFICATIONS = "notifications"
     const val CURRENCY = "currency"
     const val BIOMETRIC_LOCK = "biometric_lock"
-    const val CHANGE_PIN = "change_pin"
+    const val CHANGE_PASSWORD = "change_password"
 }

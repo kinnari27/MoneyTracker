@@ -74,6 +74,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -84,6 +85,7 @@ import com.moneytracker.domain.model.TransactionType
 import com.moneytracker.presentation.components.categoryColor
 import com.moneytracker.ui.theme.AppTheme
 import com.moneytracker.ui.theme.Error
+import com.moneytracker.ui.theme.MoneyTrackerTheme
 import com.moneytracker.ui.theme.PrimaryDark
 import com.moneytracker.ui.theme.Success
 import com.moneytracker.ui.theme.Warning
@@ -869,5 +871,76 @@ private fun EditCategoryGrid(
                 }
             }
         }
+    }
+}
+
+// ── Previews ──────────────────────────────────────────────────────────────────
+
+@Preview(name = "Edit — Expense Light", showBackground = true)
+@Composable
+private fun PreviewEditExpenseLight() {
+    MoneyTrackerTheme(darkTheme = false) {
+        EditTransactionContent(
+            uiState = EditTransactionUiState(
+                id = 1,
+                amount = "1250",
+                selectedCategory = "Food",
+                type = TransactionType.EXPENSE,
+                note = "Dinner with friends",
+                isLoading = false
+            ),
+            onAmountChange = {}, onCategorySelect = {}, onTypeChange = {},
+            onNoteChange = {}, onRecurringToggle = {},
+            onMaturityDateChange = {}, onInterestRateChange = {},
+            onRdMonthlyAmountChange = {}, onRdMaturityDateChange = {},
+            onRdInterestRateChange = {}, onSave = {}, onDelete = {}, onBack = {}
+        )
+    }
+}
+
+@Preview(name = "Edit — FD Dark", showBackground = true)
+@Composable
+private fun PreviewEditFdDark() {
+    MoneyTrackerTheme(darkTheme = true) {
+        EditTransactionContent(
+            uiState = EditTransactionUiState(
+                id = 2,
+                amount = "50000",
+                selectedCategory = InvestmentCategory.FD,
+                type = TransactionType.INVESTMENT,
+                interestRate = "7.5",
+                maturityAmount = 53750.0,
+                isLoading = false
+            ),
+            onAmountChange = {}, onCategorySelect = {}, onTypeChange = {},
+            onNoteChange = {}, onRecurringToggle = {},
+            onMaturityDateChange = {}, onInterestRateChange = {},
+            onRdMonthlyAmountChange = {}, onRdMaturityDateChange = {},
+            onRdInterestRateChange = {}, onSave = {}, onDelete = {}, onBack = {}
+        )
+    }
+}
+
+@Preview(name = "Edit — RD Light", showBackground = true)
+@Composable
+private fun PreviewEditRdLight() {
+    MoneyTrackerTheme(darkTheme = false) {
+        EditTransactionContent(
+            uiState = EditTransactionUiState(
+                id = 3,
+                rdMonthlyAmount = "5000",
+                selectedCategory = InvestmentCategory.RD,
+                type = TransactionType.INVESTMENT,
+                rdInterestRate = "6.5",
+                rdMaturityAmount = 62100.0,
+                isRecurring = true,
+                isLoading = false
+            ),
+            onAmountChange = {}, onCategorySelect = {}, onTypeChange = {},
+            onNoteChange = {}, onRecurringToggle = {},
+            onMaturityDateChange = {}, onInterestRateChange = {},
+            onRdMonthlyAmountChange = {}, onRdMaturityDateChange = {},
+            onRdInterestRateChange = {}, onSave = {}, onDelete = {}, onBack = {}
+        )
     }
 }

@@ -2,90 +2,90 @@ package com.moneytracker.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// ─── Primary ─────────────────────────────────────────────────────────────────
+// ─── Primary (Indigo) ────────────────────────────────────────────────────────
 
-val Primary = Color(0xFF054D3A)
-val PrimaryLight = Color(0xFF0A7C5C)
-val PrimaryDark = Color(0xFF022B1E)
-val PrimaryContainer = Color(0xFFEEEEEE)
-val OnPrimaryContainer = Color(0xFF111111)
+val Primary = Color(0xFF3F51B5)
+val PrimaryLight = Color(0xFF7986CB)
+val PrimaryDark = Color(0xFF303F9F)
+val PrimaryContainer = Color(0xFFE8EAF6)
+val OnPrimaryContainer = Color(0xFF1A237E)
 val OnPrimary = Color(0xFFFFFFFF)
 
-// ─── Secondary ───────────────────────────────────────────────────────────────
-val Secondary = Color(0xFF555555)
-val SecondaryContainer = Color(0xFFE5E5E5)
-val OnSecondaryContainer = Color(0xFF111111)
+// ─── Secondary (Slate) ───────────────────────────────────────────────────────
+val Secondary = Color(0xFF64748B)
+val SecondaryContainer = Color(0xFFF1F5F9)
+val OnSecondaryContainer = Color(0xFF1E293B)
 
 // ─── Accent / Tertiary ───────────────────────────────────────────────────────
-val Accent = Color(0xFF222222)
-val TertiaryContainer = Color(0xFFDDDDDD)
-val OnTertiaryContainer = Color(0xFF111111)
+val Accent = Color(0xFF475569)
+val TertiaryContainer = Color(0xFFF8FAFC)
+val OnTertiaryContainer = Color(0xFF0F172A)
 
-// ─── Neutral Base (Light Mode) ───────────────────────────────────────────────
-val Background = Color(0xFFF9F9F9)        // Off-white, soft on eyes
+// ─── Neutral Base (Light Mode - Slate based) ─────────────────────────────────
+val Background = Color(0xFFF8FAFC)        // Slate 50
 val Surface = Color(0xFFFFFFFF)           // Pure white cards
-val SurfaceElevated = Color(0xFFF3F3F3)   // Slightly elevated surface
-val SurfaceVariant = Color(0xFFEDEDED)    // Subtle grey for chips/tags
-val Outline = Color(0xFFCCCCCC)           // Light grey border
-val OutlineVariant = Color(0xFFE2E2E2)    // Even softer border
-val OnSurface = Color(0xFF0D0D0D)         // Near-black text
-val OnSurfaceVariant = Color(0xFF6B6B6B)  // Secondary grey text
+val SurfaceElevated = Color(0xFFF1F5F9)   // Slate 100
+val SurfaceVariant = Color(0xFFE2E8F0)    // Slate 200
+val Outline = Color(0xFFCBD5E1)           // Slate 300
+val OutlineVariant = Color(0xFFF1F5F9)    // Slate 100
+val OnSurface = Color(0xFF0F172A)         // Slate 900 text
+val OnSurfaceVariant = Color(0xFF475569)  // Slate 600 text
 
 // ─── Semantic — Light ─────────────────────────────────────────────────────────
-val Success = Color(0xFF2E7D32)           // Subtle dark green for income
-val SuccessContainer = Color(0xFFE8F5E9)
-val Error = Color(0xFFC62828)             // Dark red for expenses
-val ErrorContainer = Color(0xFFFFEBEE)
+val Success = Color(0xFF10B981)           // Emerald 500
+val SuccessContainer = Color(0xFFECFDF5)
+val Error = Color(0xFFEF4444)             // Red 500
+val ErrorContainer = Color(0xFFFEF2F2)
 val ErrorContainerM3 = Color(0xFFFFDAD6)
-val OnErrorContainer = Color(0xFF7A0000)
-val Warning = Color(0xFFE65100)
-val WarningContainer = Color(0xFFFFF3E0)
-val InputBackground = Color(0xFFF5F5F5)
+val OnErrorContainer = Color(0xFF410002)
+val Warning = Color(0xFFF59E0B)           // Amber 500
+val WarningContainer = Color(0xFFFFFBEB)
+val InputBackground = Color(0xFFF1F5F9)
 val Scrim = Color(0xFF000000)
 
-// ─── Dark Mode Palette ───────────────────────────────────────────────────────
-val DarkBackground = Color(0xFF0A0A0A)    // True dark background
-val DarkSurface = Color(0xFF141414)       // Card surface
-val DarkSurfaceElevated = Color(0xFF1F1F1F)
-val DarkSurfaceVariant = Color(0xFF2A2A2A)
-val DarkOutline = Color(0xFF3D3D3D)
-val DarkOutlineVariant = Color(0xFF2C2C2C)
-val OnSurfaceDark = Color(0xFFF2F2F2)     // Near-white text
-val OnSurfaceVariantDark = Color(0xFF9E9E9E) // Muted grey secondary text
+// ─── Dark Mode Palette (Slate based) ─────────────────────────────────────────
+val DarkBackground = Color(0xFF0F172A)    // Slate 900
+val DarkSurface = Color(0xFF1E293B)       // Slate 800
+val DarkSurfaceElevated = Color(0xFF334155) // Slate 700
+val DarkSurfaceVariant = Color(0xFF475569)  // Slate 600
+val DarkOutline = Color(0xFF334155)         // Slate 700
+val DarkOutlineVariant = Color(0xFF1E293B)  // Slate 800
+val OnSurfaceDark = Color(0xFFF8FAFC)       // Slate 50
+val OnSurfaceVariantDark = Color(0xFF94A3B8) // Slate 400muted text
 
-val PrimaryDark_Mode = Color(0xFFEEEEEE) // Near-white as primary on dark
-val PrimaryContainerDark = Color(0xFF2A2A2A)
-val OnPrimaryDark = Color(0xFF0A0A0A)
-val OnPrimaryContainerDark = Color(0xFFEEEEEE)
+val PrimaryDark_Mode = Color(0xFFC5CAE9)    // Indigo 100 as primary on dark
+val PrimaryContainerDark = Color(0xFF3F51B5)
+val OnPrimaryDark = Color(0xFF1A237E)
+val OnPrimaryContainerDark = Color(0xFFE8EAF6)
 
 // ─── Secondary — Dark ────────────────────────────────────────────────────────
-val SecondaryDark = Color(0xFFAAAAAA)
-val OnSecondaryDark = Color(0xFF0A0A0A)
-val SecondaryContainerDark = Color(0xFF2A2A2A)
-val OnSecondaryContainerDark = Color(0xFFDDDDDD)
+val SecondaryDark = Color(0xFF94A3B8)
+val OnSecondaryDark = Color(0xFF0F172A)
+val SecondaryContainerDark = Color(0xFF1E293B)
+val OnSecondaryContainerDark = Color(0xFFF1F5F9)
 
 // ─── Tertiary — Dark ─────────────────────────────────────────────────────────
-val OnTertiaryDark = Color(0xFF0A0A0A)
-val TertiaryContainerDark = Color(0xFF2A2A2A)
-val OnTertiaryContainerDark = Color(0xFFDDDDDD)
+val OnTertiaryDark = Color(0xFF0F172A)
+val TertiaryContainerDark = Color(0xFF1E293B)
+val OnTertiaryContainerDark = Color(0xFFF8FAFC)
 
 // ─── Semantic — Dark ─────────────────────────────────────────────────────────
-val SuccessDark = Color(0xFF66BB6A)
-val SuccessContainerDark = Color(0xFF1B3A1C)
-val ErrorDark = Color(0xFFEF9A9A)
-val ErrorContainerDark = Color(0xFF4E1010)
-val OnErrorDark = Color(0xFF3E0000)
+val SuccessDark = Color(0xFF34D399)
+val SuccessContainerDark = Color(0xFF064E3B)
+val ErrorDark = Color(0xFFF87171)
+val ErrorContainerDark = Color(0xFF7F1D1D)
+val OnErrorDark = Color(0xFF450003)
 val OnErrorContainerDark = Color(0xFFFFDAD6)
-val WarningDark = Color(0xFFFFB74D)
-val WarningContainerDark = Color(0xFF3E2000)
-val InputBackgroundDark = Color(0xFF1E1E1E)
+val WarningDark = Color(0xFFFBBF24)
+val WarningContainerDark = Color(0xFF78350F)
+val InputBackgroundDark = Color(0xFF1E293B)
 
-// ─── Category Colors (muted, monochrome-friendly) ────────────────────────────
-val CategoryFood = Color(0xFFBF6040)
-val CategoryTransport = Color(0xFF5577AA)
-val CategoryShopping = Color(0xFF886699)
-val CategoryHealth = Color(0xFF448877)
-val CategoryEntertainment = Color(0xFFAA8833)
-val CategoryBills = Color(0xFF778888)
-val CategoryEducation = Color(0xFF556699)
-val CategoryOther = Color(0xFF887766)
+// ─── Category Colors (Indigo/Slate harmonized) ───────────────────────────────
+val CategoryFood = Color(0xFF6366F1)
+val CategoryTransport = Color(0xFF0EA5E9)
+val CategoryShopping = Color(0xFF8B5CF6)
+val CategoryHealth = Color(0xFF10B981)
+val CategoryEntertainment = Color(0xFFF59E0B)
+val CategoryBills = Color(0xFF64748B)
+val CategoryEducation = Color(0xFF3B82F6)
+val CategoryOther = Color(0xFF94A3B8)

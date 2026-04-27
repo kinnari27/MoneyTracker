@@ -106,7 +106,7 @@ fun ProfileScreenContent(
                     "Biometric Lock",
                     "Fingerprint / Face ID"
                 ) to Routes.BIOMETRIC_LOCK,
-                Triple(R.drawable.ic_key, "Change PIN", "Update your PIN") to Routes.CHANGE_PIN,
+                Triple(R.drawable.ic_key, "Change Password", "Update your password") to Routes.CHANGE_PASSWORD,
             )
         )
     }

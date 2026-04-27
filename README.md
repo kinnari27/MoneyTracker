@@ -100,8 +100,8 @@ Modification interface for existing financial entries.
 ### Biometric Lock
 <img src="screenshorts/biometric_lock.png" width="250" />
 
-### Change PIN
-<img src="screenshorts/change_pin.png" width="250" />
+### Change Password
+<img src="screenshorts/change_password.png" width="250" />
 
 ---
 *Last updated: April 2026*

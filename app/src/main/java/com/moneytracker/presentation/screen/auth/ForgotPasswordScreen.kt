@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -56,9 +57,27 @@ import com.moneytracker.ui.theme.PrimaryDark
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ForgotPasswordScreen(
-    onBack: () -> Unit, viewModel: AuthViewModel = hiltViewModel()
+    onBack: () -> Unit,
+    viewModel: AuthViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    ForgotPasswordScreenContent(
+        uiState = uiState,
+        onBack = onBack,
+        onEmailChange = viewModel::onEmailChange,
+        onSendResetLink = viewModel::sendResetLink
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ForgotPasswordScreenContent(
+    uiState: AuthUiState,
+    onBack: () -> Unit,
+    onEmailChange: (String) -> Unit,
+    onSendResetLink: () -> Unit
+) {
     val colors = AppTheme.colors
     val cs = MaterialTheme.colorScheme
 
@@ -120,7 +139,7 @@ fun ForgotPasswordScreen(
                     modifier = Modifier
                         .size(88.dp)
                         .clip(CircleShape)
-                        .background(Color.White.copy(0.18f)), 
+                        .background(Color.White.copy(0.18f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -163,7 +182,7 @@ fun ForgotPasswordScreen(
 
                         AuthField(
                             value = uiState.email,
-                            onValueChange = viewModel::onEmailChange,
+                            onValueChange = onEmailChange,
                             label = "Email Address",
                             placeholder = "Enter your email",
                             leadingIcon = Icons.Outlined.Email,
@@ -239,7 +258,7 @@ fun ForgotPasswordScreen(
                         }
 
                         Button(
-                            onClick = viewModel::sendResetLink,
+                            onClick = onSendResetLink,
                             enabled = !uiState.isLoading,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -255,7 +274,7 @@ fun ForgotPasswordScreen(
                                 )
                             } else {
                                 Text(
-                                    "Send Reset Link", 
+                                    "Send Reset Link",
                                     style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.ExtraBold
                                 )
@@ -265,5 +284,31 @@ fun ForgotPasswordScreen(
                 }
             }
         }
+    }
+}
+
+@Preview(name = "Forgot Password - Light", showBackground = true)
+@Composable
+private fun ForgotPasswordPreviewLight() {
+    com.moneytracker.ui.theme.MoneyTrackerTheme(darkTheme = false) {
+        ForgotPasswordScreenContent(
+            uiState = AuthUiState(email = "rahul@example.com"),
+            onBack = {},
+            onEmailChange = {},
+            onSendResetLink = {}
+        )
+    }
+}
+
+@Preview(name = "Forgot Password - Success", showBackground = true)
+@Composable
+private fun ForgotPasswordPreviewSuccess() {
+    com.moneytracker.ui.theme.MoneyTrackerTheme(darkTheme = true) {
+        ForgotPasswordScreenContent(
+            uiState = AuthUiState(email = "rahul@example.com", isSuccess = true),
+            onBack = {},
+            onEmailChange = {},
+            onSendResetLink = {}
+        )
     }
 }
