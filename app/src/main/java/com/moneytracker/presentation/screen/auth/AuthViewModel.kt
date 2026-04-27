@@ -132,16 +132,24 @@ class AuthViewModel @Inject constructor(
     fun signInWithGoogle(context: android.content.Context) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            val idToken = googleAuthUiClient.signIn(context)
-            if (idToken == null) {
-                _uiState.update { it.copy(isLoading = false, error = "Google Sign-In failed") }
-                return@launch
-            }
+            try {
+                val idToken = googleAuthUiClient.signIn(context)
+                if (idToken == null) {
+                    _uiState.update { 
+                        it.copy(isLoading = false, error = "Sign-in cancelled or failed to retrieve token") 
+                    }
+                    return@launch
+                }
 
-            userRepository.signInWithGoogle(idToken).fold(
-                onSuccess = { _uiState.update { it.copy(isLoading = false, isSuccess = true) } },
-                onFailure = { e -> _uiState.update { it.copy(isLoading = false, error = e.message) } }
-            )
+                userRepository.signInWithGoogle(idToken).fold(
+                    onSuccess = { _uiState.update { it.copy(isLoading = false, isSuccess = true) } },
+                    onFailure = { e -> 
+                        _uiState.update { it.copy(isLoading = false, error = e.message ?: "Firebase authentication failed") } 
+                    }
+                )
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, error = e.message ?: "An unexpected error occurred") }
+            }
         }
     }
 

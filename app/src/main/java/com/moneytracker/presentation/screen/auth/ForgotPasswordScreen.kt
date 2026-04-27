@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -45,6 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -82,9 +84,27 @@ fun ForgotPasswordScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(240.dp)
+                    .height(260.dp)
                     .background(Brush.verticalGradient(listOf(PrimaryDark, cs.primary)))
-            )
+            ) {
+                // Decorative Blobs
+                Box(
+                    modifier = Modifier
+                        .size(180.dp)
+                        .align(Alignment.TopEnd)
+                        .offset(x = 50.dp, y = (-30).dp)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(0.06f))
+                )
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .align(Alignment.BottomStart)
+                        .offset(x = (-20).dp, y = 20.dp)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(0.04f))
+                )
+            }
 
             Column(
                 modifier = Modifier
@@ -93,14 +113,15 @@ fun ForgotPasswordScreen(
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(30.dp))
 
                 // Icon
                 Box(
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(88.dp)
                         .clip(CircleShape)
-                        .background(Color.White.copy(0.2f)), contentAlignment = Alignment.Center
+                        .background(Color.White.copy(0.18f)), 
+                    contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         Icons.Outlined.Email,
@@ -117,74 +138,103 @@ fun ForgotPasswordScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp),
                     shape = RoundedCornerShape(28.dp),
-                    colors = CardDefaults.cardColors(containerColor = cs.surface)
+                    colors = CardDefaults.cardColors(containerColor = cs.surface),
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = if (colors.isDark) 0.dp else 6.dp
+                    )
                 ) {
                     Column(
-                        modifier = Modifier.padding(24.dp),
+                        modifier = Modifier.padding(28.dp),
                         verticalArrangement = Arrangement.spacedBy(20.dp)
                     ) {
-                        Text(
-                            "Reset Password",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            "Enter your email address and we'll send you instructions to reset your password.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = colors.textSecondary
-                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text(
+                                "Reset Password",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = cs.onSurface
+                            )
+                            Text(
+                                "Enter your email to receive a password reset link.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = colors.textSecondary
+                            )
+                        }
 
                         AuthField(
                             value = uiState.email,
                             onValueChange = viewModel::onEmailChange,
                             label = "Email Address",
-                            placeholder = "name@example.com",
-                            leadingIcon = Icons.Outlined.Email
+                            placeholder = "Enter your email",
+                            leadingIcon = Icons.Outlined.Email,
+                            keyboardType = KeyboardType.Email
                         )
 
-                        // Error message
+                        // Error Banner
                         AnimatedVisibility(
                             visible = uiState.error != null,
                             enter = fadeIn() + slideInVertically(),
                             exit = fadeOut()
                         ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            Card(
+                                colors = CardDefaults.cardColors(
+                                    containerColor = colors.errorContainer,
+                                    contentColor = colors.error
+                                ),
+                                shape = RoundedCornerShape(12.dp)
                             ) {
-                                Icon(
-                                    Icons.Default.ErrorOutline,
-                                    null,
-                                    tint = colors.error,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Text(
-                                    uiState.error ?: "",
-                                    color = colors.error,
-                                    style = MaterialTheme.typography.bodySmall
-                                )
+                                Row(
+                                    modifier = Modifier.padding(12.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        Icons.Default.ErrorOutline,
+                                        null,
+                                        modifier = Modifier.size(16.dp),
+                                        tint = colors.error
+                                    )
+                                    Text(
+                                        uiState.error ?: "",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = colors.error,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
                             }
                         }
 
-                        // Success message
-                        if (uiState.isSuccess) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        // Success Banner
+                        AnimatedVisibility(
+                            visible = uiState.isSuccess,
+                            enter = fadeIn() + slideInVertically(),
+                            exit = fadeOut()
+                        ) {
+                            Card(
+                                colors = CardDefaults.cardColors(
+                                    containerColor = Color(0xFFE8F5E9),
+                                    contentColor = Color(0xFF2E7D32)
+                                ),
+                                shape = RoundedCornerShape(12.dp)
                             ) {
-                                Icon(
-                                    Icons.Default.CheckCircle,
-                                    null,
-                                    tint = Color(0xFF4CAF50),
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Text(
-                                    "Reset link sent to your email!",
-                                    color = Color(0xFF4CAF50),
-                                    style = MaterialTheme.typography.bodySmall
-                                )
+                                Row(
+                                    modifier = Modifier.padding(12.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        Icons.Default.CheckCircle,
+                                        null,
+                                        modifier = Modifier.size(16.dp),
+                                        tint = Color(0xFF2E7D32)
+                                    )
+                                    Text(
+                                        "Instructions sent! Check your inbox.",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color(0xFF2E7D32),
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
                             }
                         }
 
@@ -194,7 +244,7 @@ fun ForgotPasswordScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),
-                            shape = RoundedCornerShape(16.dp),
+                            shape = RoundedCornerShape(18.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = cs.primary)
                         ) {
                             if (uiState.isLoading) {
@@ -204,7 +254,11 @@ fun ForgotPasswordScreen(
                                     strokeWidth = 2.5.dp
                                 )
                             } else {
-                                Text("Send Reset Link", fontWeight = FontWeight.Bold)
+                                Text(
+                                    "Send Reset Link", 
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.ExtraBold
+                                )
                             }
                         }
                     }

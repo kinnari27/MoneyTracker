@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">MoneyTracker</string>
     <!-- Replace with your actual Web Client ID from Firebase Console -->
-    <string name="default_web_client_id">YOUR_WEB_CLIENT_ID.apps.googleusercontent.com</string>
+    <string name="default_web_client_id">1069185982319-f6uhmdu6tlqo2oo40aurpa4hm01b0kmb.apps.googleusercontent.com</string>
 </resources>
