@@ -9,6 +9,7 @@ data class ChangePasswordUiState(
     val confirmPassword: String = "",
     val passwordVisible: Boolean = false,
     val confirmVisible: Boolean = false,
+    val hasPassword: Boolean = true,
     val isLoading: Boolean = false,
     val error: String? = null,
     val isComplete: Boolean = false

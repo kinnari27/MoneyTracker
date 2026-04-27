@@ -19,6 +19,18 @@ class ChangePasswordViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ChangePasswordUiState())
     val uiState: StateFlow<ChangePasswordUiState> = _uiState.asStateFlow()
 
+    init {
+        checkUserStatus()
+    }
+
+    private fun checkUserStatus() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            val user = userRepository.getCurrentUser()
+            _uiState.update { it.copy(isLoading = false, hasPassword = user?.hasPassword ?: false) }
+        }
+    }
+
     fun onCurrentPasswordChange(v: String) = _uiState.update { it.copy(currentPassword = v, error = null) }
     fun onNewPasswordChange(v: String) = _uiState.update { it.copy(newPassword = v, error = null) }
     fun onConfirmPasswordChange(v: String) = _uiState.update { it.copy(confirmPassword = v, error = null) }

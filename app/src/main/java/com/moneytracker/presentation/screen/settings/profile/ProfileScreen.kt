@@ -105,9 +105,12 @@ fun ProfileScreenContent(
                     R.drawable.ic_locked,
                     "Biometric Lock",
                     "Fingerprint / Face ID"
-                ) to Routes.BIOMETRIC_LOCK,
-                Triple(R.drawable.ic_key, "Change Password", "Update your password") to Routes.CHANGE_PASSWORD,
-            )
+                ) to Routes.BIOMETRIC_LOCK
+            ) + if (uiState.hasPassword) {
+                listOf(Triple(R.drawable.ic_key, "Change Password", "Update your password") to Routes.CHANGE_PASSWORD)
+            } else {
+                emptyList()
+            }
         )
     }
 

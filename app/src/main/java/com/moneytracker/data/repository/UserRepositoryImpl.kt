@@ -86,9 +86,13 @@ class UserRepositoryImpl @Inject constructor(
                 userDao.insertUser(newUser.toEntity())
                 userEntity = userDao.getUserByEmail(email.lowercase())
             } else {
-                // Update existing user with firebaseUid and login status
+                // Update existing user with firebaseUid if missing and set login status
+                if (userEntity.firebaseUid == null) {
+                    userDao.updateFirebaseUid(userEntity.id, firebaseUser.uid)
+                }
                 userDao.updateLoginStatus(userEntity.id, true)
-                // We could also update firebaseUid if it was null
+                // Refresh entity after update
+                userEntity = userDao.getUserByEmail(email.lowercase())
             }
 
             Result.success(userEntity!!.toDomain().copy(isLoggedIn = true))

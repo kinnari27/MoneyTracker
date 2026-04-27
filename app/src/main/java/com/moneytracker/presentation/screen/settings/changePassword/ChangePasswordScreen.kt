@@ -138,6 +138,24 @@ fun ChangePasswordScreenContent(
             }
         }
 
+        if (!uiState.hasPassword && !uiState.isLoading) {
+            Box(Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Icon(Icons.Default.Lock, null, modifier = Modifier.size(64.dp), tint = colors.textSecondary.copy(0.3f))
+                    Text(
+                        "You are signed in with Google. You can manage your security settings in your Google Account.",
+                        textAlign = TextAlign.Center,
+                        color = colors.textSecondary,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Button(onClick = onBack, shape = RoundedCornerShape(12.dp)) {
+                        Text("Go Back")
+                    }
+                }
+            }
+            return@Column
+        }
+
         // Step indicator
         Row(
             modifier = Modifier

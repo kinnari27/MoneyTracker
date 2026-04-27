@@ -39,6 +39,7 @@ class ProfileViewModel @Inject constructor(
                         userEmail = user?.email ?: "",
                         userPhone = user?.phone ?: "",
                         currency = user?.currency ?: "INR",
+                        hasPassword = user?.hasPassword ?: false
                     )
                 }
             }

@@ -12,5 +12,6 @@ data class ProfileUiState(
     val totalIncome: Double = 0.0,
     val totalExpense: Double = 0.0,
     val totalInvested: Double = 0.0,
+    val hasPassword: Boolean = false,
     val isLoading: Boolean = true
 )

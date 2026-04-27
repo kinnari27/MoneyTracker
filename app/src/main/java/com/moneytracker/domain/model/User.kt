@@ -11,5 +11,6 @@ data class User(
     val budgetLimit: Double = 0.0,
     val currency: String = "INR",
     val biometricEnabled: Boolean = false,
-    val isLoggedIn: Boolean = false
+    val isLoggedIn: Boolean = false,
+    val hasPassword: Boolean = false
 )

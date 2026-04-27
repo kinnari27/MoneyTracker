@@ -56,6 +56,9 @@ interface UserDao {
     @Query("UPDATE users SET isLoggedIn = :isLoggedIn WHERE id = :userId")
     suspend fun updateLoginStatus(userId: Int, isLoggedIn: Boolean)
 
+    @Query("UPDATE users SET firebaseUid = :uid WHERE id = :userId")
+    suspend fun updateFirebaseUid(userId: Int, uid: String)
+
     @Query("SELECT * FROM users WHERE isLoggedIn = 1 LIMIT 1")
     suspend fun getLoggedInUser(): UserEntity?
 }

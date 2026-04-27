@@ -14,7 +14,8 @@ fun UserEntity.toDomain(): User = User(
     budgetLimit = budgetLimit,
     currency = currency,
     biometricEnabled = biometricEnabled,
-    isLoggedIn = isLoggedIn
+    isLoggedIn = isLoggedIn,
+    hasPassword = pin.isNotBlank()
 )
 
 fun User.toEntity(hashedPin: String = ""): UserEntity = UserEntity(
