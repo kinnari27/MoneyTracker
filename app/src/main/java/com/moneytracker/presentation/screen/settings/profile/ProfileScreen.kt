@@ -12,11 +12,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
@@ -25,7 +23,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -34,8 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,13 +40,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moneytracker.R
 import com.moneytracker.presentation.navigation.Routes
-import com.moneytracker.ui.theme.Error
-import com.moneytracker.ui.theme.OnSurface
-import com.moneytracker.ui.theme.OnSurfaceVariant
-import com.moneytracker.ui.theme.Outline
-import com.moneytracker.ui.theme.Primary
-import com.moneytracker.ui.theme.PrimaryDark
-import com.moneytracker.ui.theme.Surface
+import com.moneytracker.ui.theme.Indigo100
+import com.moneytracker.ui.theme.Indigo600
+import com.moneytracker.ui.theme.Slate100
+import com.moneytracker.ui.theme.Slate200
+import com.moneytracker.ui.theme.Slate400
+import com.moneytracker.ui.theme.Slate50
+import com.moneytracker.ui.theme.Slate900
+import com.moneytracker.ui.theme.White
 import com.moneytracker.ui.theme.moneytrackerTheme
 
 @Composable
@@ -81,103 +77,87 @@ fun ProfileScreenContent(
     onSignOut: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val cs = MaterialTheme.colorScheme
     val userName = uiState.userName.ifBlank { "User" }
     val userEmail = uiState.userEmail
 
-    // Map each menu item to its route
     val menuSections = remember {
         listOf(
             "Account" to listOf(
-                Triple(
-                    R.drawable.ic_user,
-                    "Edit Profile",
-                    "Update personal info"
-                ) to Routes.EDIT_PROFILE,
-                Triple(
-                    R.drawable.ic_bell,
-                    "Notifications",
-                    "Manage alerts"
-                ) to Routes.NOTIFICATIONS,
+                Triple(R.drawable.ic_user, "Edit Profile", "Update personal info") to Routes.EDIT_PROFILE,
+                Triple(R.drawable.ic_bell, "Notifications", "Manage alerts") to Routes.NOTIFICATIONS,
                 Triple(R.drawable.ic_currency, "Currency", "Indian Rupee ₹ INR") to Routes.CURRENCY,
             ),
             "Security" to listOf(
-                Triple(
-                    R.drawable.ic_locked,
-                    "Biometric Lock",
-                    "Fingerprint / Face ID"
-                ) to Routes.BIOMETRIC_LOCK
+                Triple(R.drawable.ic_locked, "Biometric Lock", "Fingerprint / Face ID") to Routes.BIOMETRIC_LOCK
             ) + if (uiState.hasPassword) {
                 listOf(Triple(R.drawable.ic_key, "Change Password", "Update your password") to Routes.CHANGE_PASSWORD)
-            } else {
-                emptyList()
-            }
+            } else emptyList()
         )
     }
 
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().background(cs.background),
         contentPadding = PaddingValues(bottom = 90.dp)
     ) {
 
-        // ── Header ────────────────────────────────────────────────────────────
+        // ── Header — flat Slate900, no gradient ───────────────────────────────
         item {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Brush.linearGradient(listOf(PrimaryDark, Primary)))
-                    .padding(top = 52.dp, bottom = 40.dp),
+                    .background(Slate900)
+                    .padding(top = 52.dp, bottom = 32.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+                    // Avatar — rounded square, not a circle
                     Box(
                         modifier = Modifier
-                            .size(88.dp)
-                            .clip(CircleShape)
-                            .background(Color.White.copy(0.2f)),
+                            .size(72.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(Indigo600),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            userName.take(1).uppercase(),
-                            fontSize = 38.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color.White
+                            text = userName.take(1).uppercase(),
+                            fontSize = 30.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = White
                         )
                     }
-                    Spacer(Modifier.height(12.dp))
+
+                    Spacer(Modifier.height(14.dp))
+
                     Text(
                         userName,
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color.White
+                        fontWeight = FontWeight.Bold,
+                        color = White
                     )
+                    Spacer(Modifier.height(2.dp))
                     Text(
                         userEmail,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(0.7f)
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Slate400
                     )
+
+                    // Premium badge — subtle, no pill shape
                     if (uiState.isPremium) {
                         Spacer(Modifier.height(12.dp))
-                        Surface(
-                            shape = RoundedCornerShape(99.dp),
-                            color = Color.White.copy(0.15f)
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Indigo600.copy(alpha = 0.25f))
+                                .padding(horizontal = 12.dp, vertical = 5.dp)
                         ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(6.dp)
-                            ) {
-                                Image(
-                                    painterResource(R.drawable.ic_star),
-                                    null,
-                                    modifier = Modifier.size(14.dp),
-                                )
-                                Text(
-                                    "Premium Member",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = Color.White,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
+                            Text(
+                                "Premium Member",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = Indigo100,
+                                fontWeight = FontWeight.Medium
+                            )
                         }
                     }
                 }
@@ -188,11 +168,11 @@ fun ProfileScreenContent(
         item {
             Card(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .offset(y = (-20).dp),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Surface),
-                elevation = CardDefaults.cardElevation(4.dp)
+                    .padding(horizontal = 16.dp, vertical = 16.dp)
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(containerColor = cs.surface),
+                elevation = CardDefaults.cardElevation(0.dp)
             ) {
                 Row(
                     modifier = Modifier
@@ -201,29 +181,29 @@ fun ProfileScreenContent(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val stats = listOf(
+                    listOf(
                         uiState.totalTransactions.toString() to "Transactions",
                         uiState.totalCategories.toString() to "Categories",
                         uiState.activeMonths.toString() to "Months"
-                    )
-                    stats.forEachIndexed { i, (value, label) ->
+                    ).forEachIndexed { i, (value, label) ->
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
                                 value,
                                 style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = Primary
+                                fontWeight = FontWeight.Bold,
+                                color = Indigo600
                             )
+                            Spacer(Modifier.height(2.dp))
                             Text(
                                 label,
                                 style = MaterialTheme.typography.labelSmall,
-                                color = OnSurfaceVariant
+                                color = cs.onSurfaceVariant
                             )
                         }
-                        if (i < stats.size - 1) VerticalDivider(
-                            modifier = Modifier.height(36.dp),
-                            thickness = 1.dp,
-                            color = Outline.copy(0.4f)
+                        if (i < 2) VerticalDivider(
+                            modifier = Modifier.height(32.dp),
+                            thickness = 0.5.dp,
+                            color = Slate200
                         )
                     }
                 }
@@ -237,15 +217,14 @@ fun ProfileScreenContent(
                     Text(
                         text = section.uppercase(),
                         style = MaterialTheme.typography.labelSmall,
-                        color = OnSurfaceVariant,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp,
+                        color = cs.onSurfaceVariant,
+                        letterSpacing = 0.8.sp,
                         modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
                     )
                     Card(
-                        shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(containerColor = Surface),
-                        elevation = CardDefaults.cardElevation(1.dp)
+                        shape = RoundedCornerShape(14.dp),
+                        colors = CardDefaults.cardColors(containerColor = cs.surface),
+                        elevation = CardDefaults.cardElevation(0.dp)
                     ) {
                         items.forEachIndexed { idx, (triple, route) ->
                             val (iconRes, title, subtitle) = triple
@@ -253,46 +232,48 @@ fun ProfileScreenContent(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable { if (route.isNotEmpty()) onNavigate(route) }
-                                    .padding(horizontal = 18.dp, vertical = 15.dp),
+                                    .padding(horizontal = 16.dp, vertical = 14.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(14.dp)
                             ) {
+                                // Icon container — rounded square
                                 Box(
                                     modifier = Modifier
-                                        .size(44.dp)
-                                        .clip(RoundedCornerShape(14.dp))
-                                        .background(Primary.copy(alpha = 0.08f)),
+                                        .size(40.dp)
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .background(Slate100),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Image(
                                         painterResource(iconRes),
                                         title,
-                                        modifier = Modifier.size(22.dp)
+                                        modifier = Modifier.size(20.dp)
                                     )
                                 }
                                 Column(Modifier.weight(1f)) {
                                     Text(
                                         title,
                                         style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = OnSurface
+                                        fontWeight = FontWeight.Medium,
+                                        color = cs.onSurface
                                     )
                                     Text(
                                         subtitle,
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = OnSurfaceVariant
+                                        color = cs.onSurfaceVariant
                                     )
                                 }
                                 Icon(
                                     Icons.Default.ChevronRight,
                                     null,
-                                    tint = OnSurfaceVariant.copy(0.5f)
+                                    tint = Slate400,
+                                    modifier = Modifier.size(18.dp)
                                 )
                             }
                             if (idx < items.size - 1) HorizontalDivider(
-                                color = Outline.copy(0.3f),
+                                color = cs.outline,
                                 thickness = 0.5.dp,
-                                modifier = Modifier.padding(horizontal = 18.dp)
+                                modifier = Modifier.padding(horizontal = 16.dp)
                             )
                         }
                     }
@@ -306,8 +287,10 @@ fun ProfileScreenContent(
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 12.dp)
                     .fillMaxWidth(),
-                shape = RoundedCornerShape(18.dp),
-                colors = CardDefaults.cardColors(containerColor = Error.copy(0.08f)),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = cs.errorContainer
+                ),
                 onClick = { onSignOut() }
             ) {
                 Box(
@@ -319,8 +302,8 @@ fun ProfileScreenContent(
                     Text(
                         "Sign Out",
                         style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = Error
+                        fontWeight = FontWeight.Medium,
+                        color = cs.error
                     )
                 }
             }
@@ -328,15 +311,13 @@ fun ProfileScreenContent(
 
         item {
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     "MoneyTracker v1.0.0",
                     style = MaterialTheme.typography.labelSmall,
-                    color = OnSurfaceVariant.copy(0.4f)
+                    color = cs.onSurfaceVariant.copy(alpha = 0.4f)
                 )
             }
         }

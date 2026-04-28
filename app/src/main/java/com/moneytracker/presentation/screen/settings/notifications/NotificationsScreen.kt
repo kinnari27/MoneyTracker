@@ -31,7 +31,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -41,13 +40,12 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moneytracker.R
-import com.moneytracker.ui.theme.OnSurface
-import com.moneytracker.ui.theme.OnSurfaceVariant
-import com.moneytracker.ui.theme.Outline
-import com.moneytracker.ui.theme.Primary
-import com.moneytracker.ui.theme.PrimaryDark
-import com.moneytracker.ui.theme.Surface
-import com.moneytracker.ui.theme.SurfaceVariant
+import com.moneytracker.ui.theme.Indigo100
+import com.moneytracker.ui.theme.Indigo600
+import com.moneytracker.ui.theme.Slate100
+import com.moneytracker.ui.theme.Slate400
+import com.moneytracker.ui.theme.Slate900
+import com.moneytracker.ui.theme.White
 import com.moneytracker.ui.theme.moneytrackerTheme
 
 @Composable
@@ -63,13 +61,13 @@ fun NotificationsScreen(
         onBack = onBack,
         onToggle = { key, enabled ->
             when (key) {
-                "all" -> viewModel.onAllNotificationsToggle(enabled)
-                "budget" -> viewModel.onBudgetAlertToggle(enabled)
-                "large" -> viewModel.onLargeTransactionToggle(enabled)
-                "daily" -> viewModel.onDailySummaryToggle(enabled)
-                "bill" -> viewModel.onBillReminderToggle(enabled)
+                "all"     -> viewModel.onAllNotificationsToggle(enabled)
+                "budget"  -> viewModel.onBudgetAlertToggle(enabled)
+                "large"   -> viewModel.onLargeTransactionToggle(enabled)
+                "daily"   -> viewModel.onDailySummaryToggle(enabled)
+                "bill"    -> viewModel.onBillReminderToggle(enabled)
                 "monthly" -> viewModel.onMonthlyReportToggle(enabled)
-                "tips" -> viewModel.onTipsToggle(enabled)
+                "tips"    -> viewModel.onTipsToggle(enabled)
                 "updates" -> viewModel.onAppUpdatesToggle(enabled)
             }
         },
@@ -84,35 +82,37 @@ fun NotificationsScreenContent(
     onToggle: (String, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val cs = MaterialTheme.colorScheme
+
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().background(cs.background),
         contentPadding = PaddingValues(bottom = 40.dp)
     ) {
 
-        // ── Header ────────────────────────────────────────────────────────────
+        // ── Header — flat Slate900, no gradient ───────────────────────────────
         item {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Brush.linearGradient(listOf(PrimaryDark, Primary)))
+                    .background(Slate900)
                     .padding(top = 52.dp, start = 4.dp, end = 20.dp, bottom = 28.dp)
             ) {
                 Column {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBackIosNew, null, tint = Color.White)
+                        Icon(Icons.Default.ArrowBackIosNew, null, tint = White)
                     }
                     Spacer(Modifier.height(4.dp))
                     Text(
                         "Notifications",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color.White,
+                        style = MaterialTheme.typography.headlineLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = White,
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
                     Text(
                         "Manage your alerts",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color.White.copy(0.7f),
+                        color = Slate400,
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
                 }
@@ -125,99 +125,72 @@ fun NotificationsScreenContent(
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 16.dp)
                     .fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(14.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = if (uiState.allNotifications) Primary.copy(0.08f) else SurfaceVariant.copy(
-                        0.5f
-                    )
+                    containerColor = if (uiState.allNotifications) Indigo100 else cs.surfaceVariant
                 ),
                 elevation = CardDefaults.cardElevation(0.dp)
             ) {
                 Row(
-                    modifier = Modifier.padding(20.dp),
+                    modifier = Modifier.padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    horizontalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(52.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(if (uiState.allNotifications) Primary.copy(0.15f) else SurfaceVariant),
+                            .size(44.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(
+                                if (uiState.allNotifications) Indigo600.copy(0.15f)
+                                else Slate100
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
                             painter = painterResource(R.drawable.ic_bell),
                             contentDescription = null,
-                            modifier = Modifier.size(26.dp),
+                            modifier = Modifier.size(22.dp)
                         )
                     }
                     Column(Modifier.weight(1f)) {
                         Text(
                             "All Notifications",
                             style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = OnSurface
+                            fontWeight = FontWeight.Medium,
+                            color = cs.onSurface
                         )
                         Text(
                             if (uiState.allNotifications) "Enabled" else "Disabled",
                             style = MaterialTheme.typography.bodySmall,
-                            color = if (uiState.allNotifications) Primary else OnSurfaceVariant
+                            color = if (uiState.allNotifications) Indigo600 else cs.onSurfaceVariant
                         )
                     }
                     Switch(
                         checked = uiState.allNotifications,
                         onCheckedChange = { onToggle("all", it) },
                         colors = SwitchDefaults.colors(
-                            checkedThumbColor = Color.White,
-                            checkedTrackColor = Primary
+                            checkedThumbColor = White,
+                            checkedTrackColor = Indigo600
                         )
                     )
                 }
             }
         }
 
-        // ── Notification Groups ───────────────────────────────────────────────
+        // ── Notification Sections ─────────────────────────────────────────────
         val sections = listOf(
             "Spending Alerts" to listOf(
-                Triple(
-                    "Budget Limit Alert",
-                    "Warn when you near budget limit",
-                    uiState.budgetAlert
-                ) to "budget",
-                Triple(
-                    "Large Transaction",
-                    "Alert for transactions over ₹1000",
-                    uiState.largeTransaction
-                ) to "large",
-                Triple(
-                    "Daily Spending Summary",
-                    "Get a summary every evening",
-                    uiState.dailySummary
-                ) to "daily",
+                Triple("Budget Limit Alert",     "Warn when you near budget limit",    uiState.budgetAlert)     to "budget",
+                Triple("Large Transaction",      "Alert for transactions over ₹1000",  uiState.largeTransaction) to "large",
+                Triple("Daily Spending Summary", "Get a summary every evening",        uiState.dailySummary)    to "daily",
             ),
             "Reminders" to listOf(
-                Triple(
-                    "Bill Payment Reminder",
-                    "Remind before due date",
-                    uiState.billReminder
-                ) to "bill",
-                Triple(
-                    "Monthly Report",
-                    "Summary on 1st of every month",
-                    uiState.monthlyReport
-                ) to "monthly",
+                Triple("Bill Payment Reminder", "Remind before due date",          uiState.billReminder)  to "bill",
+                Triple("Monthly Report",        "Summary on 1st of every month",   uiState.monthlyReport) to "monthly",
             ),
             "App" to listOf(
-                Triple(
-                    "Tips & Insights",
-                    "Smart money-saving tips",
-                    uiState.tips
-                ) to "tips",
-                Triple(
-                    "App Updates",
-                    "New features and improvements",
-                    uiState.appUpdates
-                ) to "updates",
+                Triple("Tips & Insights", "Smart money-saving tips",        uiState.tips)       to "tips",
+                Triple("App Updates",     "New features and improvements",   uiState.appUpdates) to "updates",
             )
         )
 
@@ -227,15 +200,14 @@ fun NotificationsScreenContent(
                     Text(
                         text = sectionTitle.uppercase(),
                         style = MaterialTheme.typography.labelSmall,
-                        color = OnSurfaceVariant,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp,
+                        color = cs.onSurfaceVariant,
+                        letterSpacing = 0.8.sp,
                         modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
                     )
                     Card(
-                        shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(containerColor = Surface),
-                        elevation = CardDefaults.cardElevation(1.dp)
+                        shape = RoundedCornerShape(14.dp),
+                        colors = CardDefaults.cardColors(containerColor = cs.surface),
+                        elevation = CardDefaults.cardElevation(0.dp)
                     ) {
                         items.forEachIndexed { idx, (triple, key) ->
                             val (title, subtitle, isOn) = triple
@@ -243,7 +215,7 @@ fun NotificationsScreenContent(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 18.dp, vertical = 14.dp),
+                                    .padding(horizontal = 16.dp, vertical = 14.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(14.dp)
                             ) {
@@ -251,13 +223,13 @@ fun NotificationsScreenContent(
                                     Text(
                                         title,
                                         style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = if (enabled) OnSurface else OnSurfaceVariant
+                                        fontWeight = FontWeight.Medium,
+                                        color = if (enabled) cs.onSurface else cs.onSurfaceVariant
                                     )
                                     Text(
                                         subtitle,
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = OnSurfaceVariant
+                                        color = cs.onSurfaceVariant
                                     )
                                 }
                                 Switch(
@@ -265,18 +237,16 @@ fun NotificationsScreenContent(
                                     onCheckedChange = { if (enabled) onToggle(key, it) },
                                     enabled = enabled,
                                     colors = SwitchDefaults.colors(
-                                        checkedThumbColor = Color.White,
-                                        checkedTrackColor = Primary
+                                        checkedThumbColor = White,
+                                        checkedTrackColor = Indigo600
                                     )
                                 )
                             }
-                            if (idx < items.size - 1) {
-                                HorizontalDivider(
-                                    color = Outline.copy(0.3f),
-                                    thickness = 0.5.dp,
-                                    modifier = Modifier.padding(horizontal = 18.dp)
-                                )
-                            }
+                            if (idx < items.size - 1) HorizontalDivider(
+                                color = cs.outline,
+                                thickness = 0.5.dp,
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
                         }
                     }
                 }

@@ -32,8 +32,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,11 +41,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moneytracker.presentation.screen.settings.currency.CurrencyItem
 import com.moneytracker.presentation.screen.settings.currency.CurrencyUiState
 import com.moneytracker.presentation.screen.settings.currency.CurrencyViewModel
-import com.moneytracker.ui.theme.OnSurface
-import com.moneytracker.ui.theme.OnSurfaceVariant
-import com.moneytracker.ui.theme.Primary
-import com.moneytracker.ui.theme.PrimaryDark
-import com.moneytracker.ui.theme.Surface
+import com.moneytracker.ui.theme.Indigo100
+import com.moneytracker.ui.theme.Indigo600
+import com.moneytracker.ui.theme.Slate100
+import com.moneytracker.ui.theme.Slate400
+import com.moneytracker.ui.theme.Slate900
+import com.moneytracker.ui.theme.White
 import com.moneytracker.ui.theme.moneytrackerTheme
 
 @Composable
@@ -75,61 +74,58 @@ fun CurrencyScreenContent(
     onCurrencySelect: (CurrencyItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier.fillMaxSize()) {
+    val cs = MaterialTheme.colorScheme
 
-        // ── Header ────────────────────────────────────────────────────────────
+    Column(modifier = modifier.fillMaxSize().background(cs.background)) {
+
+        // ── Header — flat Slate900 ────────────────────────────────────────────
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Brush.linearGradient(listOf(PrimaryDark, Primary)))
-                .padding(top = 52.dp, start = 4.dp, end = 20.dp, bottom = 28.dp)
+                .background(Slate900)
+                .padding(top = 52.dp, start = 4.dp, end = 16.dp, bottom = 20.dp)
         ) {
             Column {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.Default.ArrowBackIosNew, null, tint = Color.White)
+                    Icon(Icons.Default.ArrowBackIosNew, null, tint = White)
                 }
                 Spacer(Modifier.height(4.dp))
                 Text(
                     "Currency",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color.White,
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = White,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
                 Text(
                     "Select your preferred currency",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.White.copy(0.7f),
+                    color = Slate400,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
-
                 Spacer(Modifier.height(16.dp))
 
-                // Search
+                // Search field — styled for dark header
                 OutlinedTextField(
                     value = uiState.searchQuery,
                     onValueChange = onSearchChange,
-                    placeholder = { Text("Search currency…", color = Color.White.copy(0.5f)) },
+                    placeholder = { Text("Search currency…", color = Slate400) },
                     leadingIcon = {
-                        Icon(
-                            Icons.Default.Search,
-                            null,
-                            tint = Color.White.copy(0.7f)
-                        )
+                        Icon(Icons.Default.Search, null, tint = Slate400, modifier = Modifier.size(20.dp))
                     },
                     singleLine = true,
-                    shape = RoundedCornerShape(14.dp),
+                    shape = RoundedCornerShape(10.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedBorderColor = Color.White.copy(0.3f),
-                        focusedBorderColor = Color.White,
-                        unfocusedContainerColor = Color.White.copy(0.12f),
-                        focusedContainerColor = Color.White.copy(0.18f),
-                        unfocusedTextColor = Color.White,
-                        focusedTextColor = Color.White,
-                        cursorColor = Color.White
+                        unfocusedBorderColor    = Slate400.copy(alpha = 0.3f),
+                        focusedBorderColor      = Indigo600,
+                        unfocusedContainerColor = White.copy(alpha = 0.07f),
+                        focusedContainerColor   = White.copy(alpha = 0.10f),
+                        unfocusedTextColor      = White,
+                        focusedTextColor        = White,
+                        cursorColor             = Indigo600
                     )
                 )
             }
@@ -140,42 +136,39 @@ fun CurrencyScreenContent(
             modifier = Modifier
                 .padding(16.dp)
                 .fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Primary.copy(0.08f)),
+            shape = RoundedCornerShape(14.dp),
+            colors = CardDefaults.cardColors(containerColor = Indigo100),
             elevation = CardDefaults.cardElevation(0.dp)
         ) {
             Row(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(14.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(14.dp)
             ) {
-                Text(
-                    uiState.selectedCurrency.flag,
-                    fontSize = 32.sp
-                )
+                Text(uiState.selectedCurrency.flag, fontSize = 28.sp)
                 Column(Modifier.weight(1f)) {
                     Text(
                         "Current Currency",
                         style = MaterialTheme.typography.labelSmall,
-                        color = Primary
+                        color = Indigo600
                     )
                     Text(
                         "${uiState.selectedCurrency.code} — ${uiState.selectedCurrency.name}",
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = OnSurface
+                        fontWeight = FontWeight.Medium,
+                        color = cs.onSurface
                     )
                 }
                 Text(
                     uiState.selectedCurrency.symbol,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Primary
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Indigo600
                 )
             }
         }
 
-        // ── Currency List ─────────────────────────────────────────────────────
+        // ── Currency list ─────────────────────────────────────────────────────
         LazyColumn(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -186,52 +179,46 @@ fun CurrencyScreenContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .then(
-                            if (isSelected) Modifier.border(
-                                2.dp,
-                                Primary,
-                                RoundedCornerShape(16.dp)
-                            ) else Modifier
+                            if (isSelected) Modifier.border(1.5.dp, Indigo600, RoundedCornerShape(12.dp))
+                            else Modifier
                         ),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (isSelected) Primary.copy(
-                            0.06f
-                        ) else Surface
+                        containerColor = if (isSelected) Indigo100 else cs.surface
                     ),
-                    elevation = CardDefaults.cardElevation(if (isSelected) 0.dp else 1.dp),
+                    elevation = CardDefaults.cardElevation(0.dp),
                     onClick = { onCurrencySelect(currency) }
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(14.dp)
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text(currency.flag, fontSize = 28.sp)
+                        Text(currency.flag, fontSize = 24.sp)
                         Column(Modifier.weight(1f)) {
                             Text(
                                 currency.code,
                                 style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = if (isSelected) Primary else OnSurface
+                                fontWeight = FontWeight.Medium,
+                                color = if (isSelected) Indigo600 else cs.onSurface
                             )
                             Text(
                                 currency.name,
                                 style = MaterialTheme.typography.bodySmall,
-                                color = OnSurfaceVariant
+                                color = cs.onSurfaceVariant
                             )
                         }
                         Text(
                             currency.symbol,
                             style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = if (isSelected) Primary else OnSurfaceVariant
+                            fontWeight = FontWeight.Medium,
+                            color = if (isSelected) Indigo600 else cs.onSurfaceVariant
                         )
                         if (isSelected) {
                             Icon(
-                                Icons.Default.Check,
-                                null,
-                                tint = Primary,
-                                modifier = Modifier.size(20.dp)
+                                Icons.Default.Check, null,
+                                tint = Indigo600,
+                                modifier = Modifier.size(18.dp)
                             )
                         }
                     }

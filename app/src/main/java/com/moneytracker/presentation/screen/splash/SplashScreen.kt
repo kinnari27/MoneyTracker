@@ -14,10 +14,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,8 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -37,10 +34,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.moneytracker.ui.theme.MoneyTrackerTheme
-import com.moneytracker.ui.theme.Primary
-import com.moneytracker.ui.theme.PrimaryDark
-import com.moneytracker.ui.theme.PrimaryLight
+import com.moneytracker.ui.theme.Indigo400
+import com.moneytracker.ui.theme.Indigo600
+import com.moneytracker.ui.theme.Slate400
+import com.moneytracker.ui.theme.Slate900
+import com.moneytracker.ui.theme.White
+import com.moneytracker.ui.theme.moneytrackerTheme
 
 // ── Entry point ───────────────────────────────────────────────────────────────
 @Composable
@@ -54,10 +53,10 @@ fun SplashScreen(
 
     LaunchedEffect(destination) {
         when (destination) {
-            SplashDestination.Login -> onNavigateToLogin()
+            SplashDestination.Login    -> onNavigateToLogin()
             SplashDestination.Register -> onNavigateToRegister()
-            SplashDestination.Home -> onNavigateToHome()
-            SplashDestination.Loading -> Unit
+            SplashDestination.Home     -> onNavigateToHome()
+            SplashDestination.Loading  -> Unit
         }
     }
 
@@ -67,173 +66,115 @@ fun SplashScreen(
 // ── Stateless content ─────────────────────────────────────────────────────────
 @Composable
 fun SplashScreenContent() {
+
     val infiniteTransition = rememberInfiniteTransition(label = "splash")
 
-    // Logo pulse
-    val logoScale by infiniteTransition.animateFloat(
-        initialValue = 0.95f,
-        targetValue = 1.05f,
+    // Three loading bars animate with staggered delays
+    val bar1 by infiniteTransition.animateFloat(
+        initialValue = 0.3f, targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            tween(1200, easing = EaseInOut), RepeatMode.Reverse
+            tween(700, easing = EaseInOut, delayMillis = 0), RepeatMode.Reverse
         ),
-        label = "logo_scale"
+        label = "bar1"
+    )
+    val bar2 by infiniteTransition.animateFloat(
+        initialValue = 0.3f, targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            tween(700, easing = EaseInOut, delayMillis = 200), RepeatMode.Reverse
+        ),
+        label = "bar2"
+    )
+    val bar3 by infiniteTransition.animateFloat(
+        initialValue = 0.3f, targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            tween(700, easing = EaseInOut, delayMillis = 400), RepeatMode.Reverse
+        ),
+        label = "bar3"
     )
 
-    // Outer ring pulse
-    val ringScale by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.18f,
+    // Tagline subtle fade
+    val taglineAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.45f, targetValue = 0.9f,
         animationSpec = infiniteRepeatable(
-            tween(1600, easing = EaseInOut), RepeatMode.Reverse
+            tween(1400, easing = EaseInOut), RepeatMode.Reverse
         ),
-        label = "ring_scale"
-    )
-
-    // Tagline shimmer
-    val shimmerAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.5f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            tween(900, easing = EaseInOut), RepeatMode.Reverse
-        ),
-        label = "shimmer"
-    )
-
-    // Three bouncing loading dots — staggered delays
-    val dotOffset1 by infiniteTransition.animateFloat(
-        initialValue = 0f, targetValue = -10f,
-        animationSpec = infiniteRepeatable(
-            tween(500, easing = EaseInOut, delayMillis = 0), RepeatMode.Reverse
-        ),
-        label = "dot1"
-    )
-    val dotOffset2 by infiniteTransition.animateFloat(
-        initialValue = 0f, targetValue = -10f,
-        animationSpec = infiniteRepeatable(
-            tween(500, easing = EaseInOut, delayMillis = 160), RepeatMode.Reverse
-        ),
-        label = "dot2"
-    )
-    val dotOffset3 by infiniteTransition.animateFloat(
-        initialValue = 0f, targetValue = -10f,
-        animationSpec = infiniteRepeatable(
-            tween(500, easing = EaseInOut, delayMillis = 320), RepeatMode.Reverse
-        ),
-        label = "dot3"
+        label = "tagline"
     )
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(PrimaryDark, Primary, PrimaryLight)
-                )
-            ),
+            .background(Slate900),   // flat navy — no gradient, no circles
         contentAlignment = Alignment.Center
     ) {
-        // ── Decorative background circles ─────────────────────────────────────
-        Box(
-            modifier = Modifier
-                .size(280.dp)
-                .align(Alignment.TopEnd)
-                .offset(x = 60.dp, y = (-60).dp)
-                .clip(CircleShape)
-                .background(Color.White.copy(alpha = 0.05f))
-        )
-        Box(
-            modifier = Modifier
-                .size(200.dp)
-                .align(Alignment.BottomStart)
-                .offset(x = (-50).dp, y = 50.dp)
-                .clip(CircleShape)
-                .background(Color.White.copy(alpha = 0.04f))
-        )
 
         // ── Centre content ────────────────────────────────────────────────────
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(0.dp)
+            modifier = Modifier.padding(horizontal = 40.dp)
         ) {
-            // Logo with pulsing ring
-            Box(contentAlignment = Alignment.Center) {
-                Box(
-                    modifier = Modifier
-                        .size(140.dp)
-                        .scale(ringScale)
-                        .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.08f))
+
+            // Logo mark — rounded square, not a circle bubble
+            Box(
+                modifier = Modifier
+                    .size(76.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(Indigo600),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "₹",
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = White
                 )
-                Box(
-                    modifier = Modifier
-                        .size(112.dp)
-                        .scale(logoScale)
-                        .clip(CircleShape)
-                        .background(
-                            Brush.radialGradient(
-                                listOf(Color.White.copy(0.25f), Color.White.copy(0.10f))
-                            )
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        "₹",
-                        fontSize = 52.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color.White
-                    )
-                }
             }
 
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(28.dp))
 
             Text(
                 text = "MoneyTracker",
-                fontSize = 34.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.White,
-                letterSpacing = 0.5.sp
+                fontSize = 26.sp,
+                fontWeight = FontWeight.Bold,
+                color = White,
+                letterSpacing = 0.sp
             )
 
             Spacer(Modifier.height(8.dp))
 
             Text(
-                text = "Smart spending. Better living.",
+                text = "Track smarter. Save better.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.White.copy(alpha = shimmerAlpha),
+                color = White.copy(alpha = taglineAlpha),
                 textAlign = TextAlign.Center
             )
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(12.dp))
 
             // Version badge
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(99.dp))
-                    .background(Color.White.copy(alpha = 0.15f))
-                    .padding(horizontal = 16.dp, vertical = 6.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(White.copy(alpha = 0.08f))
+                    .padding(horizontal = 10.dp, vertical = 4.dp)
             ) {
                 Text(
                     text = "v 1.0.0",
                     style = MaterialTheme.typography.labelSmall,
-                    color = Color.White.copy(0.8f),
-                    fontWeight = FontWeight.SemiBold
+                    color = Slate400
                 )
             }
 
-            Spacer(Modifier.height(80.dp))
+            Spacer(Modifier.height(72.dp))
 
-            // Bouncing loading dots
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                listOf(dotOffset1, dotOffset2, dotOffset3).forEach { offset ->
-                    Box(
-                        modifier = Modifier
-                            .offset(y = offset.dp)
-                            .size(10.dp)
-                            .clip(CircleShape)
-                            .background(Color.White.copy(alpha = 0.8f))
-                    )
-                }
+            // Animated bar loader — unique, not dots or spinner
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                AnimatedBar(fraction = bar1, color = Indigo600)
+                AnimatedBar(fraction = bar2, color = Indigo400)
+                AnimatedBar(fraction = bar3, color = Indigo600)
             }
 
             Spacer(Modifier.height(16.dp))
@@ -241,7 +182,7 @@ fun SplashScreenContent() {
             Text(
                 text = "Loading…",
                 style = MaterialTheme.typography.labelSmall,
-                color = Color.White.copy(0.5f)
+                color = Slate400
             )
         }
 
@@ -249,7 +190,7 @@ fun SplashScreenContent() {
         Text(
             text = "MoneyTracker v1.0.0",
             style = MaterialTheme.typography.labelSmall,
-            color = Color.White.copy(0.3f),
+            color = White.copy(alpha = 0.18f),
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 32.dp)
@@ -257,15 +198,27 @@ fun SplashScreenContent() {
     }
 }
 
+// ── Reusable animated loading bar ─────────────────────────────────────────────
+@Composable
+private fun AnimatedBar(fraction: Float, color: Color) {
+    Box(
+        modifier = Modifier
+            .width((24 * fraction).dp.coerceAtLeast(8.dp))
+            .height(4.dp)
+            .clip(RoundedCornerShape(2.dp))
+            .background(color.copy(alpha = 0.35f + 0.65f * fraction))
+    )
+}
+
 // ── Previews ──────────────────────────────────────────────────────────────────
 @Preview(name = "Splash — Light", showBackground = true)
 @Composable
 private fun SplashPreviewLight() {
-    MoneyTrackerTheme(darkTheme = false) { SplashScreenContent() }
+    moneytrackerTheme(darkTheme = false) { SplashScreenContent() }
 }
 
 @Preview(name = "Splash — Dark", showBackground = true)
 @Composable
 private fun SplashPreviewDark() {
-    MoneyTrackerTheme(darkTheme = true) { SplashScreenContent() }
+    moneytrackerTheme(darkTheme = true) { SplashScreenContent() }
 }
