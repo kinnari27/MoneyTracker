@@ -177,11 +177,11 @@ fun EditProfileScreenContent(
         ) {
 
             ProfileFormCard(title = "Personal Info") {
-                ProfileField("Full Name",  uiState.name,  onNameChange,  "Rahul Sharma")
+                ProfileField("Full Name", uiState.name, onNameChange, "Rahul Sharma")
                 Spacer(Modifier.height(12.dp))
-                ProfileField("Email",      uiState.email, onEmailChange, "rahul@gmail.com")
+                ProfileField("Email", uiState.email, onEmailChange, "rahul@gmail.com")
                 Spacer(Modifier.height(12.dp))
-                ProfileField("Phone",      uiState.phone, onPhoneChange, "+91 XXXXX XXXXX")
+                ProfileField("Phone", uiState.phone, onPhoneChange, "+91 XXXXX XXXXX")
             }
 
             ProfileFormCard(title = "Financial & Professional") {
@@ -316,12 +316,12 @@ private fun ProfileField(
             modifier = Modifier.fillMaxWidth(),
             colors = colors(
                 unfocusedContainerColor = Slate100,
-                focusedContainerColor   = Slate100,
-                unfocusedBorderColor    = cs.outline,
-                focusedBorderColor      = Indigo600,
-                unfocusedTextColor      = cs.onSurface,
-                focusedTextColor        = cs.onSurface,
-                cursorColor             = Indigo600,
+                focusedContainerColor = Slate100,
+                unfocusedBorderColor = cs.outline,
+                focusedBorderColor = Indigo600,
+                unfocusedTextColor = cs.onSurface,
+                focusedTextColor = cs.onSurface,
+                cursorColor = Indigo600,
             )
         )
     }

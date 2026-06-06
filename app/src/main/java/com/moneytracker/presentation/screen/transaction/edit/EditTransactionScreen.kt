@@ -415,10 +415,12 @@ fun EditTransactionContent(
                         Category.ALL, uiState.selectedCategory, onCategorySelect,
                         { Category.iconResFor(it) }, { it }, { categoryColor(it) }
                     )
+
                     TransactionType.INCOME -> EditCategoryGrid(
                         IncomeCategory.ALL, uiState.selectedCategory, onCategorySelect,
                         { IncomeCategory.iconResFor(it) }, { it }, { colors.success }
                     )
+
                     TransactionType.INVESTMENT -> EditCategoryGrid(
                         InvestmentCategory.ALL, uiState.selectedCategory, onCategorySelect,
                         { InvestmentCategory.iconResFor(it) },
@@ -601,6 +603,7 @@ fun EditTransactionContent(
                     uiState.rdMonthlyAmount.isNotBlank() &&
                             uiState.rdInterestRate.isNotBlank() &&
                             uiState.selectedCategory.isNotBlank()
+
                 else ->
                     uiState.amount.isNotBlank() && uiState.selectedCategory.isNotBlank()
             }

@@ -6,13 +6,13 @@ import androidx.compose.ui.unit.dp
 //  Spacing scale
 // ─────────────────────────────────────────────────────────────────────────────
 object Spacing {
-    val xxs  = 2.dp
-    val xs   = 4.dp
-    val sm   = 8.dp
-    val md   = 12.dp
-    val lg   = 16.dp
-    val xl   = 20.dp
-    val xxl  = 24.dp
+    val xxs = 2.dp
+    val xs = 4.dp
+    val sm = 8.dp
+    val md = 12.dp
+    val lg = 16.dp
+    val xl = 20.dp
+    val xxl = 24.dp
     val xxxl = 32.dp
 
     // Screen-level horizontal padding
@@ -29,8 +29,8 @@ object Spacing {
 //  Elevation (keep flat — very low elevations only)
 // ─────────────────────────────────────────────────────────────────────────────
 object Elevation {
-    val none   = 0.dp
-    val card   = 0.dp   // flat cards, border only
+    val none = 0.dp
+    val card = 0.dp   // flat cards, border only
     val dialog = 2.dp
     val navbar = 0.dp   // bottom nav: flat with top border
 }
@@ -40,7 +40,7 @@ object Elevation {
 // ─────────────────────────────────────────────────────────────────────────────
 object Size {
     // Buttons
-    val buttonHeight      = 52.dp
+    val buttonHeight = 52.dp
     val buttonHeightSmall = 40.dp
 
     // Input fields
@@ -71,5 +71,5 @@ object Size {
 
     // Stroke / divider
     val dividerThickness = 0.5.dp
-    val borderWidth      = 0.5.dp
+    val borderWidth = 0.5.dp
 }

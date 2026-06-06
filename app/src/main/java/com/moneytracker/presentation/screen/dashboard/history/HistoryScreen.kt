@@ -103,7 +103,14 @@ fun HistoryScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Brush.linearGradient(listOf(colorScheme.primary, colorScheme.primary)))
+                    .background(
+                        Brush.linearGradient(
+                            listOf(
+                                colorScheme.primary,
+                                colorScheme.primary
+                            )
+                        )
+                    )
                     .padding(top = 52.dp, start = 20.dp, end = 20.dp, bottom = 24.dp)
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -158,9 +165,13 @@ fun HistoryScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     listOf(
-                        Triple("Income",     "₹${uiState.totalIncome.toInt()}",      extendedColors.success),
-                        Triple("Expense",    "₹${uiState.totalExpense.toInt()}",     extendedColors.error),
-                        Triple("Invest",     "₹${uiState.totalInvestment.toInt()}", extendedColors.accent),
+                        Triple("Income", "₹${uiState.totalIncome.toInt()}", extendedColors.success),
+                        Triple("Expense", "₹${uiState.totalExpense.toInt()}", extendedColors.error),
+                        Triple(
+                            "Invest",
+                            "₹${uiState.totalInvestment.toInt()}",
+                            extendedColors.accent
+                        ),
                         Triple(
                             "Net",
                             "₹${(uiState.totalIncome - uiState.totalExpense).toInt()}",
@@ -248,9 +259,9 @@ fun HistoryScreen(
                         ) {
                             val dayNet = transactions.sumOf {
                                 when (it.type) {
-                                    TransactionType.INCOME     ->  it.amount
-                                    TransactionType.EXPENSE    -> -it.amount
-                                    TransactionType.INVESTMENT ->  0.0
+                                    TransactionType.INCOME -> it.amount
+                                    TransactionType.EXPENSE -> -it.amount
+                                    TransactionType.INVESTMENT -> 0.0
                                 }
                             }
                             Text(
@@ -345,9 +356,9 @@ private fun ScrollableFilterChips(
     ) {
         TransactionFilter.values().forEach { f ->
             val label = when (f) {
-                TransactionFilter.ALL        -> "All"
-                TransactionFilter.INCOME     -> "Income"
-                TransactionFilter.EXPENSE    -> "Expense"
+                TransactionFilter.ALL -> "All"
+                TransactionFilter.INCOME -> "Income"
+                TransactionFilter.EXPENSE -> "Expense"
                 TransactionFilter.INVESTMENT -> "Investment"
             }
             FilterChip(

@@ -276,7 +276,9 @@ fun BiometricLockContent(
                         Icons.Default.Check,
                         null,
                         tint = Invest600,
-                        modifier = Modifier.size(16.dp).padding(top = 1.dp)
+                        modifier = Modifier
+                            .size(16.dp)
+                            .padding(top = 1.dp)
                     )
                     Text(
                         "Biometric data stays on your device and is never shared with us.",
@@ -368,7 +370,11 @@ private fun BiometricPreviewDisabled() {
 private fun BiometricPreviewEnabled() {
     moneytrackerTheme(darkTheme = true) {
         BiometricLockContent(
-            uiState = BiometricLockUiState(biometricEnabled = true, autoLockOption = 1, isLoading = false),
+            uiState = BiometricLockUiState(
+                biometricEnabled = true,
+                autoLockOption = 1,
+                isLoading = false
+            ),
             onBiometricToggle = {},
             onFaceIdToggle = {},
             onAutoLockSelect = {},

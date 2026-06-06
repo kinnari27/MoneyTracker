@@ -78,7 +78,13 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
-                            Brush.linearGradient(listOf(cs.primary, cs.primary, extendedColors.accent))
+                            Brush.linearGradient(
+                                listOf(
+                                    cs.primary,
+                                    cs.primary,
+                                    extendedColors.accent
+                                )
+                            )
                         )
                         .statusBarsPadding()
                         .padding(top = 20.dp, start = 20.dp, end = 20.dp, bottom = 80.dp)
@@ -278,7 +284,12 @@ private fun BalanceTile(
                         .background(color),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(prefix, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    Text(
+                        prefix,
+                        color = Color.White,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
                 Text(
                     label,
@@ -300,10 +311,10 @@ private fun BalanceTile(
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 private fun getGreeting(): String = when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
-    in 0..11  -> "Good Morning"
+    in 0..11 -> "Good Morning"
     in 12..15 -> "Good Afternoon"
     in 16..20 -> "Good Evening"
-    else      -> "Good Night"
+    else -> "Good Night"
 }
 
 // ── Preview ───────────────────────────────────────────────────────────────────

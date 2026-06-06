@@ -43,7 +43,6 @@ import com.moneytracker.presentation.screen.settings.currency.CurrencyUiState
 import com.moneytracker.presentation.screen.settings.currency.CurrencyViewModel
 import com.moneytracker.ui.theme.Indigo100
 import com.moneytracker.ui.theme.Indigo600
-import com.moneytracker.ui.theme.Slate100
 import com.moneytracker.ui.theme.Slate400
 import com.moneytracker.ui.theme.Slate900
 import com.moneytracker.ui.theme.White
@@ -76,7 +75,9 @@ fun CurrencyScreenContent(
 ) {
     val cs = MaterialTheme.colorScheme
 
-    Column(modifier = modifier.fillMaxSize().background(cs.background)) {
+    Column(modifier = modifier
+        .fillMaxSize()
+        .background(cs.background)) {
 
         // ── Header — flat Slate900 ────────────────────────────────────────────
         Box(
@@ -111,7 +112,12 @@ fun CurrencyScreenContent(
                     onValueChange = onSearchChange,
                     placeholder = { Text("Search currency…", color = Slate400) },
                     leadingIcon = {
-                        Icon(Icons.Default.Search, null, tint = Slate400, modifier = Modifier.size(20.dp))
+                        Icon(
+                            Icons.Default.Search,
+                            null,
+                            tint = Slate400,
+                            modifier = Modifier.size(20.dp)
+                        )
                     },
                     singleLine = true,
                     shape = RoundedCornerShape(10.dp),
@@ -119,13 +125,13 @@ fun CurrencyScreenContent(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedBorderColor    = Slate400.copy(alpha = 0.3f),
-                        focusedBorderColor      = Indigo600,
+                        unfocusedBorderColor = Slate400.copy(alpha = 0.3f),
+                        focusedBorderColor = Indigo600,
                         unfocusedContainerColor = White.copy(alpha = 0.07f),
-                        focusedContainerColor   = White.copy(alpha = 0.10f),
-                        unfocusedTextColor      = White,
-                        focusedTextColor        = White,
-                        cursorColor             = Indigo600
+                        focusedContainerColor = White.copy(alpha = 0.10f),
+                        unfocusedTextColor = White,
+                        focusedTextColor = White,
+                        cursorColor = Indigo600
                     )
                 )
             }
@@ -179,7 +185,11 @@ fun CurrencyScreenContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .then(
-                            if (isSelected) Modifier.border(1.5.dp, Indigo600, RoundedCornerShape(12.dp))
+                            if (isSelected) Modifier.border(
+                                1.5.dp,
+                                Indigo600,
+                                RoundedCornerShape(12.dp)
+                            )
                             else Modifier
                         ),
                     shape = RoundedCornerShape(12.dp),

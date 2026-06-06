@@ -42,7 +42,11 @@ class GoogleAuthUiClient @Inject constructor(
             Log.e("GoogleAuthUiClient", "No credentials available", e)
             Result.failure(Exception("No Google accounts found. Please add an account in Settings."))
         } catch (e: Exception) {
-            Log.e("GoogleAuthUiClient", "Sign-in failed with exception: ${e.javaClass.simpleName}", e)
+            Log.e(
+                "GoogleAuthUiClient",
+                "Sign-in failed with exception: ${e.javaClass.simpleName}",
+                e
+            )
             Result.failure(e)
         }
     }
@@ -56,9 +60,11 @@ class GoogleAuthUiClient @Inject constructor(
                 Log.d("GoogleAuthUiClient", "Got GoogleIdTokenCredential")
                 credential.idToken
             }
+
             credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL -> {
                 try {
-                    val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                    val googleIdTokenCredential =
+                        GoogleIdTokenCredential.createFrom(credential.data)
                     Log.d("GoogleAuthUiClient", "Parsed GoogleIdTokenCredential from data")
                     googleIdTokenCredential.idToken
                 } catch (e: Exception) {
@@ -66,6 +72,7 @@ class GoogleAuthUiClient @Inject constructor(
                     null
                 }
             }
+
             else -> {
                 Log.e("GoogleAuthUiClient", "Unexpected credential type: ${credential.type}")
                 null

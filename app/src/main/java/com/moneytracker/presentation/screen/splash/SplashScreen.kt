@@ -53,10 +53,10 @@ fun SplashScreen(
 
     LaunchedEffect(destination) {
         when (destination) {
-            SplashDestination.Login    -> onNavigateToLogin()
+            SplashDestination.Login -> onNavigateToLogin()
             SplashDestination.Register -> onNavigateToRegister()
-            SplashDestination.Home     -> onNavigateToHome()
-            SplashDestination.Loading  -> Unit
+            SplashDestination.Home -> onNavigateToHome()
+            SplashDestination.Loading -> Unit
         }
     }
 

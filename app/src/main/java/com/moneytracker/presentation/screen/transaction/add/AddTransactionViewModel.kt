@@ -152,7 +152,8 @@ class AddTransactionViewModel @Inject constructor(
 
                 // Derive tenure in months from date -> rdMaturityDate
                 val diffInMillies = state.rdMaturityDate.time - state.date.time
-                val months = (TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS) / 30).toInt()
+                val months =
+                    (TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS) / 30).toInt()
 
                 if (monthly <= 0 || rate <= 0 || months <= 0) return
 

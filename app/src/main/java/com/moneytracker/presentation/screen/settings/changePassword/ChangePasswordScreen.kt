@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -47,7 +46,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moneytracker.presentation.screen.auth.AuthField
@@ -139,9 +137,19 @@ fun ChangePasswordScreenContent(
         }
 
         if (!uiState.hasPassword && !uiState.isLoading) {
-            Box(Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Icon(Icons.Default.Lock, null, modifier = Modifier.size(64.dp), tint = colors.textSecondary.copy(0.3f))
+            Box(Modifier
+                .fillMaxSize()
+                .padding(32.dp), contentAlignment = Alignment.Center) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Lock,
+                        null,
+                        modifier = Modifier.size(64.dp),
+                        tint = colors.textSecondary.copy(0.3f)
+                    )
                     Text(
                         "You are signed in with Google. You can manage your security settings in your Google Account.",
                         textAlign = TextAlign.Center,
@@ -229,6 +237,7 @@ fun ChangePasswordScreenContent(
                                 imeAction = ImeAction.Done,
                                 onImeAction = onNext
                             )
+
                             PasswordStep.NEW -> AuthField(
                                 value = uiState.newPassword,
                                 onValueChange = onNewChange,
@@ -241,6 +250,7 @@ fun ChangePasswordScreenContent(
                                 imeAction = ImeAction.Next,
                                 onImeAction = onNext
                             )
+
                             PasswordStep.CONFIRM -> AuthField(
                                 value = uiState.confirmPassword,
                                 onValueChange = onConfirmChange,
@@ -267,7 +277,12 @@ fun ChangePasswordScreenContent(
                                 .background(Error.copy(0.1f))
                                 .padding(12.dp)
                         ) {
-                            Icon(Icons.Default.ErrorOutline, null, tint = Error, modifier = Modifier.size(18.dp))
+                            Icon(
+                                Icons.Default.ErrorOutline,
+                                null,
+                                tint = Error,
+                                modifier = Modifier.size(18.dp)
+                            )
                             Text(
                                 text = uiState.error ?: "",
                                 color = Error,
@@ -287,7 +302,11 @@ fun ChangePasswordScreenContent(
                         colors = ButtonDefaults.buttonColors(containerColor = Primary)
                     ) {
                         if (uiState.isLoading) {
-                            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(22.dp), strokeWidth = 2.5.dp)
+                            CircularProgressIndicator(
+                                color = Color.White,
+                                modifier = Modifier.size(22.dp),
+                                strokeWidth = 2.5.dp
+                            )
                         } else {
                             Text(
                                 if (uiState.step == PasswordStep.CONFIRM) "Update Password" else "Continue",

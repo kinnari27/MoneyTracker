@@ -31,11 +31,16 @@ class ChangePasswordViewModel @Inject constructor(
         }
     }
 
-    fun onCurrentPasswordChange(v: String) = _uiState.update { it.copy(currentPassword = v, error = null) }
+    fun onCurrentPasswordChange(v: String) =
+        _uiState.update { it.copy(currentPassword = v, error = null) }
+
     fun onNewPasswordChange(v: String) = _uiState.update { it.copy(newPassword = v, error = null) }
-    fun onConfirmPasswordChange(v: String) = _uiState.update { it.copy(confirmPassword = v, error = null) }
-    
-    fun togglePasswordVisibility() = _uiState.update { it.copy(passwordVisible = !it.passwordVisible) }
+    fun onConfirmPasswordChange(v: String) =
+        _uiState.update { it.copy(confirmPassword = v, error = null) }
+
+    fun togglePasswordVisibility() =
+        _uiState.update { it.copy(passwordVisible = !it.passwordVisible) }
+
     fun toggleConfirmVisibility() = _uiState.update { it.copy(confirmVisible = !it.confirmVisible) }
 
     fun next() {
@@ -49,6 +54,7 @@ class ChangePasswordViewModel @Inject constructor(
                     _uiState.update { it.copy(step = PasswordStep.CONFIRM, error = null) }
                 }
             }
+
             PasswordStep.CONFIRM -> {
                 if (s.newPassword == s.confirmPassword) {
                     submit()
@@ -65,16 +71,32 @@ class ChangePasswordViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, error = null) }
             val user = userRepository.getCurrentUser()
             if (user == null) {
-                _uiState.update { it.copy(isLoading = false, error = "Session error. Please login again.") }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = "Session error. Please login again."
+                    )
+                }
                 return@launch
             }
 
             userRepository.loginUser(user.email, s.currentPassword).fold(
                 onSuccess = {
-                    _uiState.update { it.copy(isLoading = false, step = PasswordStep.NEW, error = null) }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            step = PasswordStep.NEW,
+                            error = null
+                        )
+                    }
                 },
                 onFailure = {
-                    _uiState.update { it.copy(isLoading = false, error = "Incorrect current password") }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = "Incorrect current password"
+                        )
+                    }
                 }
             )
         }
@@ -95,7 +117,12 @@ class ChangePasswordViewModel @Inject constructor(
                     _uiState.update { it.copy(isLoading = false, isComplete = true) }
                 },
                 onFailure = { e ->
-                    _uiState.update { it.copy(isLoading = false, error = e.message ?: "Failed to update password") }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = e.message ?: "Failed to update password"
+                        )
+                    }
                 }
             )
         }

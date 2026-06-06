@@ -35,9 +35,13 @@ class HistoryViewModel @Inject constructor(
                 .collect { transactions ->
                     _uiState.update {
                         val filtered = applyFilter(transactions, it.filter, it.searchQuery)
-                        val income = filtered.filter { t -> t.type == TransactionType.INCOME }.sumOf { t -> t.amount }
-                        val expense = filtered.filter { t -> t.type == TransactionType.EXPENSE }.sumOf { t -> t.amount }
-                        val investment = filtered.filter { t -> t.type == TransactionType.INVESTMENT }.sumOf { t -> t.amount }
+                        val income = filtered.filter { t -> t.type == TransactionType.INCOME }
+                            .sumOf { t -> t.amount }
+                        val expense = filtered.filter { t -> t.type == TransactionType.EXPENSE }
+                            .sumOf { t -> t.amount }
+                        val investment =
+                            filtered.filter { t -> t.type == TransactionType.INVESTMENT }
+                                .sumOf { t -> t.amount }
 
                         it.copy(
                             isLoading = false,
@@ -55,9 +59,12 @@ class HistoryViewModel @Inject constructor(
     fun onFilterChange(filter: TransactionFilter) {
         _uiState.update {
             val filtered = applyFilter(it.allTransactions, filter, it.searchQuery)
-            val income = filtered.filter { t -> t.type == TransactionType.INCOME }.sumOf { t -> t.amount }
-            val expense = filtered.filter { t -> t.type == TransactionType.EXPENSE }.sumOf { t -> t.amount }
-            val investment = filtered.filter { t -> t.type == TransactionType.INVESTMENT }.sumOf { t -> t.amount }
+            val income =
+                filtered.filter { t -> t.type == TransactionType.INCOME }.sumOf { t -> t.amount }
+            val expense =
+                filtered.filter { t -> t.type == TransactionType.EXPENSE }.sumOf { t -> t.amount }
+            val investment = filtered.filter { t -> t.type == TransactionType.INVESTMENT }
+                .sumOf { t -> t.amount }
 
             it.copy(
                 filter = filter,
@@ -72,9 +79,12 @@ class HistoryViewModel @Inject constructor(
     fun onSearchChange(query: String) {
         _uiState.update {
             val filtered = applyFilter(it.allTransactions, it.filter, query)
-            val income = filtered.filter { t -> t.type == TransactionType.INCOME }.sumOf { t -> t.amount }
-            val expense = filtered.filter { t -> t.type == TransactionType.EXPENSE }.sumOf { t -> t.amount }
-            val investment = filtered.filter { t -> t.type == TransactionType.INVESTMENT }.sumOf { t -> t.amount }
+            val income =
+                filtered.filter { t -> t.type == TransactionType.INCOME }.sumOf { t -> t.amount }
+            val expense =
+                filtered.filter { t -> t.type == TransactionType.EXPENSE }.sumOf { t -> t.amount }
+            val investment = filtered.filter { t -> t.type == TransactionType.INVESTMENT }
+                .sumOf { t -> t.amount }
 
             it.copy(
                 searchQuery = query,

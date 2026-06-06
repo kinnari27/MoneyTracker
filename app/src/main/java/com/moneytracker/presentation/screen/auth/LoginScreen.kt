@@ -42,17 +42,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.res.painterResource
-import com.moneytracker.R
-import kotlinx.coroutines.launch
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.moneytracker.R
 import com.moneytracker.ui.theme.AppTheme
 import com.moneytracker.ui.theme.MoneyTrackerTheme
 
@@ -307,9 +306,23 @@ fun LoginScreenContent(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Box(modifier = Modifier.weight(1f).height(1.dp).background(colors.outline.copy(0.3f)))
-                        Text("OR", style = MaterialTheme.typography.labelSmall, color = colors.textSecondary)
-                        Box(modifier = Modifier.weight(1f).height(1.dp).background(colors.outline.copy(0.3f)))
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(1.dp)
+                                .background(colors.outline.copy(0.3f))
+                        )
+                        Text(
+                            "OR",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = colors.textSecondary
+                        )
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(1.dp)
+                                .background(colors.outline.copy(0.3f))
+                        )
                     }
 
                     // Google Sign In Button
@@ -320,7 +333,10 @@ fun LoginScreenContent(
                             .fillMaxWidth()
                             .height(56.dp),
                         shape = RoundedCornerShape(18.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, colors.outline.copy(0.5f))
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.dp,
+                            colors.outline.copy(0.5f)
+                        )
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,

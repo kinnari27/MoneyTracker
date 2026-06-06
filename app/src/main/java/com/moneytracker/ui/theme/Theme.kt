@@ -24,46 +24,46 @@ import androidx.core.view.WindowCompat
 private val LightColorScheme = lightColorScheme(
 
     // Primary (Indigo)
-    primary          = Indigo600,
-    onPrimary        = White,
+    primary = Indigo600,
+    onPrimary = White,
     primaryContainer = Indigo100,
     onPrimaryContainer = Indigo600,
 
     // Secondary (Slate mid)
-    secondary          = Slate700,
-    onSecondary        = White,
+    secondary = Slate700,
+    onSecondary = White,
     secondaryContainer = Slate100,
     onSecondaryContainer = Slate700,
 
     // Tertiary (used for invest/amber tint)
-    tertiary          = Invest600,
-    onTertiary        = White,
+    tertiary = Invest600,
+    onTertiary = White,
     tertiaryContainer = Invest100,
     onTertiaryContainer = Invest600,
 
     // Error (Expense red)
-    error          = Expense600,
-    onError        = White,
+    error = Expense600,
+    onError = White,
     errorContainer = Expense100,
     onErrorContainer = Expense600,
 
     // Backgrounds & surfaces
-    background    = Slate50,
-    onBackground  = Slate900,
+    background = Slate50,
+    onBackground = Slate900,
 
-    surface           = White,
-    onSurface         = Slate900,
-    surfaceVariant    = Slate100,
-    onSurfaceVariant  = Slate600,
+    surface = White,
+    onSurface = Slate900,
+    surfaceVariant = Slate100,
+    onSurfaceVariant = Slate600,
 
     // Outline
-    outline        = Slate200,
+    outline = Slate200,
     outlineVariant = Slate100,
 
     // Inverse (for snackbars, etc.)
-    inverseSurface    = Slate900,
-    inverseOnSurface  = Slate50,
-    inversePrimary    = Indigo400,
+    inverseSurface = Slate900,
+    inverseOnSurface = Slate50,
+    inversePrimary = Indigo400,
 
     scrim = Black
 )
@@ -74,46 +74,46 @@ private val LightColorScheme = lightColorScheme(
 private val DarkColorScheme = darkColorScheme(
 
     // Primary (Indigo — lighter for dark)
-    primary          = Indigo400,
-    onPrimary        = Dark900,
+    primary = Indigo400,
+    onPrimary = Dark900,
     primaryContainer = Dark700,
     onPrimaryContainer = Indigo200,
 
     // Secondary
-    secondary          = Slate400,
-    onSecondary        = Dark900,
+    secondary = Slate400,
+    onSecondary = Dark900,
     secondaryContainer = Dark700,
     onSecondaryContainer = Slate200,
 
     // Tertiary
-    tertiary          = Invest500,
-    onTertiary        = Dark900,
+    tertiary = Invest500,
+    onTertiary = Dark900,
     tertiaryContainer = Dark700,
     onTertiaryContainer = Invest100,
 
     // Error
-    error          = Expense500,
-    onError        = Dark900,
+    error = Expense500,
+    onError = Dark900,
     errorContainer = Dark700,
     onErrorContainer = Expense100,
 
     // Backgrounds & surfaces
-    background    = Dark900,
-    onBackground  = Slate200,
+    background = Dark900,
+    onBackground = Slate200,
 
-    surface           = Dark800,
-    onSurface         = Slate200,
-    surfaceVariant    = Dark700,
-    onSurfaceVariant  = Slate400,
+    surface = Dark800,
+    onSurface = Slate200,
+    surfaceVariant = Dark700,
+    onSurfaceVariant = Slate400,
 
     // Outline
-    outline        = Dark600,
+    outline = Dark600,
     outlineVariant = Dark700,
 
     // Inverse
-    inverseSurface    = Slate100,
-    inverseOnSurface  = Slate900,
-    inversePrimary    = Indigo600,
+    inverseSurface = Slate100,
+    inverseOnSurface = Slate900,
+    inversePrimary = Indigo600,
 
     scrim = Black
 )
@@ -162,69 +162,69 @@ data class ExtendedColors(
 )
 
 val LightExtendedColors = ExtendedColors(
-    isDark              = false,
-    headerBackground    = Slate900,
-    headerOnBackground  = White,
-    headerSubtle        = Slate400,
+    isDark = false,
+    headerBackground = Slate900,
+    headerOnBackground = White,
+    headerSubtle = Slate400,
 
-    primary             = Indigo600,
-    accent              = Indigo400,
+    primary = Indigo600,
+    accent = Indigo400,
 
-    incomeColor         = Income600,
-    incomeContainer     = Income100,
-    expenseColor        = Expense600,
-    expenseContainer    = Expense100,
-    investColor         = Invest600,
-    investContainer     = Invest100,
+    incomeColor = Income600,
+    incomeContainer = Income100,
+    expenseColor = Expense600,
+    expenseContainer = Expense100,
+    investColor = Invest600,
+    investContainer = Invest100,
 
-    textSecondary       = Slate600,
-    success             = Income600,
-    error               = Expense600,
-    errorContainer      = Expense100,
-    warning             = Invest500,
+    textSecondary = Slate600,
+    success = Income600,
+    error = Expense600,
+    errorContainer = Expense100,
+    warning = Invest500,
 
-    cardSurface         = White,
-    divider             = Slate100,
+    cardSurface = White,
+    divider = Slate100,
 
     segmentedBackground = Slate100,
-    segmentedSelected   = White,
+    segmentedSelected = White,
     segmentedOnSelected = Slate900,
 
-    inputBackground     = Slate100,
-    outline             = Slate200,
+    inputBackground = Slate100,
+    outline = Slate200,
 )
 
 val DarkExtendedColors = ExtendedColors(
-    isDark              = true,
-    headerBackground    = Dark900,
-    headerOnBackground  = Slate100,
-    headerSubtle        = Slate600,
+    isDark = true,
+    headerBackground = Dark900,
+    headerOnBackground = Slate100,
+    headerSubtle = Slate600,
 
-    primary             = Indigo400,
-    accent              = Indigo200,
+    primary = Indigo400,
+    accent = Indigo200,
 
-    incomeColor         = Income500,
-    incomeContainer     = Color(0xFF0D2E1A),
-    expenseColor        = Expense500,
-    expenseContainer    = Color(0xFF2D1010),
-    investColor         = Invest500,
-    investContainer     = Color(0xFF2D1F03),
+    incomeColor = Income500,
+    incomeContainer = Color(0xFF0D2E1A),
+    expenseColor = Expense500,
+    expenseContainer = Color(0xFF2D1010),
+    investColor = Invest500,
+    investContainer = Color(0xFF2D1F03),
 
-    textSecondary       = Slate400,
-    success             = Income500,
-    error               = Expense500,
-    errorContainer      = Color(0xFF2D1010),
-    warning             = Invest500,
+    textSecondary = Slate400,
+    success = Income500,
+    error = Expense500,
+    errorContainer = Color(0xFF2D1010),
+    warning = Invest500,
 
-    cardSurface         = Dark800,
-    divider             = Dark600,
+    cardSurface = Dark800,
+    divider = Dark600,
 
     segmentedBackground = Dark700,
-    segmentedSelected   = Dark600,
+    segmentedSelected = Dark600,
     segmentedOnSelected = Slate100,
 
-    inputBackground     = Dark700,
-    outline             = Dark600,
+    inputBackground = Dark700,
+    outline = Dark600,
 )
 
 val LocalExtendedColors = staticCompositionLocalOf { LightExtendedColors }
@@ -250,8 +250,9 @@ fun MoneyTrackerTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
+
         darkTheme -> DarkColorScheme
-        else      -> LightColorScheme
+        else -> LightColorScheme
     }
 
     val extendedColors = if (darkTheme) DarkExtendedColors else LightExtendedColors
@@ -271,9 +272,9 @@ fun MoneyTrackerTheme(
     CompositionLocalProvider(LocalExtendedColors provides extendedColors) {
         MaterialTheme(
             colorScheme = colorScheme,
-            typography  = Typography,
-            shapes      = Shapes,
-            content     = content
+            typography = Typography,
+            shapes = Shapes,
+            content = content
         )
     }
 }

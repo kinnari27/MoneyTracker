@@ -69,7 +69,12 @@ fun BottomNavBar(navController: NavController) {
                                 .size(52.dp)
                                 .shadow(8.dp, CircleShape)
                                 .background(
-                                    brush = Brush.linearGradient(listOf(AppTheme.colors.primary, AppTheme.colors.accent)),
+                                    brush = Brush.linearGradient(
+                                        listOf(
+                                            AppTheme.colors.primary,
+                                            AppTheme.colors.accent
+                                        )
+                                    ),
                                     shape = CircleShape
                                 ),
                             contentAlignment = Alignment.Center

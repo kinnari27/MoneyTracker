@@ -141,14 +141,31 @@ class AuthViewModel @Inject constructor(
                     }
 
                     userRepository.signInWithGoogle(idToken).fold(
-                        onSuccess = { _uiState.update { it.copy(isLoading = false, isSuccess = true) } },
-                        onFailure = { e -> 
-                            _uiState.update { it.copy(isLoading = false, error = e.message ?: "Firebase authentication failed") } 
+                        onSuccess = {
+                            _uiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    isSuccess = true
+                                )
+                            }
+                        },
+                        onFailure = { e ->
+                            _uiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = e.message ?: "Firebase authentication failed"
+                                )
+                            }
                         }
                     )
                 },
                 onFailure = { e ->
-                    _uiState.update { it.copy(isLoading = false, error = e.message ?: "Google Sign-In failed") }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = e.message ?: "Google Sign-In failed"
+                        )
+                    }
                 }
             )
         }
@@ -164,7 +181,14 @@ class AuthViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, error = null) }
             userRepository.signInWithGoogle(idToken).fold(
                 onSuccess = { _uiState.update { it.copy(isLoading = false, isSuccess = true) } },
-                onFailure = { e -> _uiState.update { it.copy(isLoading = false, error = e.message) } }
+                onFailure = { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = e.message
+                        )
+                    }
+                }
             )
         }
     }

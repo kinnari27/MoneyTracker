@@ -208,7 +208,13 @@ fun AddTransactionScreen(
             onDismissRequest = { showRdMaturityDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    rdMaturityDatePickerState.selectedDateMillis?.let { onRdMaturityDateChange(Date(it)) }
+                    rdMaturityDatePickerState.selectedDateMillis?.let {
+                        onRdMaturityDateChange(
+                            Date(
+                                it
+                            )
+                        )
+                    }
                     showRdMaturityDatePicker = false
                 }) { Text("OK") }
             },
@@ -431,9 +437,20 @@ fun AddTransactionScreen(
                 label = "category_panel"
             ) { type ->
                 when (type) {
-                    TransactionType.EXPENSE -> ExpenseCategoryGrid(uiState.selectedCategory, onCategorySelect)
-                    TransactionType.INVESTMENT -> InvestmentCategoryGrid(uiState.selectedCategory, onCategorySelect)
-                    TransactionType.INCOME -> IncomeCategoryGrid(uiState.selectedCategory, onCategorySelect)
+                    TransactionType.EXPENSE -> ExpenseCategoryGrid(
+                        uiState.selectedCategory,
+                        onCategorySelect
+                    )
+
+                    TransactionType.INVESTMENT -> InvestmentCategoryGrid(
+                        uiState.selectedCategory,
+                        onCategorySelect
+                    )
+
+                    TransactionType.INCOME -> IncomeCategoryGrid(
+                        uiState.selectedCategory,
+                        onCategorySelect
+                    )
                 }
             }
 
@@ -664,6 +681,7 @@ fun AddTransactionScreen(
                     uiState.rdMonthlyAmount.isNotBlank() &&
                             uiState.rdInterestRate.isNotBlank() &&
                             uiState.selectedCategory.isNotBlank()
+
                 else ->
                     uiState.amount.isNotBlank() && uiState.selectedCategory.isNotBlank()
             }
@@ -678,8 +696,10 @@ fun AddTransactionScreen(
                 val hint = when {
                     uiState.selectedCategory == InvestmentCategory.RD &&
                             uiState.rdMonthlyAmount.isBlank() -> "Enter monthly installment to continue"
+
                     uiState.selectedCategory == InvestmentCategory.RD &&
                             uiState.rdInterestRate.isBlank() -> "Enter interest rate to continue"
+
                     uiState.amount.isBlank() -> "Enter an amount to continue"
                     uiState.selectedCategory.isBlank() -> "Select a category to continue"
                     else -> null

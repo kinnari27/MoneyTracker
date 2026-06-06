@@ -31,7 +31,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,13 +60,13 @@ fun NotificationsScreen(
         onBack = onBack,
         onToggle = { key, enabled ->
             when (key) {
-                "all"     -> viewModel.onAllNotificationsToggle(enabled)
-                "budget"  -> viewModel.onBudgetAlertToggle(enabled)
-                "large"   -> viewModel.onLargeTransactionToggle(enabled)
-                "daily"   -> viewModel.onDailySummaryToggle(enabled)
-                "bill"    -> viewModel.onBillReminderToggle(enabled)
+                "all" -> viewModel.onAllNotificationsToggle(enabled)
+                "budget" -> viewModel.onBudgetAlertToggle(enabled)
+                "large" -> viewModel.onLargeTransactionToggle(enabled)
+                "daily" -> viewModel.onDailySummaryToggle(enabled)
+                "bill" -> viewModel.onBillReminderToggle(enabled)
                 "monthly" -> viewModel.onMonthlyReportToggle(enabled)
-                "tips"    -> viewModel.onTipsToggle(enabled)
+                "tips" -> viewModel.onTipsToggle(enabled)
                 "updates" -> viewModel.onAppUpdatesToggle(enabled)
             }
         },
@@ -85,7 +84,9 @@ fun NotificationsScreenContent(
     val cs = MaterialTheme.colorScheme
 
     LazyColumn(
-        modifier = modifier.fillMaxSize().background(cs.background),
+        modifier = modifier
+            .fillMaxSize()
+            .background(cs.background),
         contentPadding = PaddingValues(bottom = 40.dp)
     ) {
 
@@ -180,17 +181,41 @@ fun NotificationsScreenContent(
         // ── Notification Sections ─────────────────────────────────────────────
         val sections = listOf(
             "Spending Alerts" to listOf(
-                Triple("Budget Limit Alert",     "Warn when you near budget limit",    uiState.budgetAlert)     to "budget",
-                Triple("Large Transaction",      "Alert for transactions over ₹1000",  uiState.largeTransaction) to "large",
-                Triple("Daily Spending Summary", "Get a summary every evening",        uiState.dailySummary)    to "daily",
+                Triple(
+                    "Budget Limit Alert",
+                    "Warn when you near budget limit",
+                    uiState.budgetAlert
+                ) to "budget",
+                Triple(
+                    "Large Transaction",
+                    "Alert for transactions over ₹1000",
+                    uiState.largeTransaction
+                ) to "large",
+                Triple(
+                    "Daily Spending Summary",
+                    "Get a summary every evening",
+                    uiState.dailySummary
+                ) to "daily",
             ),
             "Reminders" to listOf(
-                Triple("Bill Payment Reminder", "Remind before due date",          uiState.billReminder)  to "bill",
-                Triple("Monthly Report",        "Summary on 1st of every month",   uiState.monthlyReport) to "monthly",
+                Triple(
+                    "Bill Payment Reminder",
+                    "Remind before due date",
+                    uiState.billReminder
+                ) to "bill",
+                Triple(
+                    "Monthly Report",
+                    "Summary on 1st of every month",
+                    uiState.monthlyReport
+                ) to "monthly",
             ),
             "App" to listOf(
-                Triple("Tips & Insights", "Smart money-saving tips",        uiState.tips)       to "tips",
-                Triple("App Updates",     "New features and improvements",   uiState.appUpdates) to "updates",
+                Triple("Tips & Insights", "Smart money-saving tips", uiState.tips) to "tips",
+                Triple(
+                    "App Updates",
+                    "New features and improvements",
+                    uiState.appUpdates
+                ) to "updates",
             )
         )
 

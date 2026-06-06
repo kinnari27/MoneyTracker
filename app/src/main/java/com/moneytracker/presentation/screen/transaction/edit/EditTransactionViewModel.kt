@@ -59,12 +59,14 @@ class EditTransactionViewModel @Inject constructor(
                     // RD is always recurring — enforce on load too
                     isRecurring = if (tx.category == InvestmentCategory.RD) true else tx.isRecurring,
                     // FD fields
-                    maturityDate = tx.maturityDate ?: Date(System.currentTimeMillis() + 31536000000L),
+                    maturityDate = tx.maturityDate
+                        ?: Date(System.currentTimeMillis() + 31536000000L),
                     interestRate = tx.interestRate?.toString() ?: "",
                     maturityAmount = tx.maturityAmount ?: 0.0,
                     // RD fields (rdTenureMonths no longer stored in UI state)
                     rdMonthlyAmount = tx.rdMonthlyAmount?.toString() ?: "",
-                    rdMaturityDate = tx.rdMaturityDate ?: Date(System.currentTimeMillis() + 31536000000L),
+                    rdMaturityDate = tx.rdMaturityDate
+                        ?: Date(System.currentTimeMillis() + 31536000000L),
                     rdInterestRate = tx.rdInterestRate?.toString() ?: "",
                     rdMaturityAmount = tx.rdMaturityAmount ?: 0.0,
                     isLoading = false

@@ -24,12 +24,12 @@ val Shapes = Shapes(
 )
 
 // ── Named aliases for use in composables ────────────────────────────────────
-val ChipShape      = RoundedCornerShape(6.dp)
-val InputShape     = RoundedCornerShape(10.dp)
-val CardShape      = RoundedCornerShape(14.dp)
+val ChipShape = RoundedCornerShape(6.dp)
+val InputShape = RoundedCornerShape(10.dp)
+val CardShape = RoundedCornerShape(14.dp)
 val LargeCardShape = RoundedCornerShape(18.dp)
-val ButtonShape    = RoundedCornerShape(12.dp)
-val BadgeShape     = RoundedCornerShape(4.dp)
+val ButtonShape = RoundedCornerShape(12.dp)
+val BadgeShape = RoundedCornerShape(4.dp)
 
 // Pill shape — only for toggle/segmented control, NOT for general cards
 val PillShape = RoundedCornerShape(50)

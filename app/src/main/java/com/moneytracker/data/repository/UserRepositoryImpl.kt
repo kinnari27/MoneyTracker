@@ -1,15 +1,15 @@
 package com.moneytracker.data.repository
 
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.moneytracker.data.local.dao.UserDao
 import com.moneytracker.data.mapper.toDomain
 import com.moneytracker.data.mapper.toEntity
 import com.moneytracker.domain.model.User
 import com.moneytracker.domain.repository.UserRepository
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
 import java.security.MessageDigest
 import javax.inject.Inject
 
@@ -70,7 +70,8 @@ class UserRepositoryImpl @Inject constructor(
         return try {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
             val authResult = firebaseAuth.signInWithCredential(credential).await()
-            val firebaseUser = authResult.user ?: return Result.failure(Exception("Google sign-in failed"))
+            val firebaseUser =
+                authResult.user ?: return Result.failure(Exception("Google sign-in failed"))
 
             val email = firebaseUser.email ?: ""
             var userEntity = userDao.getUserByEmail(email.lowercase())

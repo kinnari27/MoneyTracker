@@ -45,7 +45,6 @@ import com.moneytracker.ui.theme.Indigo600
 import com.moneytracker.ui.theme.Slate100
 import com.moneytracker.ui.theme.Slate200
 import com.moneytracker.ui.theme.Slate400
-import com.moneytracker.ui.theme.Slate50
 import com.moneytracker.ui.theme.Slate900
 import com.moneytracker.ui.theme.White
 import com.moneytracker.ui.theme.moneytrackerTheme
@@ -84,20 +83,40 @@ fun ProfileScreenContent(
     val menuSections = remember {
         listOf(
             "Account" to listOf(
-                Triple(R.drawable.ic_user, "Edit Profile", "Update personal info") to Routes.EDIT_PROFILE,
-                Triple(R.drawable.ic_bell, "Notifications", "Manage alerts") to Routes.NOTIFICATIONS,
+                Triple(
+                    R.drawable.ic_user,
+                    "Edit Profile",
+                    "Update personal info"
+                ) to Routes.EDIT_PROFILE,
+                Triple(
+                    R.drawable.ic_bell,
+                    "Notifications",
+                    "Manage alerts"
+                ) to Routes.NOTIFICATIONS,
                 Triple(R.drawable.ic_currency, "Currency", "Indian Rupee ₹ INR") to Routes.CURRENCY,
             ),
             "Security" to listOf(
-                Triple(R.drawable.ic_locked, "Biometric Lock", "Fingerprint / Face ID") to Routes.BIOMETRIC_LOCK
+                Triple(
+                    R.drawable.ic_locked,
+                    "Biometric Lock",
+                    "Fingerprint / Face ID"
+                ) to Routes.BIOMETRIC_LOCK
             ) + if (uiState.hasPassword) {
-                listOf(Triple(R.drawable.ic_key, "Change Password", "Update your password") to Routes.CHANGE_PASSWORD)
+                listOf(
+                    Triple(
+                        R.drawable.ic_key,
+                        "Change Password",
+                        "Update your password"
+                    ) to Routes.CHANGE_PASSWORD
+                )
             } else emptyList()
         )
     }
 
     LazyColumn(
-        modifier = modifier.fillMaxSize().background(cs.background),
+        modifier = modifier
+            .fillMaxSize()
+            .background(cs.background),
         contentPadding = PaddingValues(bottom = 90.dp)
     ) {
 
@@ -311,7 +330,9 @@ fun ProfileScreenContent(
 
         item {
             Box(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
