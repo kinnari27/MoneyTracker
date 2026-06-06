@@ -47,14 +47,7 @@ import com.moneytracker.domain.model.Category
 import com.moneytracker.domain.model.Transaction
 import com.moneytracker.domain.model.TransactionType
 import com.moneytracker.presentation.components.TransactionCard
-import com.moneytracker.ui.theme.Accent
-import com.moneytracker.ui.theme.Error
-import com.moneytracker.ui.theme.OnSurfaceVariant
-import com.moneytracker.ui.theme.Primary
-import com.moneytracker.ui.theme.PrimaryDark
-import com.moneytracker.ui.theme.Success
-import com.moneytracker.ui.theme.Surface
-import com.moneytracker.ui.theme.SurfaceVariant
+import com.moneytracker.ui.theme.AppTheme
 import com.moneytracker.ui.theme.moneytrackerTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -78,6 +71,8 @@ fun HistoryScreen(
     val grouped = uiState.filteredTransactions.groupBy { transaction ->
         SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(transaction.date)
     }
+    val colorScheme = MaterialTheme.colorScheme
+    val extendedColors = AppTheme.colors
 
     // ── Delete confirmation dialog ───────────────────────────────────────────
     if (uiState.transactionToDelete != null) {
@@ -88,7 +83,7 @@ fun HistoryScreen(
             confirmButton = {
                 Button(
                     onClick = onConfirmDelete,
-                    colors = ButtonDefaults.buttonColors(containerColor = Error)
+                    colors = ButtonDefaults.buttonColors(containerColor = extendedColors.error)
                 ) { Text("Delete") }
             },
             dismissButton = {
@@ -108,7 +103,7 @@ fun HistoryScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Brush.linearGradient(listOf(PrimaryDark, Primary)))
+                    .background(Brush.linearGradient(listOf(colorScheme.primary, colorScheme.primary)))
                     .padding(top = 52.dp, start = 20.dp, end = 20.dp, bottom = 24.dp)
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -163,13 +158,13 @@ fun HistoryScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     listOf(
-                        Triple("Income",     "₹${uiState.totalIncome.toInt()}",      Success),
-                        Triple("Expense",    "₹${uiState.totalExpense.toInt()}",     Error),
-                        Triple("Invest",     "₹${uiState.totalInvestment.toInt()}", Accent),
+                        Triple("Income",     "₹${uiState.totalIncome.toInt()}",      extendedColors.success),
+                        Triple("Expense",    "₹${uiState.totalExpense.toInt()}",     extendedColors.error),
+                        Triple("Invest",     "₹${uiState.totalInvestment.toInt()}", extendedColors.accent),
                         Triple(
                             "Net",
                             "₹${(uiState.totalIncome - uiState.totalExpense).toInt()}",
-                            Primary
+                            colorScheme.primary
                         )
                     ).forEach { (label, value, color) ->
                         SummaryCard(
@@ -198,7 +193,7 @@ fun HistoryScreen(
                         .padding(32.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = Primary)
+                    CircularProgressIndicator(color = colorScheme.primary)
                 }
             }
         } else if (grouped.isEmpty()) {
@@ -209,7 +204,7 @@ fun HistoryScreen(
                         .padding(40.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("No transactions found", color = OnSurfaceVariant)
+                    Text("No transactions found", color = colorScheme.onSurfaceVariant)
                 }
             }
         } else {
@@ -242,14 +237,14 @@ fun HistoryScreen(
                             Text(
                                 text = dayName,
                                 style = MaterialTheme.typography.labelSmall,
-                                color = OnSurfaceVariant
+                                color = colorScheme.onSurfaceVariant
                             )
                         }
 
                         // Day net badge
                         Surface(
                             shape = RoundedCornerShape(99.dp),
-                            color = SurfaceVariant
+                            color = colorScheme.surfaceVariant
                         ) {
                             val dayNet = transactions.sumOf {
                                 when (it.type) {
@@ -264,7 +259,7 @@ fun HistoryScreen(
                                 }",
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = if (dayNet >= 0) Success else Error,
+                                color = if (dayNet >= 0) extendedColors.success else extendedColors.error,
                                 modifier = Modifier.padding(
                                     horizontal = 12.dp,
                                     vertical = 6.dp
@@ -304,7 +299,7 @@ private fun SummaryCard(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Surface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
@@ -325,7 +320,7 @@ private fun SummaryCard(
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
-                color = OnSurfaceVariant,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1
             )
         }
@@ -366,9 +361,9 @@ private fun ScrollableFilterChips(
                     )
                 },
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = Primary,
+                    selectedContainerColor = MaterialTheme.colorScheme.primary,
                     selectedLabelColor = Color.White,
-                    containerColor = Surface
+                    containerColor = MaterialTheme.colorScheme.surface
                 )
             )
         }

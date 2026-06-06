@@ -25,9 +25,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.moneytracker.presentation.navigation.BottomNavItem
 import com.moneytracker.presentation.navigation.Routes
-import com.moneytracker.ui.theme.Accent
 import com.moneytracker.ui.theme.AppTheme
-import com.moneytracker.ui.theme.Primary
 
 @Composable
 fun BottomNavBar(navController: NavController) {
@@ -71,7 +69,7 @@ fun BottomNavBar(navController: NavController) {
                                 .size(52.dp)
                                 .shadow(8.dp, CircleShape)
                                 .background(
-                                    brush = Brush.linearGradient(listOf(Primary, Accent)),
+                                    brush = Brush.linearGradient(listOf(AppTheme.colors.primary, AppTheme.colors.accent)),
                                     shape = CircleShape
                                 ),
                             contentAlignment = Alignment.Center

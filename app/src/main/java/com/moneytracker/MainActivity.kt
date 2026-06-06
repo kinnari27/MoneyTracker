@@ -15,7 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import com.moneytracker.presentation.components.BottomNavBar
 import com.moneytracker.presentation.navigation.NavGraph
 import com.moneytracker.presentation.navigation.Routes
-import com.moneytracker.ui.theme.moneytrackerTheme
+import com.moneytracker.ui.theme.MoneyTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
 
@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            moneytrackerTheme {
+            MoneyTrackerTheme {
                 val navController = rememberNavController()
                 val currentEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = currentEntry?.destination?.route

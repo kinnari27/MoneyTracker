@@ -46,3 +46,13 @@ val Dark800 = Color(0xFF161B22)
 val Dark700 = Color(0xFF21262D)
 val Dark600 = Color(0xFF30363D)
 val Dark400 = Color(0xFF484F58)
+
+// ── Category Colors ──────────────────────────────────────────────────────────
+val CategoryFood          = Color(0xFFF59E0B) // Amber
+val CategoryTransport     = Color(0xFF3B82F6) // Blue
+val CategoryShopping      = Color(0xFFEC4899) // Pink
+val CategoryHealth        = Color(0xFFEF4444) // Red
+val CategoryEntertainment = Color(0xFF8B5CF6) // Violet
+val CategoryBills         = Color(0xFF06B6D4) // Cyan
+val CategoryEducation     = Color(0xFF6366F1) // Indigo
+val CategoryOther         = Color(0xFF64748B) // Slate

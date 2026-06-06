@@ -84,11 +84,7 @@ import com.moneytracker.domain.model.InvestmentCategory
 import com.moneytracker.domain.model.TransactionType
 import com.moneytracker.presentation.components.categoryColor
 import com.moneytracker.ui.theme.AppTheme
-import com.moneytracker.ui.theme.Error
 import com.moneytracker.ui.theme.MoneyTrackerTheme
-import com.moneytracker.ui.theme.PrimaryDark
-import com.moneytracker.ui.theme.Success
-import com.moneytracker.ui.theme.Warning
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -103,6 +99,8 @@ fun EditTransactionScreen(
     viewModel: EditTransactionViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val cs = MaterialTheme.colorScheme
+    val colors = AppTheme.colors
 
     LaunchedEffect(uiState.isSaved) { if (uiState.isSaved) onSaved() }
     LaunchedEffect(uiState.isDeleted) { if (uiState.isDeleted) onDeleted() }
@@ -261,7 +259,7 @@ fun EditTransactionContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Brush.linearGradient(listOf(PrimaryDark, cs.primary)))
+                .background(Brush.linearGradient(listOf(cs.primary, cs.primary)))
                 .padding(top = 52.dp, start = 20.dp, end = 20.dp, bottom = 36.dp)
         ) {
             Column {
@@ -306,9 +304,9 @@ fun EditTransactionContent(
                     TransactionType.values().forEach { type ->
                         val isSelected = uiState.type == type
                         val typeColor = when (type) {
-                            TransactionType.INCOME -> Success
-                            TransactionType.EXPENSE -> Error
-                            TransactionType.INVESTMENT -> Warning
+                            TransactionType.INCOME -> colors.success
+                            TransactionType.EXPENSE -> colors.error
+                            TransactionType.INVESTMENT -> colors.warning
                         }
                         Box(
                             modifier = Modifier
@@ -419,13 +417,13 @@ fun EditTransactionContent(
                     )
                     TransactionType.INCOME -> EditCategoryGrid(
                         IncomeCategory.ALL, uiState.selectedCategory, onCategorySelect,
-                        { IncomeCategory.iconResFor(it) }, { it }, { Success }
+                        { IncomeCategory.iconResFor(it) }, { it }, { colors.success }
                     )
                     TransactionType.INVESTMENT -> EditCategoryGrid(
                         InvestmentCategory.ALL, uiState.selectedCategory, onCategorySelect,
                         { InvestmentCategory.iconResFor(it) },
                         { InvestmentCategory.shortLabel(it) },
-                        { Warning }
+                        { colors.warning }
                     )
                 }
             }
@@ -453,7 +451,7 @@ fun EditTransactionContent(
                     EditDatePickerRow(
                         label = "Maturity Date",
                         date = uiState.maturityDate,
-                        tint = Warning,
+                        tint = colors.warning,
                         primary = cs.primary,
                         textSecondary = colors.textSecondary,
                         inputBackground = colors.inputBackground,
@@ -494,7 +492,7 @@ fun EditTransactionContent(
                     EditDatePickerRow(
                         label = "Maturity Date",
                         date = uiState.rdMaturityDate,
-                        tint = Warning,
+                        tint = colors.warning,
                         primary = cs.primary,
                         textSecondary = colors.textSecondary,
                         inputBackground = colors.inputBackground,
@@ -563,7 +561,7 @@ fun EditTransactionContent(
                                 checkedTrackColor = cs.primary,
                                 // Keep a distinct amber tint when locked on for RD
                                 disabledCheckedThumbColor = Color.White,
-                                disabledCheckedTrackColor = Warning
+                                disabledCheckedTrackColor = colors.warning
                             )
                         )
                     }
@@ -616,9 +614,9 @@ fun EditTransactionContent(
                 shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = when (uiState.type) {
-                        TransactionType.INCOME -> Success
+                        TransactionType.INCOME -> colors.success
                         TransactionType.EXPENSE -> cs.primary
-                        TransactionType.INVESTMENT -> Warning
+                        TransactionType.INVESTMENT -> colors.warning
                     },
                     contentColor = Color.White
                 )
@@ -730,11 +728,12 @@ private fun EditMaturityAmountCard(
     maturityAmount: Double,
     extraLine: String?
 ) {
+    val colors = AppTheme.colors
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(Success.copy(alpha = 0.1f))
+            .background(colors.success.copy(alpha = 0.1f))
             .padding(16.dp)
     ) {
         Row(
@@ -744,26 +743,26 @@ private fun EditMaturityAmountCard(
             Icon(
                 Icons.Outlined.TrendingUp,
                 contentDescription = null,
-                tint = Success,
+                tint = colors.success,
                 modifier = Modifier.size(24.dp)
             )
             Column {
                 Text(
                     "Estimated Maturity Value",
                     style = MaterialTheme.typography.labelSmall,
-                    color = Success
+                    color = colors.success
                 )
                 Text(
                     "₹${String.format("%.2f", maturityAmount)}",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Success
+                    color = colors.success
                 )
                 if (extraLine != null) {
                     Text(
                         extraLine,
                         style = MaterialTheme.typography.labelSmall,
-                        color = Success.copy(alpha = 0.7f)
+                        color = colors.success.copy(alpha = 0.7f)
                     )
                 }
             }

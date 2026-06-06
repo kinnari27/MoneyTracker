@@ -47,13 +47,14 @@ import com.moneytracker.domain.model.InvestmentCategory
 import com.moneytracker.presentation.components.categoryColor
 import com.moneytracker.ui.theme.AppTheme
 import com.moneytracker.ui.theme.Error
+import com.moneytracker.ui.theme.ExtendedColors
 import com.moneytracker.ui.theme.MoneyTrackerTheme
 import com.moneytracker.ui.theme.PrimaryDark
 import com.moneytracker.ui.theme.Success
 import com.moneytracker.ui.theme.Warning
 
 // Investment category colour — amber/gold tone
-private fun investmentColor(category: String): Color = Warning
+private fun investmentColor(category: String, colors: ExtendedColors): Color = colors.warning
 
 @Composable
 fun AnalyticsScreen(
@@ -62,7 +63,7 @@ fun AnalyticsScreen(
     modifier: Modifier = Modifier
 ) {
     val cs = MaterialTheme.colorScheme
-    AppTheme.colors
+    val colors = AppTheme.colors
 
     LazyColumn(
         modifier = modifier
@@ -103,7 +104,7 @@ fun AnalyticsScreen(
                             .padding(4.dp),
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        AnalyticsPeriod.values().forEach { period ->
+                        AnalyticsPeriod.entries.forEach { period ->
                             val isSelected = uiState.period == period
                             Box(
                                 modifier = Modifier
@@ -228,7 +229,7 @@ fun AnalyticsScreen(
                     periodLabel = periodLabel(uiState.period),
                     totals = uiState.investmentBreakdown,
                     iconRes = { InvestmentCategory.iconResFor(it) },
-                    barColor = { investmentColor(it) }
+                    barColor = { investmentColor(it, colors) }
                 )
             }
         }
@@ -501,7 +502,7 @@ private fun LargestExpenseCard(tx: com.moneytracker.domain.model.Transaction) {
             .padding(horizontal = 16.dp, vertical = 4.dp),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = colors.warningContainer,
+            containerColor = colors.investContainer,
             contentColor = cs.onSurface
         ),
         elevation = CardDefaults.cardElevation(0.dp)

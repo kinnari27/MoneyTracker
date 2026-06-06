@@ -28,7 +28,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.moneytracker.ui.theme.AppTheme
-import com.moneytracker.ui.theme.Warning
 
 @Composable
 fun BudgetProgressCard(
@@ -52,7 +51,7 @@ fun BudgetProgressCard(
 
     val barColor = when {
         isOverBudget -> colors.error
-        isNearLimit -> Warning
+        isNearLimit -> colors.warning
         else -> cs.primary
     }
 

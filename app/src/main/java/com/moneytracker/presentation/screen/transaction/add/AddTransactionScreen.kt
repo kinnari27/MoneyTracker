@@ -81,13 +81,9 @@ import com.moneytracker.domain.model.IncomeCategory
 import com.moneytracker.domain.model.InvestmentCategory
 import com.moneytracker.domain.model.TransactionType
 import com.moneytracker.presentation.components.categoryColor
-import com.moneytracker.ui.theme.AppColors
 import com.moneytracker.ui.theme.AppTheme
-import com.moneytracker.ui.theme.Error
+import com.moneytracker.ui.theme.ExtendedColors
 import com.moneytracker.ui.theme.MoneyTrackerTheme
-import com.moneytracker.ui.theme.PrimaryDark
-import com.moneytracker.ui.theme.Success
-import com.moneytracker.ui.theme.Warning
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -95,9 +91,9 @@ import java.util.Locale
 // ── Colour per type ───────────────────────────────────────────────────────────
 private val TransactionType.accentColor: Color
     @Composable get() = when (this) {
-        TransactionType.INCOME -> Success
-        TransactionType.EXPENSE -> Error
-        TransactionType.INVESTMENT -> Warning
+        TransactionType.INCOME -> AppTheme.colors.success
+        TransactionType.EXPENSE -> AppTheme.colors.error
+        TransactionType.INVESTMENT -> AppTheme.colors.warning
     }
 
 private val TransactionType.label: String
@@ -234,7 +230,7 @@ fun AddTransactionScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Brush.linearGradient(listOf(PrimaryDark, cs.primary)))
+                .background(Brush.linearGradient(listOf(colors.primary, cs.primary)))
                 .padding(top = 52.dp, start = 20.dp, end = 20.dp, bottom = 36.dp)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -261,7 +257,7 @@ fun AddTransactionScreen(
                             onClick = onDelete,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(12.dp))
-                                .background(Error.copy(alpha = 0.25f))
+                                .background(colors.error.copy(alpha = 0.25f))
                         ) {
                             Icon(
                                 Icons.Default.Delete,
@@ -470,7 +466,7 @@ fun AddTransactionScreen(
                     DatePickerRow(
                         label = "Maturity Date",
                         date = uiState.maturityDate,
-                        tint = Warning,
+                        tint = colors.warning,
                         inputBackground = colors.inputBackground,
                         onSurface = cs.onSurface,
                         primary = cs.primary,
@@ -519,7 +515,7 @@ fun AddTransactionScreen(
                     DatePickerRow(
                         label = "Maturity Date",
                         date = uiState.rdMaturityDate,
-                        tint = Warning,
+                        tint = colors.warning,
                         inputBackground = colors.inputBackground,
                         onSurface = cs.onSurface,
                         primary = cs.primary,
@@ -673,9 +669,9 @@ fun AddTransactionScreen(
             }
 
             val buttonColor = when (uiState.type) {
-                TransactionType.INCOME -> Success
+                TransactionType.INCOME -> colors.success
                 TransactionType.EXPENSE -> cs.primary
-                TransactionType.INVESTMENT -> Warning
+                TransactionType.INVESTMENT -> colors.warning
             }
 
             if (!canSave && !uiState.isLoading) {
@@ -760,8 +756,8 @@ fun AddTransactionScreen(
                         .fillMaxWidth()
                         .height(56.dp),
                     shape = RoundedCornerShape(18.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Error),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Error)
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = colors.error),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, colors.error)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
@@ -847,11 +843,12 @@ private fun MaturityAmountCard(
     maturityAmount: Double,
     extraLine: String?
 ) {
+    val colors = AppTheme.colors
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(Success.copy(alpha = 0.1f))
+            .background(colors.success.copy(alpha = 0.1f))
             .padding(16.dp)
     ) {
         Row(
@@ -861,26 +858,26 @@ private fun MaturityAmountCard(
             Icon(
                 Icons.AutoMirrored.Outlined.TrendingUp,
                 contentDescription = null,
-                tint = Success,
+                tint = colors.success,
                 modifier = Modifier.size(24.dp)
             )
             Column {
                 Text(
                     "Estimated Maturity Value",
                     style = MaterialTheme.typography.labelSmall,
-                    color = Success
+                    color = colors.success
                 )
                 Text(
                     "₹${String.format("%.2f", maturityAmount)}",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Success
+                    color = colors.success
                 )
                 if (extraLine != null) {
                     Text(
                         extraLine,
                         style = MaterialTheme.typography.labelSmall,
-                        color = Success.copy(alpha = 0.7f)
+                        color = colors.success.copy(alpha = 0.7f)
                     )
                 }
             }
@@ -908,6 +905,7 @@ private fun ExpenseCategoryGrid(selected: String, onSelect: (String) -> Unit) {
 
 @Composable
 private fun IncomeCategoryGrid(selected: String, onSelect: (String) -> Unit) {
+    val colors = AppTheme.colors
     FormCard {
         FormLabel("Income Source")
         Spacer(Modifier.height(12.dp))
@@ -917,13 +915,14 @@ private fun IncomeCategoryGrid(selected: String, onSelect: (String) -> Unit) {
             onSelect = onSelect,
             iconRes = { IncomeCategory.iconResFor(it) },
             label = { it },
-            chipColor = { Success }
+            chipColor = { colors.success }
         )
     }
 }
 
 @Composable
 private fun InvestmentCategoryGrid(selected: String, onSelect: (String) -> Unit) {
+    val colors = AppTheme.colors
     FormCard {
         FormLabel("Investment Type")
         Spacer(Modifier.height(8.dp))
@@ -931,7 +930,7 @@ private fun InvestmentCategoryGrid(selected: String, onSelect: (String) -> Unit)
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
-                .background(Warning.copy(0.10f))
+                .background(colors.warning.copy(0.10f))
                 .padding(horizontal = 14.dp, vertical = 10.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -939,13 +938,13 @@ private fun InvestmentCategoryGrid(selected: String, onSelect: (String) -> Unit)
             Icon(
                 imageVector = Icons.Outlined.Info,
                 contentDescription = null,
-                tint = Warning,
+                tint = colors.warning,
                 modifier = Modifier.size(16.dp)
             )
             Text(
                 "Tracked separately from your spending.",
                 style = MaterialTheme.typography.labelSmall,
-                color = Warning,
+                color = colors.warning,
                 fontWeight = FontWeight.SemiBold
             )
         }
@@ -956,7 +955,7 @@ private fun InvestmentCategoryGrid(selected: String, onSelect: (String) -> Unit)
             onSelect = onSelect,
             iconRes = { InvestmentCategory.iconResFor(it) },
             label = { InvestmentCategory.shortLabel(it) },
-            chipColor = { Warning }
+            chipColor = { colors.warning }
         )
     }
 }
@@ -1058,7 +1057,7 @@ private fun FormCard(content: @Composable ColumnScope.() -> Unit) {
     }
 }
 
-private val AppColors.surfaceVariant: Color
+private val ExtendedColors.surfaceVariant: Color
     @Composable get() = MaterialTheme.colorScheme.surfaceVariant
 
 // ── Previews ──────────────────────────────────────────────────────────────────

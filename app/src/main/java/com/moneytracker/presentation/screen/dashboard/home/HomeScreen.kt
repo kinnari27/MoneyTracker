@@ -47,12 +47,7 @@ import com.moneytracker.domain.model.TransactionType
 import com.moneytracker.presentation.components.BudgetProgressCard
 import com.moneytracker.presentation.components.SectionHeader
 import com.moneytracker.presentation.components.TransactionCard
-import com.moneytracker.ui.theme.Error
-import com.moneytracker.ui.theme.OnSurfaceVariant
-import com.moneytracker.ui.theme.Primary
-import com.moneytracker.ui.theme.PrimaryDark
-import com.moneytracker.ui.theme.PrimaryLight
-import com.moneytracker.ui.theme.Success
+import com.moneytracker.ui.theme.AppTheme
 import com.moneytracker.ui.theme.moneytrackerTheme
 import java.util.Calendar
 import java.util.Date
@@ -64,6 +59,8 @@ fun HomeScreen(
     onTransactionClick: (Transaction) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val cs = MaterialTheme.colorScheme
+    val extendedColors = AppTheme.colors
     val greeting = remember { getGreeting() }
     val userName = uiState.userName.ifBlank { "User" }
 
@@ -81,7 +78,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
-                            Brush.linearGradient(listOf(PrimaryDark, Primary, PrimaryLight))
+                            Brush.linearGradient(listOf(cs.primary, cs.primary, extendedColors.accent))
                         )
                         .statusBarsPadding()
                         .padding(top = 20.dp, start = 20.dp, end = 20.dp, bottom = 80.dp)
@@ -136,14 +133,14 @@ fun HomeScreen(
                             BalanceTile(
                                 label = "Income",
                                 value = "₹${uiState.totalIncome.toInt()}",
-                                color = Success,
+                                color = extendedColors.success,
                                 prefix = "↑",
                                 modifier = Modifier.weight(1f)
                             )
                             BalanceTile(
                                 label = "Expense",
                                 value = "₹${uiState.totalExpense.toInt()}",
-                                color = Error,
+                                color = extendedColors.error,
                                 prefix = "↓",
                                 modifier = Modifier.weight(1f)
                             )
@@ -187,7 +184,7 @@ fun HomeScreen(
                             .padding(40.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(color = Primary, strokeCap = StrokeCap.Round)
+                        CircularProgressIndicator(color = cs.primary, strokeCap = StrokeCap.Round)
                     }
                 }
 
@@ -205,12 +202,12 @@ fun HomeScreen(
                             "No transactions yet",
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.SemiBold,
-                            color = OnSurfaceVariant
+                            color = cs.onSurfaceVariant
                         )
                         Text(
                             "Add one to start tracking",
                             style = MaterialTheme.typography.bodySmall,
-                            color = OnSurfaceVariant.copy(alpha = 0.6f)
+                            color = cs.onSurfaceVariant.copy(alpha = 0.6f)
                         )
                     }
                 }

@@ -19,8 +19,6 @@ import com.moneytracker.ui.theme.CategoryHealth
 import com.moneytracker.ui.theme.CategoryOther
 import com.moneytracker.ui.theme.CategoryShopping
 import com.moneytracker.ui.theme.CategoryTransport
-import com.moneytracker.ui.theme.OnSurface
-import com.moneytracker.ui.theme.Primary
 
 @Composable
 fun SectionHeader(
@@ -38,14 +36,14 @@ fun SectionHeader(
             text = title,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.ExtraBold,
-            color = OnSurface
+            color = MaterialTheme.colorScheme.onSurface
         )
         if (actionText != null && onAction != null) {
             TextButton(onClick = onAction) {
                 Text(
                     text = actionText,
                     style = MaterialTheme.typography.bodySmall,
-                    color = Primary,
+                    color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold
                 )
             }

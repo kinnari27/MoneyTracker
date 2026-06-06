@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.moneytracker.R
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -18,11 +18,10 @@ class GoogleAuthUiClient @Inject constructor(
 ) {
     private val credentialManager = CredentialManager.create(context)
 
-    suspend fun signIn(activityContext: Context): String? {
-        val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(filterByAuthorizedAccounts = false)
-            .setServerClientId(context.getString(R.string.default_web_client_id))
-            .setAutoSelectEnabled(true)
+    suspend fun signIn(activityContext: Context): Result<String?> {
+        val googleIdOption: GetSignInWithGoogleOption = GetSignInWithGoogleOption.Builder(
+            serverClientId = context.getString(R.string.default_web_client_id)
+        )
             .build()
 
         val request = GetCredentialRequest.Builder()
@@ -35,10 +34,16 @@ class GoogleAuthUiClient @Inject constructor(
                 request = request
             )
             Log.d("GoogleAuthUiClient", "Credential result: ${result.credential.type}")
-            handleSignInResult(result)
+            Result.success(handleSignInResult(result))
+        } catch (e: androidx.credentials.exceptions.GetCredentialCancellationException) {
+            Log.d("GoogleAuthUiClient", "Sign-in cancelled by user")
+            Result.success(null) // Treat cancellation as success with null token
+        } catch (e: androidx.credentials.exceptions.NoCredentialException) {
+            Log.e("GoogleAuthUiClient", "No credentials available", e)
+            Result.failure(Exception("No Google accounts found. Please add an account in Settings."))
         } catch (e: Exception) {
-            Log.e("GoogleAuthUiClient", "Sign-in failed", e)
-            null
+            Log.e("GoogleAuthUiClient", "Sign-in failed with exception: ${e.javaClass.simpleName}", e)
+            Result.failure(e)
         }
     }
 

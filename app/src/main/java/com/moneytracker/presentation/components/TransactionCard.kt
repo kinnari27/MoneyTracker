@@ -27,11 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.moneytracker.domain.model.Category
 import com.moneytracker.domain.model.Transaction
 import com.moneytracker.domain.model.TransactionType
-import com.moneytracker.ui.theme.Error
-import com.moneytracker.ui.theme.OnSurface
-import com.moneytracker.ui.theme.OnSurfaceVariant
-import com.moneytracker.ui.theme.Success
-import com.moneytracker.ui.theme.Surface
+import com.moneytracker.ui.theme.AppTheme
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -42,6 +38,8 @@ fun TransactionCard(
     onLongClick: () -> Unit = {}
 ) {
     val categoryColor = categoryColor(transaction.category)
+    val colorScheme = MaterialTheme.colorScheme
+    val extendedColors = AppTheme.colors
 
     Card(
         modifier = modifier
@@ -52,7 +50,7 @@ fun TransactionCard(
                 onLongClick = onLongClick
             ),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Surface),
+        colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.5.dp)
     ) {
         Row(
@@ -83,7 +81,7 @@ fun TransactionCard(
                     text = transaction.category,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = OnSurface,
+                    color = colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -91,7 +89,7 @@ fun TransactionCard(
                     Text(
                         text = transaction.note,
                         style = MaterialTheme.typography.labelMedium,
-                        color = OnSurfaceVariant,
+                        color = colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -104,7 +102,7 @@ fun TransactionCard(
                 text = formatAmount(transaction),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.ExtraBold,
-                color = if (isIncome) Success else Error
+                color = if (isIncome) extendedColors.success else extendedColors.error
             )
         }
     }

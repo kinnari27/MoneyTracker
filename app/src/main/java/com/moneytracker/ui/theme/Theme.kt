@@ -122,10 +122,15 @@ private val DarkColorScheme = darkColorScheme(
 //  Extended colors — semantic tokens not in Material3 baseline
 // ─────────────────────────────────────────────────────────────────────────────
 data class ExtendedColors(
+    val isDark: Boolean,
     // Header / screen top area
     val headerBackground: Color,
     val headerOnBackground: Color,
     val headerSubtle: Color,          // muted text in header
+
+    // Brand colors
+    val primary: Color,
+    val accent: Color,
 
     // Transaction type colors
     val incomeColor: Color,
@@ -135,6 +140,13 @@ data class ExtendedColors(
     val investColor: Color,
     val investContainer: Color,
 
+    // Semantic colors
+    val textSecondary: Color,
+    val success: Color,
+    val error: Color,
+    val errorContainer: Color,
+    val warning: Color,
+
     // Card surface slight tint
     val cardSurface: Color,
     val divider: Color,
@@ -143,12 +155,20 @@ data class ExtendedColors(
     val segmentedBackground: Color,
     val segmentedSelected: Color,
     val segmentedOnSelected: Color,
+
+    // Inputs
+    val inputBackground: Color,
+    val outline: Color,
 )
 
 val LightExtendedColors = ExtendedColors(
+    isDark              = false,
     headerBackground    = Slate900,
     headerOnBackground  = White,
     headerSubtle        = Slate400,
+
+    primary             = Indigo600,
+    accent              = Indigo400,
 
     incomeColor         = Income600,
     incomeContainer     = Income100,
@@ -157,18 +177,31 @@ val LightExtendedColors = ExtendedColors(
     investColor         = Invest600,
     investContainer     = Invest100,
 
+    textSecondary       = Slate600,
+    success             = Income600,
+    error               = Expense600,
+    errorContainer      = Expense100,
+    warning             = Invest500,
+
     cardSurface         = White,
     divider             = Slate100,
 
     segmentedBackground = Slate100,
     segmentedSelected   = White,
     segmentedOnSelected = Slate900,
+
+    inputBackground     = Slate100,
+    outline             = Slate200,
 )
 
 val DarkExtendedColors = ExtendedColors(
+    isDark              = true,
     headerBackground    = Dark900,
     headerOnBackground  = Slate100,
     headerSubtle        = Slate600,
+
+    primary             = Indigo400,
+    accent              = Indigo200,
 
     incomeColor         = Income500,
     incomeContainer     = Color(0xFF0D2E1A),
@@ -177,21 +210,36 @@ val DarkExtendedColors = ExtendedColors(
     investColor         = Invest500,
     investContainer     = Color(0xFF2D1F03),
 
+    textSecondary       = Slate400,
+    success             = Income500,
+    error               = Expense500,
+    errorContainer      = Color(0xFF2D1010),
+    warning             = Invest500,
+
     cardSurface         = Dark800,
     divider             = Dark600,
 
     segmentedBackground = Dark700,
     segmentedSelected   = Dark600,
     segmentedOnSelected = Slate100,
+
+    inputBackground     = Dark700,
+    outline             = Dark600,
 )
 
 val LocalExtendedColors = staticCompositionLocalOf { LightExtendedColors }
+
+object AppTheme {
+    val colors: ExtendedColors
+        @Composable
+        get() = LocalExtendedColors.current
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  Main theme composable
 // ─────────────────────────────────────────────────────────────────────────────
 @Composable
-fun moneytrackerTheme(
+fun MoneyTrackerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is disabled — we want our custom palette always
     dynamicColor: Boolean = false,
@@ -235,3 +283,22 @@ fun moneytrackerTheme(
 // ─────────────────────────────────────────────────────────────────────────────
 val MaterialTheme.extended: ExtendedColors
     @Composable get() = LocalExtendedColors.current
+
+// ── Compatibility aliases for legacy top-level access ────────────────────────
+val Success: Color @Composable get() = AppTheme.colors.success
+val Warning: Color @Composable get() = AppTheme.colors.warning
+val Error: Color @Composable get() = AppTheme.colors.error
+val Primary: Color @Composable get() = AppTheme.colors.primary
+val Accent: Color @Composable get() = AppTheme.colors.accent
+val PrimaryDark: Color @Composable get() = AppTheme.colors.primary
+val OnSurface: Color @Composable get() = MaterialTheme.colorScheme.onSurface
+val OnSurfaceVariant: Color @Composable get() = MaterialTheme.colorScheme.onSurfaceVariant
+val Surface: Color @Composable get() = MaterialTheme.colorScheme.surface
+val SurfaceVariant: Color @Composable get() = MaterialTheme.colorScheme.surfaceVariant
+
+@Composable
+fun moneytrackerTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    dynamicColor: Boolean = false,
+    content: @Composable () -> Unit
+) = MoneyTrackerTheme(darkTheme, dynamicColor, content)
