@@ -1,7 +1,10 @@
 package com.moneytracker.presentation.screen.settings.editProfile
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.moneytracker.data.local.ImageStorageHelper
 import com.moneytracker.domain.repository.UserRepository
 import com.moneytracker.domain.usecase.auth.UpdateProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,10 +46,50 @@ class EditProfileViewModel @Inject constructor(
                             occupation = user.occupation,
                             incomeGoal = user.incomeGoal,
                             budgetLimit = user.budgetLimit,
+                            profilePictureUrl = user.profilePictureUrl,
+                            isGoogleConnected = !user.firebaseUid.isNullOrBlank(),
                             isLoading = false
                         )
                     }
                 }
+        }
+    }
+
+    fun onProfileImageSelected(context: Context, uri: Uri) {
+        val userId = _uiState.value.userId
+        viewModelScope.launch {
+            val savedPath = ImageStorageHelper.saveImageToInternalStorage(context, uri, userId)
+            if (savedPath != null) {
+                userRepository.updateProfilePicture(userId, savedPath)
+                _uiState.update { it.copy(profilePictureUrl = savedPath) }
+            } else {
+                _uiState.update { it.copy(error = "Failed to save profile picture") }
+            }
+        }
+    }
+
+    fun syncWithGoogle() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSyncingGoogle = true, error = null) }
+            userRepository.syncGoogleProfile().fold(
+                onSuccess = { user ->
+                    _uiState.update {
+                        it.copy(
+                            isSyncingGoogle = false,
+                            name = if (it.name.isBlank()) user.name else it.name,
+                            profilePictureUrl = user.profilePictureUrl
+                        )
+                    }
+                },
+                onFailure = { e ->
+                    _uiState.update {
+                        it.copy(
+                            isSyncingGoogle = false,
+                            error = e.message ?: "Could not fetch Google profile"
+                        )
+                    }
+                }
+            )
         }
     }
 

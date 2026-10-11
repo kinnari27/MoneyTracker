@@ -11,6 +11,7 @@ object Routes {
     const val EDIT_PROFILE = "edit_profile"
     const val NOTIFICATIONS = "notifications"
     const val CURRENCY = "currency"
+    const val THEME = "theme"
     const val BIOMETRIC_LOCK = "biometric_lock"
     const val CHANGE_PASSWORD = "change_password"
 }

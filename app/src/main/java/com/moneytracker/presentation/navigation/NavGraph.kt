@@ -24,6 +24,7 @@ import com.moneytracker.presentation.screen.settings.currency.CurrencyScreen
 import com.moneytracker.presentation.screen.settings.editProfile.EditProfileScreen
 import com.moneytracker.presentation.screen.settings.notifications.NotificationsScreen
 import com.moneytracker.presentation.screen.settings.profile.ProfileScreen
+import com.moneytracker.presentation.screen.settings.theme.ThemeScreen
 import com.moneytracker.presentation.screen.splash.SplashScreen
 import com.moneytracker.presentation.screen.transaction.add.AddTransactionScreen
 import com.moneytracker.presentation.screen.transaction.add.AddTransactionViewModel
@@ -176,6 +177,7 @@ fun NavGraph(navController: NavHostController) {
         composable(Routes.EDIT_PROFILE) { EditProfileScreen(onBack = { navController.popBackStack() }) }
         composable(Routes.NOTIFICATIONS) { NotificationsScreen(onBack = { navController.popBackStack() }) }
         composable(Routes.CURRENCY) { CurrencyScreen(onBack = { navController.popBackStack() }) }
+        composable(Routes.THEME) { ThemeScreen(onBack = { navController.popBackStack() }) }
         composable(Routes.BIOMETRIC_LOCK) { BiometricLockScreen(onBack = { navController.popBackStack() }) }
         composable(Routes.CHANGE_PASSWORD) { ChangePasswordScreen(onBack = { navController.popBackStack() }) }
     }

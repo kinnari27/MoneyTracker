@@ -45,6 +45,7 @@ import com.moneytracker.domain.model.Category
 import com.moneytracker.domain.model.Transaction
 import com.moneytracker.domain.model.TransactionType
 import com.moneytracker.presentation.components.BudgetProgressCard
+import com.moneytracker.presentation.components.ProfileAvatar
 import com.moneytracker.presentation.components.SectionHeader
 import com.moneytracker.presentation.components.TransactionCard
 import com.moneytracker.ui.theme.AppTheme
@@ -110,6 +111,15 @@ fun HomeScreen(
                                     color = Color.White
                                 )
                             }
+
+                            ProfileAvatar(
+                                name = userName,
+                                imageUrl = uiState.profilePictureUrl,
+                                size = 44.dp,
+                                shape = RoundedCornerShape(12.dp),
+                                backgroundColor = Color.White.copy(alpha = 0.2f),
+                                textColor = Color.White
+                            )
                         }
 
                         Spacer(Modifier.height(20.dp))

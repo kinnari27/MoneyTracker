@@ -38,6 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.foundation.layout.statusBarsPadding
+import com.moneytracker.ui.theme.AppTheme
 import com.moneytracker.ui.theme.Indigo100
 import com.moneytracker.ui.theme.Indigo600
 import com.moneytracker.ui.theme.Slate400
@@ -76,12 +78,13 @@ fun CurrencyScreenContent(
         .fillMaxSize()
         .background(cs.background)) {
 
-        // ── Header — flat Slate900 ────────────────────────────────────────────
+        // ── Header — dynamic background matching theme ───────────────────────
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Slate900)
-                .padding(top = 52.dp, start = 4.dp, end = 16.dp, bottom = 20.dp)
+                .background(AppTheme.colors.headerBackground)
+                .statusBarsPadding()
+                .padding(top = 16.dp, start = 4.dp, end = 16.dp, bottom = 20.dp)
         ) {
             Column {
                 IconButton(onClick = onBack) {
@@ -140,7 +143,7 @@ fun CurrencyScreenContent(
                 .padding(16.dp)
                 .fillMaxWidth(),
             shape = RoundedCornerShape(14.dp),
-            colors = CardDefaults.cardColors(containerColor = Indigo100),
+            colors = CardDefaults.cardColors(containerColor = cs.primaryContainer),
             elevation = CardDefaults.cardElevation(0.dp)
         ) {
             Row(
@@ -153,7 +156,7 @@ fun CurrencyScreenContent(
                     Text(
                         "Current Currency",
                         style = MaterialTheme.typography.labelSmall,
-                        color = Indigo600
+                        color = cs.onPrimaryContainer
                     )
                     Text(
                         "${uiState.selectedCurrency.code} — ${uiState.selectedCurrency.name}",
@@ -166,7 +169,7 @@ fun CurrencyScreenContent(
                     uiState.selectedCurrency.symbol,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Indigo600
+                    color = cs.primary
                 )
             }
         }

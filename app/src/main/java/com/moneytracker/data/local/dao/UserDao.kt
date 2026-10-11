@@ -50,6 +50,9 @@ interface UserDao {
     @Query("UPDATE users SET currency = :code WHERE id = :userId")
     suspend fun updateCurrency(userId: Int, code: String)
 
+    @Query("UPDATE users SET profilePictureUrl = :url WHERE id = :userId")
+    suspend fun updateProfilePicture(userId: Int, url: String?)
+
     @Query("UPDATE users SET pin = :newPin WHERE id = :userId")
     suspend fun updatePin(userId: Int, newPin: String)
 

@@ -42,7 +42,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.foundation.layout.statusBarsPadding
 import com.moneytracker.R
+import com.moneytracker.ui.theme.AppTheme
 import com.moneytracker.ui.theme.Indigo100
 import com.moneytracker.ui.theme.Indigo200
 import com.moneytracker.ui.theme.Indigo600
@@ -93,12 +95,13 @@ fun BiometricLockContent(
             .verticalScroll(rememberScrollState())
     ) {
 
-        // ── Header — flat Slate900, no gradient ───────────────────────────────
+        // ── Header — dynamic background matching theme ───────────────────────
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Slate900)
-                .padding(top = 52.dp, start = 4.dp, end = 20.dp, bottom = 28.dp)
+                .background(AppTheme.colors.headerBackground)
+                .statusBarsPadding()
+                .padding(top = 16.dp, start = 4.dp, end = 20.dp, bottom = 24.dp)
         ) {
             Column {
                 IconButton(onClick = onBack) {
@@ -146,7 +149,7 @@ fun BiometricLockContent(
                             .size(80.dp)
                             .clip(RoundedCornerShape(22.dp))
                             .background(
-                                if (isAnyEnabled) Indigo100 else Slate100
+                                if (isAnyEnabled) cs.primaryContainer else cs.surfaceVariant
                             ),
                         contentAlignment = Alignment.Center
                     ) {

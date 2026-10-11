@@ -257,15 +257,13 @@ fun MoneyTrackerTheme(
 
     val extendedColors = if (darkTheme) DarkExtendedColors else LightExtendedColors
 
-    // Status bar color
+    // Status bar icon color: all app screen headers are dark (Indigo / Slate900 / Dark900),
+    // so status bar icons must remain light (white) for clear contrast and readability.
     val view = LocalView.current
     if (!view.isInEditMode) {
-        val statusBarColor = if (darkTheme) Dark900.toArgb() else Slate900.toArgb()
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = statusBarColor
-            WindowCompat.getInsetsController(window, view)
-                .isAppearanceLightStatusBars = !darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
         }
     }
 

@@ -6,6 +6,7 @@ data class HomeUiState(
     val isLoading: Boolean = true,
     val userName: String = "",          // from DB
     val userInitial: String = "?",         // derived
+    val profilePictureUrl: String? = null,
     val greeting: String = "Hello",     // time-based
     val totalBalance: Double = 0.0,         // income - expense - investment
     val totalIncome: Double = 0.0,

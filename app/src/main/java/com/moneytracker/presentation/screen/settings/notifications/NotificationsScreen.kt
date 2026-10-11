@@ -38,7 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.foundation.layout.statusBarsPadding
 import com.moneytracker.R
+import com.moneytracker.ui.theme.AppTheme
 import com.moneytracker.ui.theme.Indigo100
 import com.moneytracker.ui.theme.Indigo600
 import com.moneytracker.ui.theme.Slate100
@@ -90,13 +92,14 @@ fun NotificationsScreenContent(
         contentPadding = PaddingValues(bottom = 40.dp)
     ) {
 
-        // ── Header — flat Slate900, no gradient ───────────────────────────────
+        // ── Header — dynamic background matching theme ───────────────────────
         item {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Slate900)
-                    .padding(top = 52.dp, start = 4.dp, end = 20.dp, bottom = 28.dp)
+                    .background(AppTheme.colors.headerBackground)
+                    .statusBarsPadding()
+                    .padding(top = 16.dp, start = 4.dp, end = 20.dp, bottom = 24.dp)
             ) {
                 Column {
                     IconButton(onClick = onBack) {
@@ -128,7 +131,7 @@ fun NotificationsScreenContent(
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = if (uiState.allNotifications) Indigo100 else cs.surfaceVariant
+                    containerColor = if (uiState.allNotifications) cs.primaryContainer else cs.surfaceVariant
                 ),
                 elevation = CardDefaults.cardElevation(0.dp)
             ) {
@@ -142,8 +145,8 @@ fun NotificationsScreenContent(
                             .size(44.dp)
                             .clip(RoundedCornerShape(12.dp))
                             .background(
-                                if (uiState.allNotifications) Indigo600.copy(0.15f)
-                                else Slate100
+                                if (uiState.allNotifications) cs.primary.copy(0.15f)
+                                else cs.surfaceVariant
                             ),
                         contentAlignment = Alignment.Center
                     ) {

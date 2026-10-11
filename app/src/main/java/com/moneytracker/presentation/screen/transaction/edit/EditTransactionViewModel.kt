@@ -57,7 +57,7 @@ class EditTransactionViewModel @Inject constructor(
                     type = tx.type,
                     note = tx.note,
                     // RD is always recurring — enforce on load too
-                    isRecurring = if (tx.category == InvestmentCategory.RD) true else tx.isRecurring,
+                    isRecurring = tx.category == InvestmentCategory.RD || tx.isRecurring,
                     // FD fields
                     maturityDate = tx.maturityDate
                         ?: Date(System.currentTimeMillis() + 31536000000L),
@@ -96,7 +96,7 @@ class EditTransactionViewModel @Inject constructor(
                 selectedCategory = c,
                 error = null,
                 // Force recurring on when RD is selected
-                isRecurring = if (c == InvestmentCategory.RD) true else it.isRecurring
+                isRecurring = c == InvestmentCategory.RD || it.isRecurring
             )
         }
         calculateMaturity()

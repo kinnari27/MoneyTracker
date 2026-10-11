@@ -76,23 +76,29 @@ class UserRepositoryImpl @Inject constructor(
                 authResult.user ?: return Result.failure(Exception("Google sign-in failed"))
 
             val email = firebaseUser.email ?: ""
+            val photoUrl = firebaseUser.photoUrl?.toString()
+            val displayName = firebaseUser.displayName ?: "User"
             userDao.clearAllLoginStatus()
             var userEntity = userDao.getUserByEmail(email.lowercase())
 
             if (userEntity == null) {
                 // Create new user if not exists
                 val newUser = User(
-                    name = firebaseUser.displayName ?: "User",
+                    name = displayName,
                     email = email,
                     firebaseUid = firebaseUser.uid,
+                    profilePictureUrl = photoUrl,
                     isLoggedIn = true
                 )
                 userDao.insertUser(newUser.toEntity())
                 userEntity = userDao.getUserByEmail(email.lowercase())
             } else {
-                // Update existing user with firebaseUid if missing and set login status
+                // Update existing user with firebaseUid and photoUrl
                 if (userEntity.firebaseUid == null) {
                     userDao.updateFirebaseUid(userEntity.id, firebaseUser.uid)
+                }
+                if (!photoUrl.isNullOrBlank()) {
+                    userDao.updateProfilePicture(userEntity.id, photoUrl)
                 }
                 userDao.updateLoginStatus(userEntity.id, true)
                 // Refresh entity after update
@@ -125,6 +131,43 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun updateCurrency(userId: Int, code: String) =
         userDao.updateCurrency(userId, code)
+
+    override suspend fun updateProfilePicture(userId: Int, url: String?) =
+        userDao.updateProfilePicture(userId, url)
+
+    override suspend fun syncGoogleProfile(): Result<User> {
+        return try {
+            val firebaseUser = firebaseAuth.currentUser
+                ?: return Result.failure(Exception("No Google account currently connected"))
+
+            val current = userDao.getLoggedInUser()
+                ?: return Result.failure(Exception("No active user session"))
+
+            val photoUrl = firebaseUser.photoUrl?.toString()
+            val displayName = firebaseUser.displayName
+
+            if (!photoUrl.isNullOrBlank()) {
+                userDao.updateProfilePicture(current.id, photoUrl)
+            }
+            if (!displayName.isNullOrBlank() && current.name.isBlank()) {
+                userDao.updateProfile(
+                    current.id,
+                    displayName,
+                    current.email,
+                    current.phone,
+                    current.occupation,
+                    current.incomeGoal,
+                    current.budgetLimit
+                )
+            }
+
+            val updated = userDao.getCurrentUser()?.toDomain()
+                ?: return Result.failure(Exception("Failed to load user"))
+            Result.success(updated)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     // ── Security ──────────────────────────────────────────────────────────────
     override suspend fun updatePin(userId: Int, newPin: String): Result<Unit> {

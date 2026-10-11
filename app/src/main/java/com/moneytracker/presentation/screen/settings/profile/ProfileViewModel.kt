@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.moneytracker.domain.model.TransactionType
 import com.moneytracker.domain.repository.UserRepository
 import com.moneytracker.domain.usecase.transaction.GetAllTransactionsUseCase
+import com.moneytracker.data.local.ThemePreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val getAllTransactionsUseCase: GetAllTransactionsUseCase
+    private val getAllTransactionsUseCase: GetAllTransactionsUseCase,
+    private val themePreferences: ThemePreferences
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -27,6 +29,15 @@ class ProfileViewModel @Inject constructor(
     init {
         observeUser()
         observeTransactions()
+        observeTheme()
+    }
+
+    private fun observeTheme() {
+        viewModelScope.launch {
+            themePreferences.themeMode.collect { mode ->
+                _uiState.update { it.copy(themeLabel = mode.label) }
+            }
+        }
     }
 
     // ── Live user data from Room ──────────────────────────────────────────────
@@ -38,6 +49,7 @@ class ProfileViewModel @Inject constructor(
                         userName = user?.name ?: "",
                         userEmail = user?.email ?: "",
                         userPhone = user?.phone ?: "",
+                        profilePictureUrl = user?.profilePictureUrl,
                         currency = user?.currency ?: "INR",
                         hasPassword = user?.hasPassword ?: false
                     )

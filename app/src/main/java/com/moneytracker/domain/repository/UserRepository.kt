@@ -46,6 +46,12 @@ interface UserRepository {
     /** Swap the preferred currency code. */
     suspend fun updateCurrency(userId: Int, code: String)
 
+    /** Update profile picture URL or local image path. */
+    suspend fun updateProfilePicture(userId: Int, url: String?)
+
+    /** Sync user details (photo, display name) from active Google/Firebase user. */
+    suspend fun syncGoogleProfile(): Result<User>
+
     // ── Security ──────────────────────────────────────────────────────────────
     /** Replace the stored hashed PIN. Returns failure if the userId is invalid. */
     suspend fun updatePin(userId: Int, newPin: String): Result<Unit>

@@ -1,5 +1,10 @@
 package com.moneytracker.presentation.screen.settings.editProfile
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -7,12 +12,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,6 +28,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -29,6 +37,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults.colors
 import androidx.compose.material3.Text
@@ -38,12 +47,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.moneytracker.presentation.components.ProfileAvatar
+import com.moneytracker.ui.theme.AppTheme
 import com.moneytracker.ui.theme.Indigo600
 import com.moneytracker.ui.theme.Slate100
 import com.moneytracker.ui.theme.Slate400
@@ -58,6 +70,13 @@ fun EditProfileScreen(
     viewModel: EditProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri: Uri? ->
+        uri?.let { viewModel.onProfileImageSelected(context, it) }
+    }
 
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) onBack()
@@ -66,6 +85,12 @@ fun EditProfileScreen(
     EditProfileScreenContent(
         uiState = uiState,
         onBack = onBack,
+        onPickPhoto = {
+            photoPickerLauncher.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+            )
+        },
+        onSyncGoogle = viewModel::syncWithGoogle,
         onNameChange = viewModel::onNameChange,
         onEmailChange = viewModel::onEmailChange,
         onPhoneChange = viewModel::onPhoneChange,
@@ -81,6 +106,8 @@ fun EditProfileScreen(
 fun EditProfileScreenContent(
     uiState: EditProfileUiState,
     onBack: () -> Unit,
+    onPickPhoto: () -> Unit,
+    onSyncGoogle: () -> Unit,
     onNameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onPhoneChange: (String) -> Unit,
@@ -99,12 +126,13 @@ fun EditProfileScreenContent(
             .verticalScroll(rememberScrollState())
     ) {
 
-        // ── Header — flat Slate900, no gradient ───────────────────────────────
+        // ── Header — dynamic background matching theme ───────────────────────
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Slate900)
-                .padding(top = 52.dp, bottom = 32.dp)
+                .background(AppTheme.colors.headerBackground)
+                .statusBarsPadding()
+                .padding(top = 16.dp, bottom = 28.dp)
         ) {
             IconButton(
                 onClick = onBack,
@@ -120,37 +148,74 @@ fun EditProfileScreenContent(
                 Spacer(Modifier.height(8.dp))
 
                 // Avatar — rounded square with camera badge
-                Box(contentAlignment = Alignment.BottomEnd) {
-                    Box(
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(Indigo600)
-                            .clickable { },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = uiState.name.take(1).uppercase().ifEmpty { "?" },
-                            fontSize = 34.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = White
-                        )
-                    }
+                Box(
+                    modifier = Modifier.clickable { onPickPhoto() },
+                    contentAlignment = Alignment.BottomEnd
+                ) {
+                    ProfileAvatar(
+                        name = uiState.name,
+                        imageUrl = uiState.profilePictureUrl,
+                        size = 84.dp,
+                        shape = RoundedCornerShape(22.dp),
+                        onClick = onPickPhoto
+                    )
                     // Camera badge — small rounded square
                     Box(
                         modifier = Modifier
-                            .size(26.dp)
+                            .size(28.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(cs.primary)
-                            .border(2.dp, Slate900, RoundedCornerShape(8.dp)),
+                            .border(2.dp, AppTheme.colors.headerBackground, RoundedCornerShape(8.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             Icons.Default.CameraAlt,
-                            null,
+                            contentDescription = "Change photo",
                             tint = White,
-                            modifier = Modifier.size(14.dp)
+                            modifier = Modifier.size(15.dp)
                         )
+                    }
+                }
+
+                if (uiState.isGoogleConnected) {
+                    Spacer(Modifier.height(10.dp))
+                    OutlinedButton(
+                        onClick = onSyncGoogle,
+                        enabled = !uiState.isSyncingGoogle,
+                        shape = RoundedCornerShape(20.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = White
+                        ),
+                        border = BorderStroke(1.dp, Slate400.copy(alpha = 0.4f)),
+                        modifier = Modifier.height(32.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                    ) {
+                        if (uiState.isSyncingGoogle) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(12.dp),
+                                color = White,
+                                strokeWidth = 2.dp
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                "Syncing...",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = White
+                            )
+                        } else {
+                            Icon(
+                                Icons.Default.Sync,
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp),
+                                tint = White
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                "Sync Google Photo",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = White
+                            )
+                        }
                     }
                 }
 
@@ -315,13 +380,15 @@ private fun ProfileField(
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth(),
             colors = colors(
-                unfocusedContainerColor = Slate100,
-                focusedContainerColor = Slate100,
-                unfocusedBorderColor = cs.outline,
-                focusedBorderColor = Indigo600,
+                unfocusedContainerColor = AppTheme.colors.inputBackground,
+                focusedContainerColor = AppTheme.colors.inputBackground,
+                unfocusedBorderColor = AppTheme.colors.outline,
+                focusedBorderColor = cs.primary,
                 unfocusedTextColor = cs.onSurface,
                 focusedTextColor = cs.onSurface,
-                cursorColor = Indigo600,
+                unfocusedPlaceholderColor = cs.onSurfaceVariant.copy(alpha = 0.5f),
+                focusedPlaceholderColor = cs.onSurfaceVariant.copy(alpha = 0.5f),
+                cursorColor = cs.primary,
             )
         )
     }
@@ -334,6 +401,8 @@ fun EditProfileScreenPreview() {
         EditProfileScreenContent(
             uiState = EditProfileUiState(),
             onBack = {},
+            onPickPhoto = {},
+            onSyncGoogle = {},
             onNameChange = {},
             onEmailChange = {},
             onPhoneChange = {},

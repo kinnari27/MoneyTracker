@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -39,7 +40,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moneytracker.R
+import com.moneytracker.presentation.components.ProfileAvatar
 import com.moneytracker.presentation.navigation.Routes
+import com.moneytracker.ui.theme.AppTheme
 import com.moneytracker.ui.theme.Indigo100
 import com.moneytracker.ui.theme.Indigo600
 import com.moneytracker.ui.theme.Slate100
@@ -80,7 +83,7 @@ fun ProfileScreenContent(
     val userName = uiState.userName.ifBlank { "User" }
     val userEmail = uiState.userEmail
 
-    val menuSections = remember {
+    val menuSections = remember(uiState.hasPassword, uiState.themeLabel) {
         listOf(
             "Account" to listOf(
                 Triple(
@@ -94,6 +97,7 @@ fun ProfileScreenContent(
                     "Manage alerts"
                 ) to Routes.NOTIFICATIONS,
                 Triple(R.drawable.ic_currency, "Currency", "Indian Rupee ₹ INR") to Routes.CURRENCY,
+                Triple(R.drawable.ic_theme, "Theme Mode", uiState.themeLabel) to Routes.THEME,
             ),
             "Security" to listOf(
                 Triple(
@@ -120,32 +124,27 @@ fun ProfileScreenContent(
         contentPadding = PaddingValues(bottom = 90.dp)
     ) {
 
-        // ── Header — flat Slate900, no gradient ───────────────────────────────
+        // ── Header — dynamic background matching theme ───────────────────────
         item {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Slate900)
-                    .padding(top = 52.dp, bottom = 32.dp),
+                    .background(AppTheme.colors.headerBackground)
+                    .statusBarsPadding()
+                    .padding(top = 16.dp, bottom = 28.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-                    // Avatar — rounded square, not a circle
-                    Box(
-                        modifier = Modifier
-                            .size(72.dp)
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(Indigo600),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = userName.take(1).uppercase(),
-                            fontSize = 30.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = White
-                        )
-                    }
+                    // Avatar — rounded square with image or monogram
+                    ProfileAvatar(
+                        name = userName,
+                        imageUrl = uiState.profilePictureUrl,
+                        size = 72.dp,
+                        shape = RoundedCornerShape(20.dp),
+                        backgroundColor = Indigo600,
+                        textColor = White
+                    )
 
                     Spacer(Modifier.height(14.dp))
 
@@ -260,7 +259,7 @@ fun ProfileScreenContent(
                                     modifier = Modifier
                                         .size(40.dp)
                                         .clip(RoundedCornerShape(10.dp))
-                                        .background(Slate100),
+                                        .background(cs.surfaceVariant),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Image(

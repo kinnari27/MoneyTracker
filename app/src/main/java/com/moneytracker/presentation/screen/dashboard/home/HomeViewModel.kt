@@ -37,6 +37,7 @@ class HomeViewModel @Inject constructor(
                     it.copy(
                         userName = user?.name ?: "",
                         userInitial = user?.name?.take(1)?.uppercase() ?: "?",
+                        profilePictureUrl = user?.profilePictureUrl,
                         budgetLimit = user?.budgetLimit ?: 0.0,
                         greeting = timeGreeting()
                     )
