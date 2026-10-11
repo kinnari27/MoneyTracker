@@ -13,12 +13,16 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.tasks.await
+
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val loginUser: LoginUserUseCase,
     private val registerUser: RegisterUserUseCase,
     private val userRepository: com.moneytracker.domain.repository.UserRepository,
-    private val googleAuthUiClient: GoogleAuthUiClient
+    private val googleAuthUiClient: GoogleAuthUiClient,
+    private val firebaseAuth: FirebaseAuth
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AuthUiState())
@@ -203,9 +207,17 @@ class AuthViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null, isSuccess = false) }
-            // Mocking a network delay for the reset link
-            delay(1500)
-            _uiState.update { it.copy(isLoading = false, isSuccess = true) }
+            try {
+                firebaseAuth.sendPasswordResetEmail(email.trim()).await()
+                _uiState.update { it.copy(isLoading = false, isSuccess = true) }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.localizedMessage ?: "Failed to send reset email. Please try again."
+                    )
+                }
+            }
         }
     }
 }

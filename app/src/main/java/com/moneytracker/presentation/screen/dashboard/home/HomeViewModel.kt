@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.moneytracker.domain.model.TransactionType
 import com.moneytracker.domain.repository.UserRepository
-import com.moneytracker.domain.usecase.trasaction.GetAllTransactionsUseCase
+import com.moneytracker.domain.usecase.transaction.GetAllTransactionsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,7 +37,7 @@ class HomeViewModel @Inject constructor(
                     it.copy(
                         userName = user?.name ?: "",
                         userInitial = user?.name?.take(1)?.uppercase() ?: "?",
-                        budgetLimit = user?.incomeGoal?.toDouble() ?: 0.0,
+                        budgetLimit = user?.budgetLimit ?: 0.0,
                         greeting = timeGreeting()
                     )
                 }

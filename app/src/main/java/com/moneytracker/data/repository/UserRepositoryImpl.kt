@@ -40,6 +40,7 @@ class UserRepositoryImpl @Inject constructor(
                 return Result.failure(Exception("An account with this email already exists"))
             }
             // New user is automatically logged in
+            userDao.clearAllLoginStatus()
             val newUser = user.copy(isLoggedIn = true)
             userDao.insertUser(newUser.toEntity(hashedPin = hashPassword(password)))
             Result.success(Unit)
@@ -57,7 +58,8 @@ class UserRepositoryImpl @Inject constructor(
                 return Result.failure(Exception("Incorrect password"))
             }
 
-            // Mark user as logged in
+            // Mark user as logged in after clearing any previous sessions
+            userDao.clearAllLoginStatus()
             userDao.updateLoginStatus(entity.id, true)
 
             Result.success(entity.toDomain().copy(isLoggedIn = true))
@@ -74,6 +76,7 @@ class UserRepositoryImpl @Inject constructor(
                 authResult.user ?: return Result.failure(Exception("Google sign-in failed"))
 
             val email = firebaseUser.email ?: ""
+            userDao.clearAllLoginStatus()
             var userEntity = userDao.getUserByEmail(email.lowercase())
 
             if (userEntity == null) {
@@ -105,11 +108,8 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun signOut() {
         // Sign out from Firebase
         firebaseAuth.signOut()
-        // Find current logged in user and sign them out in Room
-        val user = userDao.getLoggedInUser()
-        if (user != null) {
-            userDao.updateLoginStatus(user.id, false)
-        }
+        // Sign out all sessions in Room
+        userDao.clearAllLoginStatus()
     }
 
     // ── Profile updates ───────────────────────────────────────────────────────

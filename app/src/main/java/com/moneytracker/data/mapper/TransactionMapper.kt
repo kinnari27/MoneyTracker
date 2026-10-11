@@ -15,7 +15,12 @@ fun TransactionEntity.toDomain() = Transaction(
     isRecurring = isRecurring,
     maturityDate = maturityDate?.let { Date(it) },
     interestRate = interestRate,
-    maturityAmount = maturityAmount
+    maturityAmount = maturityAmount,
+    rdMonthlyAmount = rdMonthlyAmount,
+    rdTenureMonths = rdTenureMonths,
+    rdMaturityDate = rdMaturityDate?.let { Date(it) },
+    rdInterestRate = rdInterestRate,
+    rdMaturityAmount = rdMaturityAmount
 )
 
 fun Transaction.toEntity() = TransactionEntity(
@@ -28,5 +33,10 @@ fun Transaction.toEntity() = TransactionEntity(
     isRecurring = isRecurring,
     maturityDate = maturityDate?.time,
     interestRate = interestRate,
-    maturityAmount = maturityAmount
+    maturityAmount = maturityAmount,
+    rdMonthlyAmount = rdMonthlyAmount,
+    rdTenureMonths = rdTenureMonths,
+    rdMaturityDate = rdMaturityDate?.time,
+    rdInterestRate = rdInterestRate,
+    rdMaturityAmount = rdMaturityAmount
 )

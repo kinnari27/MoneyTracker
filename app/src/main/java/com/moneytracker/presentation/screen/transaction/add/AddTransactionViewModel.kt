@@ -6,10 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.moneytracker.domain.model.InvestmentCategory
 import com.moneytracker.domain.model.Transaction
 import com.moneytracker.domain.model.TransactionType
-import com.moneytracker.domain.usecase.trasaction.AddTransactionUseCase
-import com.moneytracker.domain.usecase.trasaction.DeleteTransactionUseCase
-import com.moneytracker.domain.usecase.trasaction.GetTransactionByIdUseCase
-import com.moneytracker.domain.usecase.trasaction.UpdateTransactionUseCase
+import com.moneytracker.domain.usecase.transaction.AddTransactionUseCase
+import com.moneytracker.domain.usecase.transaction.DeleteTransactionUseCase
+import com.moneytracker.domain.usecase.transaction.GetTransactionByIdUseCase
+import com.moneytracker.domain.usecase.transaction.UpdateTransactionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

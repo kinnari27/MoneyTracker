@@ -20,7 +20,7 @@ import com.moneytracker.presentation.screen.dashboard.home.HomeScreen
 import com.moneytracker.presentation.screen.dashboard.home.HomeViewModel
 import com.moneytracker.presentation.screen.settings.biometricLock.BiometricLockScreen
 import com.moneytracker.presentation.screen.settings.changePassword.ChangePasswordScreen
-import com.moneytracker.presentation.screen.settings.editProfile.CurrencyScreen
+import com.moneytracker.presentation.screen.settings.currency.CurrencyScreen
 import com.moneytracker.presentation.screen.settings.editProfile.EditProfileScreen
 import com.moneytracker.presentation.screen.settings.notifications.NotificationsScreen
 import com.moneytracker.presentation.screen.settings.profile.ProfileScreen

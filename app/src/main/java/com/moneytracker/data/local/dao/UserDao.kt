@@ -9,10 +9,10 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDao {
-    @Query("SELECT * FROM users LIMIT 1")
+    @Query("SELECT * FROM users WHERE isLoggedIn = 1 LIMIT 1")
     fun observeCurrentUser(): Flow<UserEntity?>
 
-    @Query("SELECT * FROM users LIMIT 1")
+    @Query("SELECT * FROM users WHERE isLoggedIn = 1 LIMIT 1")
     suspend fun getCurrentUser(): UserEntity?
 
     @Query("SELECT COUNT(*) FROM users")
@@ -58,6 +58,9 @@ interface UserDao {
 
     @Query("UPDATE users SET firebaseUid = :uid WHERE id = :userId")
     suspend fun updateFirebaseUid(userId: Int, uid: String)
+
+    @Query("UPDATE users SET isLoggedIn = 0")
+    suspend fun clearAllLoginStatus()
 
     @Query("SELECT * FROM users WHERE isLoggedIn = 1 LIMIT 1")
     suspend fun getLoggedInUser(): UserEntity?

@@ -1,4 +1,4 @@
-package com.moneytracker.domain.usecase.trasaction
+package com.moneytracker.domain.usecase.transaction
 
 import com.moneytracker.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.Flow

@@ -1,4 +1,4 @@
-package com.moneytracker.presentation.screen.settings.editProfile
+package com.moneytracker.presentation.screen.settings.currency
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -38,9 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.moneytracker.presentation.screen.settings.currency.CurrencyItem
-import com.moneytracker.presentation.screen.settings.currency.CurrencyUiState
-import com.moneytracker.presentation.screen.settings.currency.CurrencyViewModel
 import com.moneytracker.ui.theme.Indigo100
 import com.moneytracker.ui.theme.Indigo600
 import com.moneytracker.ui.theme.Slate400

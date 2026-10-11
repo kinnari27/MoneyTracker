@@ -11,7 +11,7 @@ import com.moneytracker.data.local.entity.UserEntity
 
 @Database(
     entities = [TransactionEntity::class, BudgetEntity::class, UserEntity::class],
-    version = 9,
+    version = 10,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

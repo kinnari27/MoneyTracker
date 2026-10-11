@@ -16,5 +16,11 @@ data class TransactionEntity(
     // FD specific fields
     val maturityDate: Long? = null,
     val interestRate: Double? = null,
-    val maturityAmount: Double? = null
+    val maturityAmount: Double? = null,
+    // RD specific fields
+    val rdMonthlyAmount: Double? = null,
+    val rdTenureMonths: Int? = null,
+    val rdMaturityDate: Long? = null,
+    val rdInterestRate: Double? = null,
+    val rdMaturityAmount: Double? = null
 )
