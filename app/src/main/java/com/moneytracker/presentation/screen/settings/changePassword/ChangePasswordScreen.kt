@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -112,8 +113,9 @@ fun ChangePasswordScreenContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Brush.linearGradient(listOf(PrimaryDark, Primary)))
-                .padding(top = 52.dp, start = 4.dp, end = 20.dp, bottom = 32.dp)
+                .background(Brush.linearGradient(AppTheme.colors.headerGradient))
+                .statusBarsPadding()
+                .padding(top = 16.dp, start = 4.dp, end = 20.dp, bottom = 28.dp)
         ) {
             Column {
                 IconButton(onClick = onBack) {

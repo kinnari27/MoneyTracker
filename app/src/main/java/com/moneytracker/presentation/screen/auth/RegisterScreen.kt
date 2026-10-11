@@ -59,6 +59,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -151,7 +152,7 @@ fun RegisterScreenContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(220.dp)
-                .background(cs.primary)
+                .background(Brush.linearGradient(colors.headerGradient))
         )
 
         Column(

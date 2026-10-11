@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.moneytracker.R
@@ -77,8 +78,9 @@ fun AnalyticsScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Brush.linearGradient(listOf(PrimaryDark, cs.primary)))
-                    .padding(top = 52.dp, start = 20.dp, end = 20.dp, bottom = 28.dp)
+                    .background(Brush.linearGradient(AppTheme.colors.headerGradient))
+                    .statusBarsPadding()
+                    .padding(top = 16.dp, start = 20.dp, end = 20.dp, bottom = 28.dp)
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     Column {

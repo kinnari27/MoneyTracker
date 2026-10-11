@@ -78,15 +78,7 @@ fun HomeScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(
-                            Brush.linearGradient(
-                                listOf(
-                                    cs.primary,
-                                    cs.primary,
-                                    extendedColors.accent
-                                )
-                            )
-                        )
+                        .background(Brush.linearGradient(extendedColors.headerGradient))
                         .statusBarsPadding()
                         .padding(top = 20.dp, start = 20.dp, end = 20.dp, bottom = 80.dp)
                 ) {

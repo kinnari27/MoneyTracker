@@ -127,6 +127,7 @@ data class ExtendedColors(
     val headerBackground: Color,
     val headerOnBackground: Color,
     val headerSubtle: Color,          // muted text in header
+    val headerGradient: List<Color>,
 
     // Brand colors
     val primary: Color,
@@ -166,6 +167,7 @@ val LightExtendedColors = ExtendedColors(
     headerBackground = Slate900,
     headerOnBackground = White,
     headerSubtle = Slate400,
+    headerGradient = listOf(Indigo600, Indigo600, Indigo500),
 
     primary = Indigo600,
     accent = Indigo400,
@@ -199,6 +201,7 @@ val DarkExtendedColors = ExtendedColors(
     headerBackground = Dark900,
     headerOnBackground = Slate100,
     headerSubtle = Slate600,
+    headerGradient = listOf(Dark900, Color(0xFF161B2E)),
 
     primary = Indigo400,
     accent = Indigo200,

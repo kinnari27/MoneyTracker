@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -236,8 +237,9 @@ fun AddTransactionScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Brush.linearGradient(listOf(colors.primary, cs.primary)))
-                .padding(top = 52.dp, start = 20.dp, end = 20.dp, bottom = 36.dp)
+                .background(Brush.linearGradient(colors.headerGradient))
+                .statusBarsPadding()
+                .padding(top = 16.dp, start = 20.dp, end = 20.dp, bottom = 36.dp)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Row(

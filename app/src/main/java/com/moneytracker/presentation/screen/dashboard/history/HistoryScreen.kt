@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.moneytracker.domain.model.Category
@@ -103,15 +104,9 @@ fun HistoryScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(
-                        Brush.linearGradient(
-                            listOf(
-                                colorScheme.primary,
-                                colorScheme.primary
-                            )
-                        )
-                    )
-                    .padding(top = 52.dp, start = 20.dp, end = 20.dp, bottom = 24.dp)
+                    .background(Brush.linearGradient(AppTheme.colors.headerGradient))
+                    .statusBarsPadding()
+                    .padding(top = 16.dp, start = 20.dp, end = 20.dp, bottom = 24.dp)
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     Text(
